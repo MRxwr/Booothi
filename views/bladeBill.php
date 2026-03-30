@@ -159,6 +159,7 @@ $info = array(
 							<span style="color:red"><?php echo direction($settingsDTime,$settingsDTimeAr);  ?></span>
 
 							<?php
+							var_dump($expressDelivery);
 							if( $_POST["address"]["country"] == "KW" && !empty($expressDelivery) ){
 								$expressOption = direction("Experss Delivery","توصيل سريع");
 								$expressPeriod = direction($expressDelivery["englishNote"],$expressDelivery["arabicNote"]);
