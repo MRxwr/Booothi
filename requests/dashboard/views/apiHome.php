@@ -7,7 +7,7 @@ for ( $y =0; $y < 3; $y++){
 	];
 	$enStatTitle = ["Daily Stats","Monthly Stats","All time Stats"];
     $arStatTitle = ["يومية","شهرية","أحصائيات الكل"];
-	$sql = "SELECT SUM(f.price+JSON_UNQUOTE(JSON_EXTRACT(f.address,'$.shipping'))) as totalPrice FROM ( SELECT * FROM `orders2` WHERE `status` != '0' AND `status` != '5' {$statsDate[$y]} GROUP BY `orderId` ) as f;";
+	$sql = "SELECT SUM(f.price+JSON_UNQUOTE(JSON_EXTRACT(f.address,'$.shipping'))) as totalPrice FROM ( SELECT * FROM `orders2` WHERE `storeId` = '{$storeId}' AND `status` != '0' AND `status` != '5' {$statsDate[$y]} GROUP BY `orderId` ) as f;";
 	$result = $dbconnect->query($sql);
 	$row = $result->fetch_assoc();
     $response["earnings"][] = array(
@@ -24,25 +24,25 @@ for ( $y =0; $y < 3; $y++){
     for( $i=0; $i < 4 ; $i++){
         $size = 0;
 		if ( $i == 0 ){
-			if ($call = selectDB("orders2","`status` = '1' {$statsDate[$y]}")){
+			if ($call = selectDB("orders2","`storeId` = '{$storeId}' AND `status` = '1' {$statsDate[$y]}")){
 				$size = sizeof($call);
 			}
 			$enTitle = "Success";
             $arTitle = "ناجحه";
 		}elseif( $i == 1 ){
-			if ($call = selectDB("orders2","`status` = '2' {$statsDate[$y]}")){
+			if ($call = selectDB("orders2","`storeId` = '{$storeId}' AND `status` = '2' {$statsDate[$y]}")){
 				$size = sizeof($call);
 			}
 			$enTitle = "Preparing";
             $arTitle = "قيد التجهيز";
 		}elseif( $i == 2 ){
-			if ($call = selectDB("orders2","`status` = '3' {$statsDate[$y]}")){
+			if ($call = selectDB("orders2","`storeId` = '{$storeId}' AND `status` = '3' {$statsDate[$y]}")){
 				$size = sizeof($call);
 			}
 			$enTitle = "Delivering";
             $arTitle = "جاري التوصيل";
 		}elseif( $i == 3 ){
-			if ($call = selectDB("orders2","`status` = '4' {$statsDate[$y]}")){
+			if ($call = selectDB("orders2","`storeId` = '{$storeId}' AND `status` = '4' {$statsDate[$y]}")){
 				$size = sizeof($call);
 			}
 			$enTitle = "Delivered";

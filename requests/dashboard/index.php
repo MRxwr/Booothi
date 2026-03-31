@@ -6,6 +6,8 @@ require_once("../../admin/includes/functions.php");
 // check user token \\
 if( !checkToken() ){
 	echo outputError(array("msg" => "Unauthorized token"));die();
+}else{
+	$storeId = checkToken();
 }
 
 // get viewed page from pages folder \\
