@@ -1,4 +1,6 @@
 <?php
+echo outputData(array("msg" => "Authorized token"));
+/*
 for ( $y =0; $y < 3; $y++){
 	$statsDate = [
 	"AND `date` LIKE '%".date("Y-m-d")."%'",
