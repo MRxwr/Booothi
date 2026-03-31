@@ -160,6 +160,7 @@ $info = array(
 
 							<?php
 							if( $_POST["address"]["country"] == "KW" && !empty($expressDelivery) ){
+								var_dump("what is this ");die();
 								$expressOption = direction("Experss Delivery","توصيل سريع");
 								$expressPeriod = direction($expressDelivery["englishNote"],$expressDelivery["arabicNote"]);
 								$expressPrice = numTo3Float(priceCurr($expressDelivery["charge"])) . selectedCurr();
@@ -169,7 +170,7 @@ $info = array(
 									$expressPrice = 0;
 								}
 							}
-							var_dump("what is this ");die();
+							
 							?>
 
 							<div class="calc-text-box d-flex justify-content-between">
