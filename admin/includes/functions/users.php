@@ -8,7 +8,7 @@ function checkToken(){
 	}
 	if( $checkToken = selectDBNew("employees",[$token],"`keepMeAlive` = ?", "") ){
 		if( $checkToken[0]["keepMeAlive"] == $token ){
-			return true;
+			return $checkToken[0]["storeId"];
 		}else{
 			return false;
 		}
