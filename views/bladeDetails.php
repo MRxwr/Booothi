@@ -110,7 +110,7 @@ body{
                     <div class="profile-sec">
 						<div style="text-align:left">
 						<img src="<?php echo encryptImage("logos/{$settingslogo}") ?>" class="rounded" style="width:150px; height:150px">
-						</div>
+						</div> 
 						<h5 class="page-title"><?php echo $OrderReceivedText ?></h5>
 						<p class="mb-4"><?php echo $OrderReceivedMsgText ?></p>
 						<div class="row">
