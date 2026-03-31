@@ -1,4 +1,11 @@
 <?php
+require_once('admin/includes/config.php');
+require_once('admin/includes/functions.php');
+require_once('admin/includes/translate.php');
+require_once("api/storeDetails.php");
+require_once('includes/checksouthead.php');
+require_once("templates/saveOrder.php");
+require_once("api/checkInvoice.php");
 if( isset($_GET["orderId"]) && !empty($_GET["orderId"]) ){
 	$order = selectDBNew("orders2",[$_GET["orderId"]],"`id` = ?","");
 	$info = json_decode($order[0]["info"],true);
