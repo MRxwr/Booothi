@@ -4,7 +4,9 @@ require_once("../../admin/includes/config.php");
 require_once("../../admin/includes/functions.php");
 
 // check user token \\
-checkToken();
+if( checkToken() !== true ){
+	echo outputError(array("msg" => "Unauthorized token"));die();
+}
 
 // get viewed page from pages folder \\
 if( isset($_GET["a"]) && searchFile("views","api{$_GET["a"]}.php") ){
