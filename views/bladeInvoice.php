@@ -1,6 +1,4 @@
 <?php
-include_once("admin/includes/config.php");
-include_once("admin/includes/functions.php");
 if( isset($_GET["orderId"]) && !empty($_GET["orderId"]) ){
 	$order = selectDBNew("orders2",[$_GET["orderId"]],"`id` = ?","");
 	$info = json_decode($order[0]["info"],true);
