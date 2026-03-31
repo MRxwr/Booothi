@@ -163,8 +163,8 @@ $info = array(
 								
 								$expressOption = direction("Experss Delivery","توصيل سريع");
 								$expressPeriod = direction($expressDelivery["englishNote"],$expressDelivery["arabicNote"]);
-								var_dump("what is this 2");die();
-								$expressPrice = numTo3Float(priceCurr($expressDelivery["charge"])) . selectedCurr();
+								var_dump($expressPrice = numTo3Float(priceCurr($expressDelivery["charge"])) . selectedCurr());die();
+								
 								
 								if( isset($expressDelivery["status"]) && $expressDelivery["status"] == 1 ){
 									echo "<div class='mt-3'><input name='express' type='checkbox' class=''> <span>{$expressOption} {$expressPeriod} - {$expressPrice}</span></div>";
