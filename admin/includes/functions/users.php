@@ -7,7 +7,7 @@ function checkToken(){
 		echo outputError(array("msg" => "Unauthorized token"));
 		exit();
 	}
-	if( $checkToken = selectDBNew("employees",[$token],"`token` = ?", "") ){
+	if( $checkToken = selectDBNew("employees",[$token],"`keepMeAlive` = ?", "") ){
 		if( $checkToken[0]["token"] == $token ){
 			echo outputData(array("msg" => "Authorized token"));
 			exit();
