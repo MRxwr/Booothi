@@ -59,7 +59,7 @@ function formatNumber($num) {
 
 // convert numbers to 3 digits \\
 function numTo3Float($data){
-	return ( isset($data) && !empty($data) && is_numeric($data) ? number_format((float)$data, 3) : 0 );
+	return ( (isset($data) && !empty($data) && is_numeric($data)) ? number_format((float)$data, 3) : 0 );
 }
 
 // generating a random alphanumeric code of 8 characters \\
