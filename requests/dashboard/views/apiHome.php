@@ -5,14 +5,14 @@ $tomorrow = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d") + 1, date("Y")));
 
 // Earnings Query - Optimized to one query
 $sqlEarnings = "SELECT 
-    SUM(CASE WHEN `date` LIKE '%{$today}%' THEN (price + JSON_UNQUOTE(JSON_EXTRACT(address, '$.shipping'))) ELSE 0 END) as dailyTotal,
-    SUM(CASE WHEN `date` BETWEEN '{$lastMonth}' AND '{$tomorrow}' THEN (price + JSON_UNQUOTE(JSON_EXTRACT(address, '$.shipping'))) ELSE 0 END) as monthlyTotal,
-    SUM(price + JSON_UNQUOTE(JSON_EXTRACT(address, '$.shipping'))) as allTimeTotal
-FROM (
-    SELECT * FROM `orders2` 
-    WHERE `storeId` = '{$storeId}' AND `status` NOT IN ('0', '5') 
-    GROUP BY `orderId`
-) as f";
+				SUM(CASE WHEN `date` LIKE '%{$today}%' THEN (price + JSON_UNQUOTE(JSON_EXTRACT(address, '$.shipping'))) ELSE 0 END) as dailyTotal,
+				SUM(CASE WHEN `date` BETWEEN '{$lastMonth}' AND '{$tomorrow}' THEN (price + JSON_UNQUOTE(JSON_EXTRACT(address, '$.shipping'))) ELSE 0 END) as monthlyTotal,
+				SUM(price + JSON_UNQUOTE(JSON_EXTRACT(address, '$.shipping'))) as allTimeTotal
+			FROM (
+				SELECT * FROM `orders2` 
+				WHERE `storeId` = '{$storeId}' AND `status` NOT IN ('0', '5') 
+				GROUP BY `orderId`
+			) as f";
 
 if ($resultEarnings = $dbconnect->query($sqlEarnings)) {
     $rowEarnings = $resultEarnings->fetch_assoc();
@@ -32,13 +32,13 @@ if ($resultEarnings = $dbconnect->query($sqlEarnings)) {
 
 // Stats Query - Optimized to one query
 $sqlStats = "SELECT 
-    `status`,
-    COUNT(CASE WHEN `date` LIKE '%{$today}%' THEN 1 END) as dailyCount,
-    COUNT(CASE WHEN `date` BETWEEN '{$lastMonth}' AND '{$today}' THEN 1 END) as monthlyCount,
-    COUNT(*) as allTimeCount
-FROM `orders2` 
-WHERE `storeId` = '{$storeId}' AND `status` IN ('1', '2', '3', '4')
-GROUP BY `status`";
+			`status`,
+			COUNT(CASE WHEN `date` LIKE '%{$today}%' THEN 1 END) as dailyCount,
+			COUNT(CASE WHEN `date` BETWEEN '{$lastMonth}' AND '{$today}' THEN 1 END) as monthlyCount,
+			COUNT(*) as allTimeCount
+		FROM `orders2` 
+		WHERE `storeId` = '{$storeId}' AND `status` IN ('1', '2', '3', '4')
+		GROUP BY `status`";
 
 if ($resultStats = $dbconnect->query($sqlStats)) {
     $statsMap = [];
