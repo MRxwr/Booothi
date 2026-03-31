@@ -1,6 +1,7 @@
 <?php
 function checkToken(){
 	GLOBAL $_SERVER;
+    echo outputData(array("msg" => $_SERVER));
 	if( isset($_SERVER['HTTP_AUTHORIZATION']) && !empty($_SERVER['HTTP_AUTHORIZATION']) ){
     	$token = str_replace("Bearer ","",$_SERVER["HTTP_AUTHORIZATION"]);
 	}else{
