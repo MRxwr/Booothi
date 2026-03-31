@@ -4,18 +4,15 @@ function checkToken(){
 	if( isset($_SERVER['HTTP_AUTHORIZATION']) && !empty($_SERVER['HTTP_AUTHORIZATION']) ){
     	$token = str_replace("Bearer ","",$_SERVER["HTTP_AUTHORIZATION"]);
 	}else{
-		echo outputError(array("msg" => "Unauthorized token"));
-		exit();
+		return false;
 	}
 	if( $checkToken = selectDBNew("employees",[$token],"`keepMeAlive` = ?", "") ){
 		if( $checkToken[0]["keepMeAlive"] == $token ){
 			return true;
 		}else{
-			echo outputError(array("msg" => "Unauthorized token"));
-			exit();
+			return false;
 		}
 	}
-	echo outputError(array("msg" => "Unauthorized token"));
-	exit();
+	return false;
 };
 ?>
