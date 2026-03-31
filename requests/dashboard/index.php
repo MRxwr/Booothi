@@ -7,7 +7,7 @@ require_once("../../admin/includes/functions.php");
 if( !checkToken() ){
 	echo outputError(array("msg" => "Unauthorized token"));die();
 }
-var_dump(searchFile("views","api{$_GET["a"]}.php"));
+
 // get viewed page from pages folder \\
 if( isset($_GET["a"]) && searchFile("views","api{$_GET["a"]}.php") ){
 	require_once("views/".searchFile("views","api{$_GET["a"]}.php"));
