@@ -8,7 +8,7 @@ function checkToken(){
 		exit();
 	}
 	if( $checkToken = selectDBNew("employees",[$token],"`keepMeAlive` = ?", "") ){
-		if( $checkToken[0]["token"] == $token ){
+		if( $checkToken[0]["keepMeAlive"] == $token ){
 			echo outputData(array("msg" => "Authorized token"));
 			exit();
 		}else{
