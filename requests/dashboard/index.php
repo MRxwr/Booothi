@@ -8,6 +8,11 @@ if( !checkToken() ){
 	echo outputError(array("msg" => "Unauthorized token"));die();
 }else{
 	$storeId = checkToken();
+	if ( !getStoreDetails($storeId) ){
+		echo outputError(array("msg" => "Store not found, Please try again later"));die();
+	}else{
+		$storeDetails = getStoreDetails($storeId);
+	}
 }
 
 // get viewed page from pages folder \\
