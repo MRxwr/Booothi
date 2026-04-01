@@ -76,9 +76,9 @@ switch ($action) {
         $newHidden = ($role[0]["hidden"] == 1) ? 2 : 1;
         if( updateDBNew("roles", array("hidden" => $newHidden), "id = ? AND storeId = ?", [$_REQUEST["roleId"], $storeId] ) ){
             logStoreActivity("Roles", "Toggled visibility for role: " . $_REQUEST["roleId"]);
-            echo outputData(array("msg" => "Role visibility updated"));
+            echo outputData(array("msg" => "Role visibility updated")); die();
         }else{
-            echo outputError(array("msg" => "Failed to update visibility"));
+            echo outputError(array("msg" => "Failed to update visibility")); die();
         }
         break;
 
