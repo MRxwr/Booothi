@@ -81,7 +81,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         $activity = $shop[0]["hidden"] == 1 ? "Unhidden" : "Hidden";
         if( updateDBNew("shops", $updateData, "id = ?", [$data["shopId"]] ) ){
             logStoreActivity("Shops", $activity . " shop: " . json_encode($data));
-            echo outputData(array("msg" => "Shop updated successfully"));
+            echo outputData(array("msg" => "Shop has been " . strtolower($activity) . " successfully"));
         }else{
             echo outputError(array("msg" => "Failed to update shop, please try again later"));
         }
