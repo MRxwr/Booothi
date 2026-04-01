@@ -76,11 +76,11 @@ switch ($action) {
 
     case "hide":
         // Show/Hide banner (hidden = 1 is visible, 2 is hidden)
-        if (!isset($_REQUEST["id"]) || !isset($_REQUEST["hidden"])) {
+        if (!isset($_REQUEST["bannerId"]) || !isset($_REQUEST["hidden"])) {
             echo outputError("Banner ID and visibility status required."); die();
         }
 
-        $bannerId = $_REQUEST["id"];
+        $bannerId = $_REQUEST["bannerId"];
         $hidden = $_REQUEST["hidden"]; // 1 or 2
 
         if (updateDBNew("banner", ["hidden" => $hidden], "id = ? AND storeId = ?", [$bannerId, $storeId])) {
@@ -94,11 +94,11 @@ switch ($action) {
 
     case "delete":
         // Soft delete a banner (status = 1)
-        if (!isset($_REQUEST["id"])) {
+        if (!isset($_REQUEST["bannerId"])) {
             echo outputError("Banner ID required."); die();
         }
 
-        $bannerId = $_REQUEST["id"];
+        $bannerId = $_REQUEST["bannerId"];
         if (updateDBNew("banner", ["status" => "1"], "id = ? AND storeId = ?", [$bannerId, $storeId])) {
             logStoreActivity($storeId, "Banner Deleted ID: " . $bannerId);
             echo outputData(["message" => "Banner deleted successfully."]); die();
@@ -109,14 +109,14 @@ switch ($action) {
 
     case "updateRank":
         // Update rank for multiple banners
-        if (!isset($_POST["id"]) || !isset($_POST["rank"]) || !is_array($_POST["id"])) {
+        if (!isset($_POST["bannerId"]) || !isset($_POST["rank"]) || !is_array($_POST["bannerId"])) {
             echo outputError("Invalid rank data."); die();
         }
 
         reset($dbconnect); // Ensure we are ready for multiple updates
         $successCount = 0;
-        for ($i = 0; $i < count($_POST["id"]); $i++) {
-            $id = $_POST["id"][$i];
+        for ($i = 0; $i < count($_POST["bannerId"]); $i++) {
+            $id = $_POST["bannerId"][$i];
             $rank = $_POST["rank"][$i];
             if (updateDBNew("banner", ["rank" => $rank], "id = ? AND storeId = ?", [$id, $storeId])) {
                 $successCount++;
