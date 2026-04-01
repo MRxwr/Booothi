@@ -17,16 +17,16 @@ switch ($action) {
                 // Decode permissions (pages)
                 $role["permissions"] = json_decode($role["pages"], true) ?: [];
             }
-            outputData($roles);
+            echo outputData($roles); die();
         } else {
-            outputData([]);
+            echo outputData([]); die();
         }
         break;
 
     case "add":
         // Add a new role
         if (!isset($_POST["enTitle"]) || !isset($_POST["arTitle"])) {
-            outputError("Missing required fields.");
+            echo outputError("Missing required fields."); die();
         }
 
         $insertData = [
@@ -39,19 +39,19 @@ switch ($action) {
 
         if (insertDB("roles", $insertData)) {
             logStoreActivity($storeId, "Role Added: " . $_POST["enTitle"]);
-            outputData(["message" => "Role added successfully."]);
+            echo outputData(["message" => "Role added successfully."]); die();
         } else {
-            outputError("Failed to add role.");
+            echo outputError("Failed to add role."); die();
         }
         break;
 
     case "update":
         // Update basic role info
-        if (!isset($_POST["id"]) || !isset($_POST["enTitle"])) {
-            outputError("Missing required fields.");
+        if (!isset($_POST["roleId"]) || !isset($_POST["enTitle"])) {
+            echo outputError("Missing required fields."); die();
         }
 
-        $roleId = $_POST["id"];
+        $roleId = $_POST["roleId"];
         $updateData = [
             "enTitle" => $_POST["enTitle"],
             "arTitle" => $_POST["arTitle"]
@@ -59,68 +59,68 @@ switch ($action) {
 
         if (updateDBNew("roles", $updateData, "id = ? AND storeId = ?", [$roleId, $storeId])) {
             logStoreActivity($storeId, "Role Updated: " . $_POST["enTitle"]);
-            outputData(["message" => "Role updated successfully."]);
+            echo outputData(["message" => "Role updated successfully."]); die();
         } else {
-            outputError("Failed to update role or no changes made.");
+            echo outputError("Failed to update role or no changes made."); die();
         }
         break;
 
-    case "toggleStatus":
-        // Toggle visibility (hidden = 1 is visible, 2 is hidden)
-        if (!isset($_REQUEST["id"]) || !isset($_REQUEST["hidden"])) {
-            outputError("Role ID and visibility status required.");
+    case "hide":
+       if( !isset($_REQUEST["roleId"]) || empty($_REQUEST["roleId"]) ){
+            echo outputError(array("msg" => "Role ID Is Required"));die();  
         }
-
-        $roleId = $_REQUEST["id"];
-        $hidden = $_REQUEST["hidden"]; // 1 or 2
-
-        if (updateDBNew("roles", ["hidden" => $hidden], "id = ? AND storeId = ?", [$roleId, $storeId])) {
-            logStoreActivity($storeId, "Role visibility updated ID: " . $roleId);
-            outputData(["message" => "Role visibility updated."]);
-        } else {
-            outputError("Failed to update role visibility.");
+        $role = selectDB("roles", "id = '{$_REQUEST["roleId"]}' AND storeId = '{$storeId}'");
+        if( !$role ){
+            echo outputError(array("msg" => "Role not found"));die();
+        }
+        $newHidden = ($role[0]["hidden"] == 1) ? 2 : 1;
+        if( updateDBNew("roles", array("hidden" => $newHidden), "id = ? AND storeId = ?", [$_REQUEST["roleId"], $storeId] ) ){
+            logStoreActivity("Roles", "Toggled visibility for role: " . $_REQUEST["roleId"]);
+            echo outputData(array("msg" => "Role visibility updated"));
+        }else{
+            echo outputError(array("msg" => "Failed to update visibility"));
         }
         break;
 
     case "delete":
         // Soft delete a role
-        if (!isset($_REQUEST["id"])) {
-            outputError("Role ID required.");
+        if (!isset($_REQUEST["roleId"])) {
+            echo outputError("Role ID required."); die();
         }
 
-        $roleId = $_REQUEST["id"];
+        $roleId = $_REQUEST["roleId"];
         if (updateDBNew("roles", ["status" => "1"], "id = ? AND storeId = ?", [$roleId, $storeId])) {
             logStoreActivity($storeId, "Role Deleted ID: " . $roleId);
-            outputData(["message" => "Role deleted successfully."]);
+            echo outputData(["message" => "Role deleted successfully."]); die();
         } else {
-            outputError("Failed to delete role.");
+            echo outputError("Failed to delete role."); die();
         }
         break;
 
     case "getPermissions":
         // Get list of all possible pages/permissions
-        $pages = selectDBNew("pages", "status = ? AND hidden = ?", ["0", "1"], "ORDER BY id ASC");
-        outputData($pages ?: []);
+        $pages = selectDBNew("pages", ["0", "1"], "status = ? AND hidden = ?", "ORDER BY enTitle ASC");
+        echo outputData($pages ?: []); die();
         break;
 
     case "savePermissions":
         // Save roles permissions (array of page IDs)
-        if (!isset($_POST["id"]) || !isset($_POST["pages"])) {
-            outputError("Role ID and pages (array) required.");
+        if (!isset($_POST["roleId"]) || !isset($_POST["pages"])) {
+            echo outputError("Role ID and pages (array) required."); die();
         }
 
-        $roleId = $_POST["id"];
+        $roleId = $_POST["roleId"];
         $pagesJson = json_encode($_POST["pages"]);
 
         if (updateDBNew("roles", ["pages" => $pagesJson], "id = ? AND storeId = ?", [$roleId, $storeId])) {
             logStoreActivity($storeId, "Role Permissions Updated ID: " . $roleId);
-            outputData(["message" => "Permissions updated successfully."]);
+            echo outputData(["message" => "Permissions updated successfully."]); die();
         } else {
-            outputError("Failed to update permissions.");
+            echo outputError("Failed to update permissions."); die();
         }
         break;
 
     default:
-        outputError("Invalid action.");
+        echo outputError("Invalid action."); die();
         break;
 }
