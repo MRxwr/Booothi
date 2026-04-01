@@ -71,7 +71,6 @@ function listOrders($storeId) {
             $s = $statusMap[$order["status"]] ?? $statusMap[0];
             $order["statusTitleEn"] = $s["en"];
             $order["statusTitleAr"] = $s["ar"];
-            $order["statusTitle"] = direction($s["en"], $s["ar"]);
 
             // Get payment method title
             if ($paymentMethod = selectDB2("enTitle, arTitle", "p_methods", "`paymentId` = '{$order["paymentMethod"]}'")) {
@@ -166,7 +165,6 @@ switch ($action) {
             $s = $statusMap[$data["status"]] ?? $statusMap[0];
             $data["statusTitleEn"] = $s["en"];
             $data["statusTitleAr"] = $s["ar"];
-            $data["statusTitle"] = direction($s["en"], $s["ar"]);
             $data["orderDate"] = timeZoneConverter($data["date"]);
 
             $data["items"] = json_decode($data["items"], true);
