@@ -44,7 +44,7 @@ switch ($action) {
 
     case "update":
         // Update an existing attribute
-        if (!isset($_POST["id"]) || !isset($_POST["enTitle"]) || !isset($_POST["arTitle"])) {
+        if (!isset($_POST["attributeId"]) || !isset($_POST["enTitle"]) || !isset($_POST["arTitle"])) {
             echo outputError("Missing required fields."); die();
         }
 
