@@ -5,7 +5,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
     $action = $_REQUEST["action"];
     $data = $_POST;
     if( $action == "list" ){
-        $shops = selectDB("shops", "storeId = '{$storeId}'");
+        $shops = selectDB("shops", "storeId = '{$storeId}' AND status = '0'");
         $response["shops"] = array();
         if( $shops ){
             foreach($shops as $shop){
