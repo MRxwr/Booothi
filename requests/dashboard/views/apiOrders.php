@@ -155,6 +155,25 @@ switch ($action) {
                         }
                     }
                 }
+                unset($item["extras"]); // Remove raw extras data
+                //do the same for collections
+                $item["collectionsDetails"] = [];
+                if (!empty($item["collections"]["id"])) {
+                    foreach ($item["collections"]["id"] as $key => $collectionId) {
+                        if (!empty($collectionId)) {
+                            $collectionInfo = selectDB2("id, enTitle, arTitle", "collections", "id = '{$collectionId}'");
+                            if ($collectionInfo) {
+                                $item["collectionsDetails"][] = [
+                                    "id" => $collectionId,
+                                    "enTitle" => $collectionInfo[0]["enTitle"],
+                                    "arTitle" => $collectionInfo[0]["arTitle"]
+                                ];
+                            }
+                        }
+                    }
+                }
+                unset($item["collections"]); // Remove raw collections data
+
             }
             
             echo outputData($data); die();
