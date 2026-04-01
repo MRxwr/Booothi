@@ -4,7 +4,22 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
 }else{
     $action = $_REQUEST["action"];
     $data = $_POST;
-    if( $action == "add" ){
+    if( $action == "list" ){
+        $shops = selectDB("shops", "storeId = '{$storeId}'");
+        $response["shops"] = array();
+        if( $shops ){
+            foreach($shops as $shop){
+                $response["shops"][] = array(
+                    "id" => $shop["id"],
+                    "enTitle" => $shop["enTitle"],
+                    "arTitle" => $shop["arTitle"],
+                    "hidden" => $shop["hidden"],
+                    "status" => $shop["status"],
+                );
+            }
+        }
+        echo outputData($response);
+    }elseif( $action == "add" ){
         if( !isset($data["enTitle"]) || empty($data["enTitle"]) ){
             echo outputError(array("msg" => "Shop English Title Is Required"));die();  
         }
