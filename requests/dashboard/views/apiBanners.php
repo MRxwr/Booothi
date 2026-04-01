@@ -50,11 +50,11 @@ switch ($action) {
 
     case "update":
         // Update an existing banner
-        if (!isset($_POST["id"]) || !isset($_POST["title"]) || !isset($_POST["link"])) {
+        if (!isset($_POST["bannerId"]) || !isset($_POST["title"]) || !isset($_POST["link"])) {
             echo outputError("Missing required fields."); die();
-        }
+        } 
 
-        $bannerId = $_POST["id"];
+        $bannerId = $_POST["bannerId"];
         $updateData = [
             "title"  => $_POST["title"],
             "link"   => $_POST["link"],
