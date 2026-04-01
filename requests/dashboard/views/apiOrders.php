@@ -122,12 +122,16 @@ switch ($action) {
             $data["address"] = json_decode($data["address"], true);
             $data["info"] = json_decode($data["info"], true);
             
-            // Enrich items with Product and Attribute titles
+            // Enrich items with Product, Attribute titles, and Image
             foreach ($data["items"] as &$item) {
                 $product = selectDB2("id, enTitle, arTitle", "products", "id = '{$item["productId"]}'");
                 $item["productTitleEn"] = $product ? $product[0]["enTitle"] : "";
                 $item["productTitleAr"] = $product ? $product[0]["arTitle"] : "";
                 
+                // Get Product Image from images table
+                $image = selectDB2("imageurl", "images", "productId = '{$item["productId"]}' ORDER BY id ASC LIMIT 1");
+                $item["productImage"] = $image ? $image[0]["imageurl"] : "";
+
                 if (!empty($item["subId"])) {
                     $attr = selectDB2("id, enTitle, arTitle", "attributes_products", "id = '{$item["subId"]}'");
                     $item["variantTitleEn"] = $attr ? $attr[0]["enTitle"] : "";
