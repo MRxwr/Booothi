@@ -5,20 +5,10 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
     $action = $_REQUEST["action"];
     $data = $_POST;
     if( $action == "list" ){
-        $categories = selectDB("categories", "storeId = '{$storeId}' AND status = '0' ORDER BY rank ASC");
+        $categories = selectDB2("id, enTitle, arTitle, imageurl, header, rank, hidden", "categories", "storeId = '{$storeId}' AND status = '0' ORDER BY rank ASC");
         $response["categories"] = array();
         if( $categories ){
-            foreach($categories as $category){
-                $response["categories"][] = array(
-                    "id" => $category["id"],
-                    "enTitle" => $category["enTitle"],
-                    "arTitle" => $category["arTitle"],
-                    "imageurl" => $category["imageurl"],
-                    "header" => $category["header"],
-                    "rank" => $category["rank"],
-                    "hidden" => $category["hidden"],
-                );
-            }
+                $response["categories"] = $categories;
         }
         echo outputData($response);
     }elseif( $action == "add" ){
