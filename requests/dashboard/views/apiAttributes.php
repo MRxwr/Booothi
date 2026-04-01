@@ -12,18 +12,18 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted attributes for the store
-        $attributes = selectDBNew("attributes", "status = ? AND storeId = ?", ["0", $storeId], "");
+        $attributes = selectDB2("`id`,`enTitle`,`arTitle`", "attributes", "status = '0' AND storeId = '{$storeId}' ORDER BY id DESC");
         if ($attributes) {
-            outputData($attributes);
+            echo outputData($attributes); die();
         } else {
-            outputData([]);
+            echo outputData([]); die();
         }
         break;
 
     case "add":
         // Add a new attribute
         if (!isset($_POST["enTitle"]) || !isset($_POST["arTitle"])) {
-            outputError("Missing required fields.");
+            echo outputError("Missing required fields."); die();
         }
 
         $insertData = [
@@ -35,19 +35,19 @@ switch ($action) {
 
         if (insertDB("attributes", $insertData)) {
             logStoreActivity($storeId, "Attribute Added: " . $_POST["enTitle"]);
-            outputData(["message" => "Attribute added successfully."]);
+            echo outputData(["message" => "Attribute added successfully."]); die();
         } else {
-            outputError("Failed to add attribute.");
+            echo outputError("Failed to add attribute."); die();
         }
         break;
 
     case "update":
         // Update an existing attribute
         if (!isset($_POST["id"]) || !isset($_POST["enTitle"]) || !isset($_POST["arTitle"])) {
-            outputError("Missing required fields.");
+            echo outputError("Missing required fields."); die();
         }
 
-        $attributeId = $_POST["id"];
+        $attributeId = $_POST["attributeId"];
         $updateData = [
             "enTitle" => $_POST["enTitle"],
             "arTitle" => $_POST["arTitle"]
@@ -55,30 +55,30 @@ switch ($action) {
 
         if (updateDBNew("attributes", $updateData, "id = ? AND storeId = ?", [$attributeId, $storeId])) {
             logStoreActivity($storeId, "Attribute Updated: " . $_POST["enTitle"]);
-            outputData(["message" => "Attribute updated successfully."]);
+            echo outputData(["message" => "Attribute updated successfully."]); die();
         } else {
-            outputError("Failed to update attribute or no changes made.");
+            echo outputError("Failed to update attribute or no changes made."); die();
         }
         break;
 
     case "delete":
         // Soft delete an attribute (status = 1)
-        if (!isset($_REQUEST["id"])) {
-            outputError("Attribute ID required.");
+        if (!isset($_REQUEST["attributeId"])) {
+            echo outputError("Attribute ID required."); die();
         }
 
-        $attributeId = $_REQUEST["id"];
+        $attributeId = $_REQUEST["attributeId"];
         $updateData = ["status" => "1"];
 
         if (updateDBNew("attributes", $updateData, "id = ? AND storeId = ?", [$attributeId, $storeId])) {
             logStoreActivity($storeId, "Attribute Deleted ID: " . $attributeId);
-            outputData(["message" => "Attribute deleted successfully."]);
+            echo outputData(["message" => "Attribute deleted successfully."]); die();
         } else {
-            outputError("Failed to delete attribute.");
+            echo outputError("Failed to delete attribute."); die();
         }
         break;
 
     default:
-        outputError("Invalid action.");
+        echo outputError("Invalid action."); die();
         break;
 }
