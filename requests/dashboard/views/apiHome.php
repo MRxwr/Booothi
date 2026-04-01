@@ -1,4 +1,9 @@
 <?php
+$response["storeDetails"] = array(
+	"title" => $storeDetails["title"],
+	"logo" => "{$storeDetails["storeCode"]}/logos/{$storeDetails["logo"]}",
+);
+
 $today = date("Y-m-d");
 $lastMonth = date("Y-m-d", mktime(0, 0, 0, date("m") - 1, date("d"), date("Y")));
 $tomorrow = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d") + 1, date("Y")));
