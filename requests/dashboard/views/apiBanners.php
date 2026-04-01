@@ -13,16 +13,16 @@ switch ($action) {
         // List all non-deleted banners for the store, ordered by rank
         $banners = selectDBNew("banner",["0", $storeId], "status = ? AND storeId = ?", "`rank` ASC");
         if ($banners) {
-            outputData($banners);
+            echo outputData($banners); die();
         } else {
-            outputData([]);
+            echo outputData([]); die();
         }
         break;
 
     case "add":
         // Add a new banner
         if (!isset($_POST["title"]) || !isset($_POST["link"])) {
-            outputError("Missing required fields.");
+            echo outputError("Missing required fields."); die();
         }
 
         $insertData = [
@@ -42,16 +42,16 @@ switch ($action) {
 
         if (insertDB("banner", $insertData)) {
             logStoreActivity($storeId, "Banner Added: " . $_POST["title"]);
-            outputData(["message" => "Banner added successfully."]);
+            echo outputData(["message" => "Banner added successfully."]); die();
         } else {
-            outputError("Failed to add banner.");
+            echo outputError("Failed to add banner."); die();
         }
         break;
 
     case "update":
         // Update an existing banner
         if (!isset($_POST["id"]) || !isset($_POST["title"]) || !isset($_POST["link"])) {
-            outputError("Missing required fields.");
+            echo outputError("Missing required fields."); die();
         }
 
         $bannerId = $_POST["id"];
@@ -68,16 +68,16 @@ switch ($action) {
 
         if (updateDBNew("banner", $updateData, "id = ? AND storeId = ?", [$bannerId, $storeId])) {
             logStoreActivity($storeId, "Banner Updated: " . $_POST["title"]);
-            outputData(["message" => "Banner updated successfully."]);
+            echo outputData(["message" => "Banner updated successfully."]); die();
         } else {
-            outputError("Failed to update banner or no changes made.");
+            echo outputError("Failed to update banner or no changes made."); die();
         }
         break;
 
     case "toggleStatus":
         // Show/Hide banner (hidden = 1 is visible, 2 is hidden)
         if (!isset($_REQUEST["id"]) || !isset($_REQUEST["hidden"])) {
-            outputError("Banner ID and visibility status required.");
+            echo outputError("Banner ID and visibility status required."); die();
         }
 
         $bannerId = $_REQUEST["id"];
@@ -86,31 +86,31 @@ switch ($action) {
         if (updateDBNew("banner", ["hidden" => $hidden], "id = ? AND storeId = ?", [$bannerId, $storeId])) {
             $statusText = ($hidden == "1") ? "Shown" : "Hidden";
             logStoreActivity($storeId, "Banner $statusText ID: " . $bannerId);
-            outputData(["message" => "Banner status updated to $statusText."]);
+            echo outputData(["message" => "Banner status updated to $statusText."]); die();
         } else {
-            outputError("Failed to update banner visibility.");
+            echo outputError("Failed to update banner visibility."); die();
         }
         break;
 
     case "delete":
         // Soft delete a banner (status = 1)
         if (!isset($_REQUEST["id"])) {
-            outputError("Banner ID required.");
+            echo outputError("Banner ID required."); die();
         }
 
         $bannerId = $_REQUEST["id"];
         if (updateDBNew("banner", ["status" => "1"], "id = ? AND storeId = ?", [$bannerId, $storeId])) {
             logStoreActivity($storeId, "Banner Deleted ID: " . $bannerId);
-            outputData(["message" => "Banner deleted successfully."]);
+            echo outputData(["message" => "Banner deleted successfully."]); die();
         } else {
-            outputError("Failed to delete banner.");
+            echo outputError("Failed to delete banner."); die();
         }
         break;
 
     case "updateRank":
         // Update rank for multiple banners
         if (!isset($_POST["id"]) || !isset($_POST["rank"]) || !is_array($_POST["id"])) {
-            outputError("Invalid rank data.");
+            echo outputError("Invalid rank data."); die();
         }
 
         reset($dbconnect); // Ensure we are ready for multiple updates
@@ -124,10 +124,10 @@ switch ($action) {
         }
 
         logStoreActivity($storeId, "Banner Ranks Updated ($successCount items)");
-        outputData(["message" => "Ranks updated successfully for $successCount items."]);
+        echo outputData(["message" => "Ranks updated successfully for $successCount items."]); die();
         break;
 
     default:
-        outputError("Invalid action.");
+        echo outputError("Invalid action."); die();
         break;
 }
