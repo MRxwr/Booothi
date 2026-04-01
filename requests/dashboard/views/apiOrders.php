@@ -133,6 +133,28 @@ switch ($action) {
                     $item["variantTitleEn"] = $attr ? $attr[0]["enTitle"] : "";
                     $item["variantTitleAr"] = $attr ? $attr[0]["arTitle"] : "";
                 }
+
+                // Enrich extras
+                $item["extrasDetails"] = [];
+                if (!empty($item["extras"]["id"])) {
+                    foreach ($item["extras"]["id"] as $key => $extraId) {
+                        if (!empty($extraId)) {
+                            $extraInfo = selectDB2("id, enTitle, arTitle, price, priceBy", "extras", "id = '{$extraId}'");
+                            if ($extraInfo) {
+                                $variantValue = $item["extras"]["variant"][$key] ?? "";
+                                $finalPrice = ($extraInfo[0]["priceBy"] == 0) ? $extraInfo[0]["price"] : $variantValue;
+                                
+                                $item["extrasDetails"][] = [
+                                    "id" => $extraId,
+                                    "enTitle" => $extraInfo[0]["enTitle"],
+                                    "arTitle" => $extraInfo[0]["arTitle"],
+                                    "price" => $finalPrice,
+                                    "variant" => ($extraInfo[0]["priceBy"] == 0) ? $variantValue : ""
+                                ];
+                            }
+                        }
+                    }
+                }
             }
             
             echo outputData($data); die();
