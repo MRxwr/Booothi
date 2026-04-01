@@ -60,7 +60,22 @@ switch ($action) {
             echo outputError("Failed to update attribute or no changes made."); die();
         }
         break;
-
+    case "hide":
+        if( !isset($_REQUEST["attributeId"]) || empty($_REQUEST["attributeId"]) ){
+            echo outputError(array("msg" => "Attribute ID Is Required"));die();  
+        }
+        $attribute = selectDB("attributes", "id = '{$_REQUEST["attributeId"]}' AND storeId = '{$storeId}'");
+        if( !$attribute ){
+            echo outputError(array("msg" => "Attribute not found"));die();
+        }
+        $newHidden = ($attribute[0]["hidden"] == 1) ? 2 : 1;
+        if( updateDBNew("attributes", array("hidden" => $newHidden), "id = ? AND storeId = ?", [$_REQUEST["attributeId"], $storeId] ) ){
+            logStoreActivity("Attributes", "Toggled visibility for attribute: " . $_REQUEST["attributeId"]);
+            echo outputData(array("msg" => "Attribute visibility updated"));
+        }else{
+            echo outputError(array("msg" => "Failed to update visibility"));
+        }
+        break;
     case "delete":
         // Soft delete an attribute (status = 1)
         if (!isset($_REQUEST["attributeId"])) {
