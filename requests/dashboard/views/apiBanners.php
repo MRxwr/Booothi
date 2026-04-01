@@ -74,7 +74,7 @@ switch ($action) {
         }
         break;
 
-    case "toggleStatus":
+    case "hide":
         // Show/Hide banner (hidden = 1 is visible, 2 is hidden)
         if (!isset($_REQUEST["id"]) || !isset($_REQUEST["hidden"])) {
             echo outputError("Banner ID and visibility status required."); die();
