@@ -20,6 +20,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         );
         
         if( insertDB("shops", $insertData) ){
+            logStoreActivity("Shops", "Added new shop: " . json_encode($data));
             echo outputData(array("msg" => "Shop added successfully"));
         }else{
             echo outputError(array("msg" => "Failed to add shop, please try again later"));
