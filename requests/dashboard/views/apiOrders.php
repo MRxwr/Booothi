@@ -105,6 +105,24 @@ switch ($action) {
         listOrders($storeId);
         break;
 
+    case "getStatuses":
+        /**
+         * Returns available order statuses.
+         * Mapping based on system logic (status 0 is default/pending):
+         * 0: Pending, 1: Paid, 2: Preparing, 3: On Delivery, 4: Delivered, 5: Cancel, 6: Return
+         */
+        $statuses = [
+            ["id" => 0, "enTitle" => "Pending", "arTitle" => "انتظار"],
+            ["id" => 1, "enTitle" => "Paid", "arTitle" => "مدفوعه"],
+            ["id" => 2, "enTitle" => "Preparing", "arTitle" => "جاري التجهيز"],
+            ["id" => 3, "enTitle" => "On Delivery", "arTitle" => "جاري التوصيل"],
+            ["id" => 4, "enTitle" => "Delivered", "arTitle" => "تم التوصيل"],
+            ["id" => 5, "enTitle" => "Cancel", "arTitle" => "ملغية"],
+            ["id" => 6, "enTitle" => "Return", "arTitle" => "مسترجع"]
+        ];
+        echo outputData($statuses); 
+        die();
+
     case "details":
         // Get full details of a specific order
         if (!isset($_REQUEST["orderId"]) || empty($_REQUEST["orderId"])) {
