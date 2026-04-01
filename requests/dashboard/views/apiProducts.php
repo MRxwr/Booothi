@@ -1,0 +1,182 @@
+<?php
+if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
+    echo outputError(array("msg" => "Action is required"));die();  
+}else{
+    $action = $_REQUEST["action"];
+    $data = $_POST;
+    
+    if( $action == "list" ){
+        $products = selectDB("products", "storeId = '{$storeId}' AND status = '0' ORDER BY id DESC");
+        $response["products"] = array();
+        if( $products ){
+            foreach($products as $product){
+                $response["products"][] = array(
+                    "id" => $product["id"],
+                    "enTitle" => $product["enTitle"],
+                    "arTitle" => $product["arTitle"],
+                    "image" => $product["imageurl"],
+                    "type" => $product["type"], // 1: Simple, 0: Variant
+                    "recent" => $product["recent"],
+                    "bestSeller" => $product["bestSeller"],
+                    "hidden" => $product["hidden"],
+                );
+            }
+        }
+        echo outputData($response);
+    }elseif( $action == "details" ){
+        if( !isset($data["productId"]) || empty($data["productId"]) ){
+            echo outputError(array("msg" => "Product ID Is Required"));die();
+        }
+        $product = selectDB("products", "id = '{$data["productId"]}' AND storeId = '{$storeId}'");
+        if( !$product ){
+            echo outputError(array("msg" => "Product not found"));die();
+        }
+        $product = $product[0];
+        // Get categories
+        $categories = selectDB("category_products", "productId = '{$product["id"]}'");
+        $product["selectedCategories"] = array_column($categories, 'categoryId');
+        
+        // If simple product, get price/sku/quantity from attributes_products
+        if( $product["type"] == 1 ){
+            $attr = selectDB("attributes_products", "productId = '{$product["id"]}' AND hidden = '0'");
+            if($attr){
+                $product["price"] = $attr[0]["price"];
+                $product["cost"] = $attr[0]["cost"];
+                $product["sku"] = $attr[0]["sku"];
+                $product["quantity"] = $attr[0]["quantity"];
+            }
+        }
+        
+        echo outputData($product);
+    }elseif( $action == "add" ){
+        // Basic required fields
+        if( !isset($data["enTitle"]) || empty($data["enTitle"]) ) { echo outputError(array("msg" => "English Title Required")); die(); }
+        
+        $insertData = array(
+            "storeId" => $storeId,
+            "enTitle" => $data["enTitle"],
+            "arTitle" => isset($data["arTitle"]) ? $data["arTitle"] : "",
+            "type" => isset($data["type"]) ? $data["type"] : "1",
+            "enDetails" => isset($data["enDetails"]) ? $data["enDetails"] : "",
+            "arDetails" => isset($data["arDetails"]) ? $data["arDetails"] : "",
+            "discount" => isset($data["discount"]) ? $data["discount"] : "0",
+            "discountType" => isset($data["discountType"]) ? $data["discountType"] : "0",
+            "video" => isset($data["video"]) ? $data["video"] : "",
+            "preorder" => isset($data["preorder"]) ? $data["preorder"] : "0",
+            "preorderText" => isset($data["preorderText"]) ? $data["preorderText"] : "",
+            "preorderTextAr" => isset($data["preorderTextAr"]) ? $data["preorderTextAr"] : "",
+            "sizeChart" => isset($data["sizeChart"]) ? $data["sizeChart"] : "0",
+            "oneTime" => isset($data["oneTime"]) ? $data["oneTime"] : "0",
+            "isImage" => isset($data["isImage"]) ? $data["isImage"] : "0",
+            "collection" => isset($data["collection"]) ? $data["collection"] : "0",
+            "giftCard" => isset($data["giftCard"]) ? $data["giftCard"] : "0",
+            "width" => isset($data["width"]) ? $data["width"] : "0",
+            "height" => isset($data["height"]) ? $data["height"] : "0",
+            "depth" => isset($data["depth"]) ? $data["depth"] : "0",
+            "weight" => isset($data["weight"]) ? $data["weight"] : "0",
+            "imageurl" => isset($data["imageurl"]) ? $data["imageurl"] : ""
+        );
+        
+        // Handle Image Upload
+        if (isset($_FILES["image"]) && is_uploaded_file($_FILES["image"]["tmp_name"])) {
+            $insertData["imageurl"] = uploadImageToStoreFolder($_FILES["image"]["tmp_name"], $storeId, "products");
+        }
+
+        if( insertDB("products", $insertData) ){
+            $productId = $dbconnect->insert_id;
+            
+            // Handle Categories
+            if( isset($data["categoryIds"]) && is_array($data["categoryIds"]) ){
+                foreach($data["categoryIds"] as $catId){
+                    insertDB("category_products", array("productId" => $productId, "categoryId" => $catId));
+                }
+            }
+            
+            // Handle Simple Product Attributes
+            if( $insertData["type"] == 1 ){
+                $attrData = array(
+                    "productId" => $productId,
+                    "price" => isset($data["price"]) ? $data["price"] : "0",
+                    "cost" => isset($data["cost"]) ? $data["cost"] : "0",
+                    "sku" => isset($data["sku"]) ? $data["sku"] : "",
+                    "quantity" => isset($data["quantity"]) ? $data["quantity"] : "0"
+                );
+                insertDB("attributes_products", $attrData);
+            }
+            
+            logStoreActivity("Products", "Added product: " . $data["enTitle"]);
+            echo outputData(array("msg" => "Product added successfully", "productId" => $productId));
+        }else{
+            echo outputError(array("msg" => "Failed to add product"));
+        }
+    }elseif( $action == "update" ){
+        if( !isset($data["productId"]) || empty($data["productId"]) ){
+            echo outputError(array("msg" => "Product ID Is Required"));die();
+        }
+        
+        $fields = ["enTitle", "arTitle", "type", "enDetails", "arDetails", "discount", "discountType", "video", "preorder", "preorderText", "preorderTextAr", "sizeChart", "oneTime", "isImage", "collection", "giftCard", "width", "height", "depth", "weight", "imageurl", "hidden"];
+        $updateData = array();
+        foreach($fields as $field){
+            if(isset($data[$field])) $updateData[$field] = $data[$field];
+        }
+
+        // Handle Image Upload
+        if (isset($_FILES["image"]) && is_uploaded_file($_FILES["image"]["tmp_name"])) {
+            $updateData["imageurl"] = uploadImageToStoreFolder($_FILES["image"]["tmp_name"], $storeId, "products");
+        }
+        
+        if( updateDBNew("products", $updateData, "id = ? AND storeId = ?", [$data["productId"], $storeId]) ){
+            // Update categories if provided
+            if( isset($data["categoryIds"]) && is_array($data["categoryIds"]) ){
+                deleteDB("category_products", "productId = '{$data["productId"]}'");
+                foreach($data["categoryIds"] as $catId){
+                    insertDB("category_products", array("productId" => $data["productId"], "categoryId" => $catId));
+                }
+            }
+            
+            // Update attributes if simple
+            $product = selectDB("products", "id = '{$data["productId"]}'");
+            if( $product && $product[0]["type"] == 1 ){
+                $attrData = array();
+                if(isset($data["price"])) $attrData["price"] = $data["price"];
+                if(isset($data["cost"])) $attrData["cost"] = $data["cost"];
+                if(isset($data["sku"])) $attrData["sku"] = $data["sku"];
+                if(isset($data["quantity"])) $attrData["quantity"] = $data["quantity"];
+                
+                if(!empty($attrData)){
+                    updateDBNew("attributes_products", $attrData, "productId = ? AND hidden = '0'", [$data["productId"]]);
+                }
+            }
+            
+            logStoreActivity("Products", "Updated product ID: " . $data["productId"]);
+            echo outputData(array("msg" => "Product updated successfully"));
+        }else{
+            echo outputError(array("msg" => "Failed to update product"));
+        }
+    }elseif( $action == "delete" ){
+        if( !isset($data["productId"]) || empty($data["productId"]) ){
+            echo outputError(array("msg" => "Product ID Is Required"));die();
+        }
+        if( updateDBNew("products", array("status" => "1"), "id = ? AND storeId = ?", [$data["productId"], $storeId]) ){
+            logStoreActivity("Products", "Deleted product ID: " . $data["productId"]);
+            echo outputData(array("msg" => "Product deleted successfully"));
+        }else{
+            echo outputError(array("msg" => "Failed to delete product"));
+        }
+    }elseif( $action == "toggleStatus" ){
+        // Handle recent/bestSeller toggles
+        if( !isset($data["productId"]) || !isset($data["field"]) ){
+            echo outputError(array("msg" => "Product ID and Field (recent/bestSeller) required"));die();
+        }
+        $field = ($data["field"] == "recent") ? "recent" : "bestSeller";
+        $product = selectDB("products", "id = '{$data["productId"]}' AND storeId = '{$storeId}'");
+        if($product){
+            $newVal = ($product[0][$field] == 1) ? 0 : 1;
+            updateDBNew("products", array($field => $newVal), "id = ? AND storeId = ?", [$data["productId"], $storeId]);
+            echo outputData(array("msg" => "Status updated"));
+        }
+    } else {
+        echo outputError(array("msg" => "Invalid action specified"));
+    }
+}
+?>
