@@ -11,7 +11,7 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted roles for the store
-        $roles = selectDBNew("roles", "status = ? AND storeId = ?", ["0", $storeId], "ORDER BY id ASC");
+        $roles = selectDBNew("roles", ["0", $storeId], "status = ? AND storeId = ?", "ORDER BY id ASC");
         if ($roles) {
             foreach ($roles as &$role) {
                 // Decode permissions (pages)
