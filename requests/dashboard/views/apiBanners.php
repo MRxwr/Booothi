@@ -11,7 +11,7 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted banners for the store, ordered by rank
-        $banners = selectDBNew("banner",["0", $storeId], "status = ? AND storeId = ?" "`rank` ASC");
+        $banners = selectDBNew("banner",["0", $storeId], "status = ? AND storeId = ?", "`rank` ASC");
         if ($banners) {
             outputData($banners);
         } else {
