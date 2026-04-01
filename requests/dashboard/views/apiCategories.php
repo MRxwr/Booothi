@@ -27,7 +27,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             "rank"    => isset($data["rank"]) ? $data["rank"] : "0"
         );
 
-        if (isset($data["imageurl"])) {
+        if (isset($data["imageurl"]) && !empty($data["imageurl"])) {
             $insertData["imageurl"] = $data["imageurl"];
         }
         
@@ -36,7 +36,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             $insertData["imageurl"] = uploadImageToStoreFolder($_FILES["image"]["tmp_name"], $storeId, "category");
         }
 
-        if (isset($data["header"])) {
+        if (isset($data["header"]) && !empty($data["header"])) {
             $insertData["header"] = $data["header"];
         }
         
@@ -61,8 +61,8 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         if(isset($data["arTitle"])) $updateData["arTitle"] = $data["arTitle"];
         if(isset($data["hidden"]))  $updateData["hidden"]  = $data["hidden"];
         if(isset($data["rank"]))    $updateData["rank"]    = $data["rank"];
-        if(isset($data["imageurl"])) $updateData["imageurl"] = $data["imageurl"];
-        if(isset($data["header"]))   $updateData["header"]   = $data["header"];
+        if(isset($data["imageurl"]) && !empty($data["imageurl"])) $updateData["imageurl"] = $data["imageurl"];
+        if(isset($data["header"]) && !empty($data["header"]))   $updateData["header"]   = $data["header"];
         
         // Handle binary uploads on update
         if (isset($_FILES["image"]) && is_uploaded_file($_FILES["image"]["tmp_name"])) {
