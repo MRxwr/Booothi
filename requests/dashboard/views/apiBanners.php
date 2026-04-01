@@ -75,20 +75,19 @@ switch ($action) {
         break;
 
     case "hide":
-        // Show/Hide banner (hidden = 1 is visible, 2 is hidden)
-        if (!isset($_REQUEST["bannerId"]) || !isset($_REQUEST["hidden"])) {
-            echo outputError("Banner ID and visibility status required."); die();
+        if( !isset($_REQUEST["bannerId"]) || empty($_REQUEST["bannerId"]) ){
+            echo outputError(array("msg" => "Banner ID Is Required"));die();  
         }
-
-        $bannerId = $_REQUEST["bannerId"];
-        $hidden = $_REQUEST["hidden"]; // 1 or 2
-
-        if (updateDBNew("banner", ["hidden" => $hidden], "id = ? AND storeId = ?", [$bannerId, $storeId])) {
-            $statusText = ($hidden == "1") ? "Shown" : "Hidden";
-            logStoreActivity($storeId, "Banner $statusText ID: " . $bannerId);
-            echo outputData(["message" => "Banner status updated to $statusText."]); die();
-        } else {
-            echo outputError("Failed to update banner visibility."); die();
+        $banner = selectDB("banner", "id = '{$_REQUEST["bannerId"]}' AND storeId = '{$storeId}'");
+        if( !$banner ){
+            echo outputError(array("msg" => "Banner not found"));die();
+        }
+        $newHidden = ($banner[0]["hidden"] == 1) ? 2 : 1;
+        if( updateDBNew("banner", array("hidden" => $newHidden), "id = ? AND storeId = ?", [$_REQUEST["bannerId"], $storeId] ) ){
+            logStoreActivity("Banners", "Toggled visibility for banner: " . $_REQUEST["bannerId"]);
+            echo outputData(array("msg" => "Banner visibility updated"));
+        }else{
+            echo outputError(array("msg" => "Failed to update visibility"));
         }
         break;
 
