@@ -47,6 +47,17 @@ function listOrders($storeId) {
     // List orders with pagination (SQL level sorting for id and date)
     $orders = selectDB2("id, info, address, price, date, paymentMethod, status, gatewayId", "orders2", "{$where} ORDER BY {$orderColumn} {$orderDir} LIMIT {$limit} OFFSET {$offset}");
     
+    // Status mapping for titles
+    $statusMap = [
+        0 => ["en" => "Pending", "ar" => "انتظار"],
+        1 => ["en" => "Paid", "ar" => "مدفوعه"],
+        2 => ["en" => "Preparing", "ar" => "جاري التجهيز"],
+        3 => ["en" => "On Delivery", "ar" => "جاري التوصيل"],
+        4 => ["en" => "Delivered", "ar" => "تم التوصيل"],
+        5 => ["en" => "Cancel", "ar" => "ملغية"],
+        6 => ["en" => "Return", "ar" => "مسترجع"]
+    ];
+
     if ($orders) {
         foreach ($orders as &$order) {
             $info = json_decode($order["info"], true);
@@ -56,6 +67,12 @@ function listOrders($storeId) {
             $order["totalPrice"] = numTo3Float($order["price"] + ($address["shipping"] ?? 0));
             $order["orderDate"] = timeZoneConverter($order["date"]);
             
+            // Get status title
+            $s = $statusMap[$order["status"]] ?? $statusMap[0];
+            $order["statusTitleEn"] = $s["en"];
+            $order["statusTitleAr"] = $s["ar"];
+            $order["statusTitle"] = direction($s["en"], $s["ar"]);
+
             // Get payment method title
             if ($paymentMethod = selectDB2("enTitle, arTitle", "p_methods", "`paymentId` = '{$order["paymentMethod"]}'")) {
                 $order["paymentTitle"] = direction($paymentMethod[0]["enTitle"], $paymentMethod[0]["arTitle"]);
@@ -130,10 +147,28 @@ switch ($action) {
         }
 
         $orderId = $_REQUEST["orderId"];
-        $order = selectDB2("id, items, voucher, giftCard, address, info", "orders2", "id = '{$orderId}' AND storeId = '{$storeId}'");
+        $order = selectDB2("id, items, voucher, giftCard, address, info, status, paymentMethod, date, price, gatewayId", "orders2", "id = '{$orderId}' AND storeId = '{$storeId}'");
         
         if ($order) {
             $data = $order[0];
+
+            // Status mapping for titles
+            $statusMap = [
+                0 => ["en" => "Pending", "ar" => "انتظار"],
+                1 => ["en" => "Paid", "ar" => "مدفوعه"],
+                2 => ["en" => "Preparing", "ar" => "جاري التجهيز"],
+                3 => ["en" => "On Delivery", "ar" => "جاري التوصيل"],
+                4 => ["en" => "Delivered", "ar" => "تم التوصيل"],
+                5 => ["en" => "Cancel", "ar" => "ملغية"],
+                6 => ["en" => "Return", "ar" => "مسترجع"]
+            ];
+
+            $s = $statusMap[$data["status"]] ?? $statusMap[0];
+            $data["statusTitleEn"] = $s["en"];
+            $data["statusTitleAr"] = $s["ar"];
+            $data["statusTitle"] = direction($s["en"], $s["ar"]);
+            $data["orderDate"] = timeZoneConverter($data["date"]);
+
             $data["items"] = json_decode($data["items"], true);
             $data["voucher"] = json_decode($data["voucher"], true);
             $data["giftCard"] = json_decode($data["giftCard"], true);
