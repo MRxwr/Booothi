@@ -200,29 +200,35 @@ function insertDB($table, $data){
     $sql = "INSERT INTO `{$table}`(";
     $placeholders = "";
     foreach ($keys as $key) {
-        $sql .= "`{$key}`,";
+        // Use urlencode for keys to ensure they are safe/escaped
+        $safeKey = urlencode($key);
+        $sql .= "`{$safeKey}`,";
         $placeholders .= "?,";
     }
     $sql = rtrim($sql, ",");
     $placeholders = rtrim($placeholders, ",");
     $sql .= ") VALUES ({$placeholders})";
-    $stmt = $dbconnect->prepare($sql);
-    $types = str_repeat('s', count($data));
-    $stmt->bind_param($types, ...array_values($data));
-    if($stmt->execute()){
-        if( isset($_GET["v"]) && !empty($_GET["v"]) ){
-            $array = array(
-                "userId" => $userID,
-                "username" => $empUsername,
-                "module" => $_GET["v"],
-                "action" => "Insert",
-                "sqlQuery" => json_encode(array("table"=>$table,"data"=>$data)),
-            );
-            LogsHistory($array);
+    if($stmt = $dbconnect->prepare($sql)){
+        $types = str_repeat('s', count($data));
+        $stmt->bind_param($types, ...array_values($data));
+        if($stmt->execute()){
+            if( isset($_GET["v"]) && !empty($_GET["v"]) ){
+                $array = array(
+                    "userId" => $userID,
+                    "username" => $empUsername,
+                    "module" => $_GET["v"],
+                    "action" => "Insert",
+                    "sqlQuery" => json_encode(array("table"=>$table,"data"=>$data)),
+                );
+                LogsHistory($array);
+            }
+            $stmt->close();
+            return 1;
+        }else{
+            $stmt->close();
+            return 0;
         }
-        return 1;
     }else{
-        $error = array("msg"=>"insert table error");
         return 0;
     }
 }
@@ -260,6 +266,55 @@ function updateDB($table, $data, $where) {
         return 1;
     } else {
         $error = array("msg" => "update table error");
+        return 0;
+    }
+}
+
+function updateDBNew($table, $data, $where, $whereParams = []) {
+    GLOBAL $dbconnect, $userID, $empUsername, $_GET;
+    $check = [';', '"'];
+    $where = str_replace($check, "", $where);
+    $keys = array_keys($data);
+    $sql = "UPDATE `" . $table . "` SET ";
+    $types = "";
+    $values = array_values($data);
+    
+    for ($i = 0; $i < count($keys); $i++) {
+        // Use urlencode for keys to ensure they are safe/escaped
+        $safeKey = urlencode($keys[$i]);
+        $sql .= "`" . $safeKey . "` = ?";
+        if ($i + 1 < count($keys)) {
+            $sql .= ", ";
+        }
+        $types .= "s";
+    }
+    
+    $sql .= " WHERE " . $where;
+    $types .= str_repeat('s', count($whereParams));
+    $allParams = array_merge($values, $whereParams);
+    
+    if ($stmt = $dbconnect->prepare($sql)) {
+        if (!empty($allParams)) {
+            $stmt->bind_param($types, ...$allParams);
+        }
+        if ($stmt->execute()) {
+            if (isset($_GET["v"]) && !empty($_GET["v"])) {
+                $array = array(
+                    "userId" => $userID,
+                    "username" => $empUsername,
+                    "module" => $_GET["v"],
+                    "action" => "update",
+                    "sqlQuery" => json_encode(array("table" => $table, "data" => $data, "where" => $where, "whereParams" => $whereParams)),
+                );
+                LogsHistory($array);
+            }
+            $stmt->close();
+            return 1;
+        } else {
+            $stmt->close();
+            return 0;
+        }
+    } else {
         return 0;
     }
 }
