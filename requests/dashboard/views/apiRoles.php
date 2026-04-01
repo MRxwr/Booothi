@@ -100,7 +100,7 @@ switch ($action) {
 
     case "getPermissions":
         // Get list of all possible pages/permissions
-        $pages = selectDBNew("pages", ["0", "1"], "status = ? AND hidden = ?", "enTitle ASC");
+        $pages = selectDB2("id, enTitle, arTitle", "pages", "status = '0' AND hidden = '0' ORDER BY enTitle ASC");
         echo outputData($pages ?: []); die();
         break;
 
