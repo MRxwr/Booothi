@@ -12,7 +12,7 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted attributes for the store
-        $attributes = selectDB2("`id`,`enTitle`,`arTitle`", "attributes", "status = '0' AND storeId = '{$storeId}' ORDER BY id DESC");
+        $attributes = selectDB2("`id`,`enTitle`,`arTitle`,`hidden`", "attributes", "status = '0' AND storeId = '{$storeId}' ORDER BY id DESC");
         if ($attributes) {
             echo outputData($attributes); die();
         } else {
@@ -30,6 +30,7 @@ switch ($action) {
             "enTitle" => $_POST["enTitle"],
             "arTitle" => $_POST["arTitle"],
             "storeId" => $storeId,
+            "hidden" => "1", 
             "status"  => "0"
         ];
 
