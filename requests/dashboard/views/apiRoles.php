@@ -16,6 +16,7 @@ switch ($action) {
             foreach ($roles as &$role) {
                 // Decode permissions (pages)
                 $role["permissions"] = json_decode($role["pages"], true) ?: [];
+                unset($role["pages"]); // Remove raw pages data
             }
             echo outputData($roles); die();
         } else {
