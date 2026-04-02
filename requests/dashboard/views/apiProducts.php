@@ -6,23 +6,36 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
     $data = $_POST;
     
     if( $action == "list" ){
+        $page = isset($_REQUEST["page"]) ? (int)$_REQUEST["page"] : 1;
+        $limit = isset($_REQUEST["limit"]) ? (int)$_REQUEST["limit"] : 20;
+        $offset = ($page - 1) * $limit;
+
+        $where = "p.storeId = '{$storeId}' AND p.status = '0'";
+
+        // Get total count for pagination
+        $totalCountResult = queryDB("SELECT COUNT(*) as total FROM products p WHERE {$where}");
+        $totalEntries = (int)($totalCountResult[0]["total"] ?? 0);
+        $totalPages = ceil($totalEntries / $limit);
+
         $sql = "SELECT p.id, p.enTitle, p.arTitle, p.type, p.recent, p.bestSeller, p.hidden, 
                 CASE WHEN p.type = 1 THEN 'Simple' ELSE 'Variant' END as typeEn,
                 CASE WHEN p.type = 1 THEN 'بسيط' ELSE 'متغير' END as typeAr,
                 (SELECT i.imageurl FROM images i WHERE i.productId = p.id ORDER BY i.id ASC LIMIT 1) as image
                 FROM products p 
-                WHERE p.storeId = '{$storeId}' AND p.status = '0' 
-                ORDER BY p.id DESC";
+                WHERE {$where} 
+                ORDER BY p.id DESC 
+                LIMIT {$limit} OFFSET {$offset}";
         $products = queryDB($sql);
         
-        if ($products) {
-            foreach ($products as &$product) {
-                $product["typeTitle"] = direction($product["typeEn"], $product["typeAr"]);
-            }
-        }
-
-        $response["products"] = $products ?: [];
-        echo outputData($response);die();
+        echo outputData([
+            "products" => $products ?: [],
+            "pagination" => [
+                "currentPage" => $page,
+                "limit" => $limit,
+                "totalEntries" => $totalEntries,
+                "totalPages" => $totalPages
+            ]
+        ]);die();
     }elseif( $action == "details" ){
         if( !isset($data["productId"]) || empty($data["productId"]) ){
             echo outputError(array("msg" => "Product ID Is Required"));die();
