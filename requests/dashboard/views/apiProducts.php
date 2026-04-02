@@ -102,7 +102,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         $variants = selectDB2("id, enTitle, arTitle, price, cost, sku, quantity, hidden", "attributes_products", "productId = '{$product["id"]}' AND  `status` = '0'");
         $product["variants"] = $variants ?: [];
 
-        unset($product["extras"], $product["categoryId"], $product["storeId"], $product["status"], $product["subId"], $product["date"], $product["storeQuantity"], $product["onlineQuantity"], $product["price"], $product["cost"], $product["sku"], $product["quantity"] ); // Remove raw IDs to save memory, we have the titles now
+        unset($product["extras"], $product["categoryId"], $product["storeId"], $product["status"], $product["subId"], $product["date"], $product["storeQuantity"], $product["onlineQuantity"], $product["price"], $product["cost"], $product["sku"], $product["quantity"] );
         echo outputData($product);die();
     }elseif( $action == "add" ){
         // Basic required fields
