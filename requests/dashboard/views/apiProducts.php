@@ -223,9 +223,9 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 updateDBNew("products", array("extras" => $extrasJson), "id = ?", [$data["productId"]]);
             }
             
-            // Update / Replace Attributes (Variants) - Always at least one
+            // Update / Sync Attributes (Variants)
             if( isset($data["variants"]) && is_array($data["variants"]) ){
-                deleteDB("attributes_products", "productId = '{$data["productId"]}'");
+                $currentVariantIds = [];
                 foreach($data["variants"] as $variant){
                     $attrData = array(
                         "productId" => $data["productId"],
@@ -236,9 +236,26 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                         "price" => $variant["price"] ?? "0",
                         "cost" => $variant["cost"] ?? "0",
                         "sku" => $variant["sku"] ?? "",
-                        "quantity" => $variant["quantity"] ?? "0"
+                        "quantity" => $variant["quantity"] ?? "0",
+                        "status" => "0"
                     );
-                    insertDB("attributes_products", $attrData);
+
+                    if( isset($variant["id"]) && !empty($variant["id"]) ){
+                        // Update existing variant (Safe because historical orders are json-cached)
+                        updateDBNew("attributes_products", $attrData, "id = ? AND productId = ?", [$variant["id"], $data["productId"]]);
+                        $currentVariantIds[] = (int)$variant["id"];
+                    } else {
+                        // Insert new variant
+                        if( insertDB("attributes_products", $attrData) ){
+                            $currentVariantIds[] = $dbconnect->insert_id;
+                        }
+                    }
+                }
+                
+                // Soft-delete variants that were NOT sent in the request (Syncing)
+                if (!empty($currentVariantIds)) {
+                    $idsList = implode(",", $currentVariantIds);
+                    updateDBNew("attributes_products", ["status" => "1"], "productId = ? AND id NOT IN ($idsList)", [$data["productId"]]);
                 }
             }
             
