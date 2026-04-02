@@ -100,7 +100,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             }
         }
         unset($extraIds); // Free memory
-        
+        $product["variants"] = [];
         // If simple product, get price/sku/quantity from attributes_products
         if( $product["type"] == 1 ){
             $attr = selectDB("attributes_products", "productId = '{$product["id"]}' AND hidden = '0'");
@@ -112,7 +112,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             }
         }else{
             // If variant product (Type 0), get all variants with their details
-            $variants = selectDB("attributes_products", "productId = '{$product["id"]}' AND hidden != '2'");
+            $variants = selectDB2("id, enTitle, arTitle, price, cost, sku, quantity, hidden", "attributes_products", "productId = '{$product["id"]}' AND  `status` = '0'");
             $product["variants"] = $variants ?: [];
         } 
         
