@@ -7,11 +7,20 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
     
     if( $action == "list" ){
         $sql = "SELECT p.id, p.enTitle, p.arTitle, p.type, p.recent, p.bestSeller, p.hidden, 
+                CASE WHEN p.type = 1 THEN 'Simple' ELSE 'Variant' END as typeEn,
+                CASE WHEN p.type = 1 THEN 'بسيط' ELSE 'متغير' END as typeAr,
                 (SELECT i.imageurl FROM images i WHERE i.productId = p.id ORDER BY i.id ASC LIMIT 1) as image
                 FROM products p 
                 WHERE p.storeId = '{$storeId}' AND p.status = '0' 
                 ORDER BY p.id DESC";
         $products = queryDB($sql);
+        
+        if ($products) {
+            foreach ($products as &$product) {
+                $product["typeTitle"] = direction($product["typeEn"], $product["typeAr"]);
+            }
+        }
+
         $response["products"] = $products ?: [];
         echo outputData($response);die();
     }elseif( $action == "details" ){
