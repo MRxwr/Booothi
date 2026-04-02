@@ -110,9 +110,13 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 $product["sku"] = $attr[0]["sku"];
                 $product["quantity"] = $attr[0]["quantity"];
             }
+        }else{
+            // If variant product (Type 0), get all variants with their details
+            $variants = selectDB("attributes_products", "productId = '{$product["id"]}' AND hidden != '2'");
+            $product["variants"] = $variants ?: [];
         }
         
-        echo outputData($product);
+        echo outputData($product);die();
     }elseif( $action == "add" ){
         // Basic required fields
         if( !isset($data["enTitle"]) || empty($data["enTitle"]) ) { echo outputError(array("msg" => "English Title Required")); die(); }
