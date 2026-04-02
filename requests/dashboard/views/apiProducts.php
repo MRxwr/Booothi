@@ -99,21 +99,10 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         }
          // Free memory
         $product["variants"] = [];
-        // If simple product, get price/sku/quantity from attributes_products
-        if( $product["type"] == 1 ){
-            $attr = selectDB("attributes_products", "productId = '{$product["id"]}' AND hidden = '0'");
-            if($attr){
-                $product["price"] = $attr[0]["price"];
-                $product["cost"] = $attr[0]["cost"];
-                $product["sku"] = $attr[0]["sku"];
-                $product["quantity"] = $attr[0]["quantity"];
-            }
-        }else{
-            // If variant product (Type 0), get all variants with their details
-            $variants = selectDB2("id, enTitle, arTitle, price, cost, sku, quantity, hidden", "attributes_products", "productId = '{$product["id"]}' AND  `status` = '0'");
-            $product["variants"] = $variants ?: [];
-        } 
-        unset($product["extras"], $product["categoryId"], $product["storeId"], $product["status"], $product["subId"], $product["date"] ); // Remove raw IDs to save memory, we have the titles now
+        $variants = selectDB2("id, enTitle, arTitle, price, cost, sku, quantity, hidden", "attributes_products", "productId = '{$product["id"]}' AND  `status` = '0'");
+        $product["variants"] = $variants ?: [];
+
+        unset($product["extras"], $product["categoryId"], $product["storeId"], $product["status"], $product["subId"], $product["date"], $product["storeQuantity"], $product["onlineQuantity"], $product["price"], $product["cost"], $product["sku"], $product["quantity"] ); // Remove raw IDs to save memory, we have the titles now
         echo outputData($product);die();
     }elseif( $action == "add" ){
         // Basic required fields
