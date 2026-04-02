@@ -1,15 +1,7 @@
 <?php
 if ( isset($_POST["id"]) ){
-	if( isset($_FILES["image"]) ){
-		if( is_uploaded_file($_FILES['image']['tmp_name']) ){
-			$directory = "cartImages/"; 
-			$originalfile = $directory . date("d-m-y") . time() . rand(111111,999999) . ".png";
-			move_uploaded_file($_FILES["image"]["tmp_name"], $originalfile);
-			$filenewname = str_replace("cartImages/",'',$originalfile);
-			$image = $filenewname; 
-		}else{
-			$image = "";
-		}
+	if( isset($_FILES["image"]) && is_uploaded_file($_FILES['image']['tmp_name']) ){
+		$image = uploadImageToStoreFolder($_FILES['image']['tmp_name'], $storeID, "cartImages");
 	}else{
 		$image = "";
 	}
