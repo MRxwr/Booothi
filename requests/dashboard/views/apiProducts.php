@@ -67,7 +67,39 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
 
         // Get categories
         $categories = selectDB("category_products", "productId = '{$product["id"]}'");
-        $product["selectedCategories"] = array_column($categories, 'categoryId');
+        $product["selectedCategories"] = array();
+        if ($categories) {
+            foreach ($categories as $cat) {
+                $categoryInfo = selectDB2("id, enTitle, arTitle", "categories", "id = '{$cat["categoryId"]}'");
+                if ($categoryInfo) {
+                    $product["selectedCategories"][] = [
+                        "id" => $categoryInfo[0]["id"],
+                        "enTitle" => $categoryInfo[0]["enTitle"],
+                        "arTitle" => $categoryInfo[0]["arTitle"],
+                        "title" => direction($categoryInfo[0]["enTitle"], $categoryInfo[0]["arTitle"])
+                    ];
+                }
+            }
+        }
+        unset($categories); // Free memory
+
+        // Get Extras/Add-ons with titles
+        $extraIds = json_decode($product["extras"], true) ?: [];
+        $product["selectedExtras"] = array();
+        if (!empty($extraIds)) {
+            foreach ($extraIds as $exId) {
+                $extraInfo = selectDB2("id, enTitle, arTitle", "extras", "id = '{$exId}'");
+                if ($extraInfo) {
+                    $product["selectedExtras"][] = [
+                        "id" => $extraInfo[0]["id"],
+                        "enTitle" => $extraInfo[0]["enTitle"],
+                        "arTitle" => $extraInfo[0]["arTitle"],
+                        "title" => direction($extraInfo[0]["enTitle"], $extraInfo[0]["arTitle"])
+                    ];
+                }
+            }
+        }
+        unset($extraIds); // Free memory
         
         // If simple product, get price/sku/quantity from attributes_products
         if( $product["type"] == 1 ){
