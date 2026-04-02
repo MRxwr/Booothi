@@ -133,13 +133,21 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             "imageurl" => isset($data["imageurl"]) ? $data["imageurl"] : ""
         );
         
-        // Handle Image Upload
-        if (isset($_FILES["image"]) && is_uploaded_file($_FILES["image"]["tmp_name"])) {
-            $insertData["imageurl"] = uploadImageToStoreFolder($_FILES["image"]["tmp_name"], $storeId, "products");
-        }
-
         if( insertDB("products", $insertData) ){
             $productId = $dbconnect->insert_id;
+
+            // Handle Image Upload (Support multiple images from 'image' input)
+            if (isset($_FILES["image"])) {
+                $files = $_FILES["image"];
+                $tmpNames = is_array($files["tmp_name"]) ? $files["tmp_name"] : [$files["tmp_name"]];
+                
+                foreach ($tmpNames as $tmpName) {
+                    if (is_uploaded_file($tmpName)) {
+                        $imageUrl = uploadImageToStoreFolder($tmpName, $storeId, "products");
+                        insertDB("images", array("productId" => $productId, "imageurl" => $imageUrl));
+                    }
+                }
+            }
             
             // Handle Categories
             if( isset($data["categoryIds"]) && is_array($data["categoryIds"]) ){
@@ -148,16 +156,22 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 }
             }
             
-            // Handle Simple Product Attributes
-            if( $insertData["type"] == 1 ){
-                $attrData = array(
-                    "productId" => $productId,
-                    "price" => isset($data["price"]) ? $data["price"] : "0",
-                    "cost" => isset($data["cost"]) ? $data["cost"] : "0",
-                    "sku" => isset($data["sku"]) ? $data["sku"] : "",
-                    "quantity" => isset($data["quantity"]) ? $data["quantity"] : "0"
-                );
-                insertDB("attributes_products", $attrData);
+            // Handle Attributes (Variants) - Always at least one
+            if( isset($data["variants"]) && is_array($data["variants"]) ){
+                foreach($data["variants"] as $variant){
+                    $attrData = array(
+                        "productId" => $productId,
+                        "storeId" => $storeId,
+                        "attribute" => $variant["attribute"] ?? "",
+                        "enTitle" => $variant["enTitle"] ?? "",
+                        "arTitle" => $variant["arTitle"] ?? "",
+                        "price" => $variant["price"] ?? "0",
+                        "cost" => $variant["cost"] ?? "0",
+                        "sku" => $variant["sku"] ?? "",
+                        "quantity" => $variant["quantity"] ?? "0"
+                    );
+                    insertDB("attributes_products", $attrData);
+                }
             }
             
             logStoreActivity("Products", "Added product: " . $data["enTitle"]);
@@ -176,12 +190,20 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             if(isset($data[$field])) $updateData[$field] = $data[$field];
         }
 
-        // Handle Image Upload
-        if (isset($_FILES["image"]) && is_uploaded_file($_FILES["image"]["tmp_name"])) {
-            $updateData["imageurl"] = uploadImageToStoreFolder($_FILES["image"]["tmp_name"], $storeId, "products");
-        }
-        
         if( updateDBNew("products", $updateData, "id = ? AND storeId = ?", [$data["productId"], $storeId]) ){
+            // Handle Image Upload (Add to images table)
+            if (isset($_FILES["image"])) {
+                $files = $_FILES["image"];
+                $tmpNames = is_array($files["tmp_name"]) ? $files["tmp_name"] : [$files["tmp_name"]];
+
+                foreach ($tmpNames as $tmpName) {
+                    if (is_uploaded_file($tmpName)) {
+                        $imageUrl = uploadImageToStoreFolder($tmpName, $storeId, "products");
+                        insertDB("images", array("productId" => $data["productId"], "imageurl" => $imageUrl));
+                    }
+                }
+            }
+
             // Update categories if provided
             if( isset($data["categoryIds"]) && is_array($data["categoryIds"]) ){
                 deleteDB("category_products", "productId = '{$data["productId"]}'");
@@ -190,17 +212,22 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 }
             }
             
-            // Update attributes if simple
-            $product = selectDB("products", "id = '{$data["productId"]}'");
-            if( $product && $product[0]["type"] == 1 ){
-                $attrData = array();
-                if(isset($data["price"])) $attrData["price"] = $data["price"];
-                if(isset($data["cost"])) $attrData["cost"] = $data["cost"];
-                if(isset($data["sku"])) $attrData["sku"] = $data["sku"];
-                if(isset($data["quantity"])) $attrData["quantity"] = $data["quantity"];
-                
-                if(!empty($attrData)){
-                    updateDBNew("attributes_products", $attrData, "productId = ? AND hidden = '0'", [$data["productId"]]);
+            // Update / Replace Attributes (Variants) - Always at least one
+            if( isset($data["variants"]) && is_array($data["variants"]) ){
+                deleteDB("attributes_products", "productId = '{$data["productId"]}'");
+                foreach($data["variants"] as $variant){
+                    $attrData = array(
+                        "productId" => $data["productId"],
+                        "storeId" => $storeId,
+                        "attribute" => $variant["attribute"] ?? "",
+                        "enTitle" => $variant["enTitle"] ?? "",
+                        "arTitle" => $variant["arTitle"] ?? "",
+                        "price" => $variant["price"] ?? "0",
+                        "cost" => $variant["cost"] ?? "0",
+                        "sku" => $variant["sku"] ?? "",
+                        "quantity" => $variant["quantity"] ?? "0"
+                    );
+                    insertDB("attributes_products", $attrData);
                 }
             }
             
