@@ -154,6 +154,12 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     insertDB("category_products", array("productId" => $productId, "categoryId" => $catId));
                 }
             }
+
+            // Handle Extras
+            if( isset($data["extraIds"]) && is_array($data["extraIds"]) ){
+                $extrasJson = json_encode($data["extraIds"]);
+                updateDBNew("products", array("extras" => $extrasJson), "id = ?", [$productId]);
+            }
             
             // Handle Attributes (Variants) - Always at least one
             if( isset($data["variants"]) && is_array($data["variants"]) ){
@@ -209,6 +215,12 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 foreach($data["categoryIds"] as $catId){
                     insertDB("category_products", array("productId" => $data["productId"], "categoryId" => $catId));
                 }
+            }
+
+            // Update extras if provided
+            if( isset($data["extraIds"]) && is_array($data["extraIds"]) ){
+                $extrasJson = json_encode($data["extraIds"]);
+                updateDBNew("products", array("extras" => $extrasJson), "id = ?", [$data["productId"]]);
             }
             
             // Update / Replace Attributes (Variants) - Always at least one
