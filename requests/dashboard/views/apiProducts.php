@@ -114,7 +114,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             // If variant product (Type 0), get all variants with their details
             $variants = selectDB("attributes_products", "productId = '{$product["id"]}' AND hidden != '2'");
             $product["variants"] = $variants ?: [];
-        }
+        } 
         
         echo outputData($product);die();
     }elseif( $action == "add" ){
