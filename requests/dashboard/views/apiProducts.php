@@ -6,23 +6,14 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
     $data = $_POST;
     
     if( $action == "list" ){
-        $products = selectDB("products", "storeId = '{$storeId}' AND status = '0' ORDER BY id DESC");
-        $response["products"] = array();
-        if( $products ){
-            foreach($products as $product){
-                $response["products"][] = array(
-                    "id" => $product["id"],
-                    "enTitle" => $product["enTitle"],
-                    "arTitle" => $product["arTitle"],
-                    "image" => $product["imageurl"],
-                    "type" => $product["type"], // 1: Simple, 0: Variant
-                    "recent" => $product["recent"],
-                    "bestSeller" => $product["bestSeller"],
-                    "hidden" => $product["hidden"],
-                );
-            }
-        }
-        echo outputData($response);
+        $sql = "SELECT p.id, p.enTitle, p.arTitle, p.type, p.recent, p.bestSeller, p.hidden, 
+                (SELECT i.imageurl FROM images i WHERE i.productId = p.id ORDER BY i.id ASC LIMIT 1) as image
+                FROM products p 
+                WHERE p.storeId = '{$storeId}' AND p.status = '0' 
+                ORDER BY p.id DESC";
+        $products = queryDB($sql);
+        $response["products"] = $products ?: [];
+        echo outputData($response);die();
     }elseif( $action == "details" ){
         if( !isset($data["productId"]) || empty($data["productId"]) ){
             echo outputError(array("msg" => "Product ID Is Required"));die();
@@ -32,6 +23,12 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             echo outputError(array("msg" => "Product not found"));die();
         }
         $product = $product[0];
+        
+        // Get all images from images table for management/deletion
+        $images = selectDB2("id, imageurl", "images", "productId = '{$product["id"]}' ORDER BY id ASC");
+        $product["image"] = $images[0]["imageurl"] ?? "";
+        $product["gallery"] = $images ?: [];
+
         // Get categories
         $categories = selectDB("category_products", "productId = '{$product["id"]}'");
         $product["selectedCategories"] = array_column($categories, 'categoryId');
@@ -175,6 +172,22 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             updateDBNew("products", array($field => $newVal), "id = ? AND storeId = ?", [$data["productId"], $storeId]);
             echo outputData(array("msg" => "Status updated"));
         }
+    }elseif( $action == "deleteImage" ){
+        if( !isset($data["imageId"]) || empty($data["imageId"]) ){
+            echo outputError(array("msg" => "Image ID Is Required"));die();
+        }
+        // Verify image owner via product
+        $image = selectDB("images", "id = '{$data["imageId"]}'");
+        if( $image ){
+            $pId = $image[0]["productId"];
+            $product = selectDB("products", "id = '{$pId}' AND storeId = '{$storeId}'");
+            if( $product ){
+                if( deleteDB("images", "id = '{$data["imageId"]}'") ){
+                    echo outputData(array("msg" => "Image deleted successfully"));die();
+                }
+            }
+        }
+        echo outputError(array("msg" => "Failed to delete image or unauthorized"));
     } else {
         echo outputError(array("msg" => "Invalid action specified"));
     }
