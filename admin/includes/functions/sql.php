@@ -194,20 +194,16 @@ function selectJoinDB($table, $joinData, $where){
 
 function insertDB($table, $data){
     GLOBAL $dbconnect, $userID, $empUsername, $_GET;
-    $check = [';', '"'];
-    //$data = escapeString($data);
     $keys = array_keys($data);
-    $sql = "INSERT INTO `{$table}`(";
     $placeholders = "";
+    $columns = "";
     foreach ($keys as $key) {
-        // Use urlencode for keys to ensure they are safe/escaped
-        $safeKey = urlencode($key);
-        $sql .= "`{$safeKey}`,";
+        $columns .= "`{$key}`,";
         $placeholders .= "?,";
     }
-    $sql = rtrim($sql, ",");
+    $columns = rtrim($columns, ",");
     $placeholders = rtrim($placeholders, ",");
-    $sql .= ") VALUES ({$placeholders})";
+    $sql = "INSERT INTO `{$table}`({$columns}) VALUES ({$placeholders})";
     if($stmt = $dbconnect->prepare($sql)){
         $types = str_repeat('s', count($data));
         $stmt->bind_param($types, ...array_values($data));

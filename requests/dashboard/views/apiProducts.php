@@ -129,8 +129,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             "width" => isset($data["width"]) ? $data["width"] : "0",
             "height" => isset($data["height"]) ? $data["height"] : "0",
             "depth" => isset($data["depth"]) ? $data["depth"] : "0",
-            "weight" => isset($data["weight"]) ? $data["weight"] : "0",
-            "imageurl" => isset($data["imageurl"]) ? $data["imageurl"] : ""
+            "weight" => isset($data["weight"]) ? $data["weight"] : "0"
         );
         
         if( insertDB("products", $insertData) ){
@@ -184,7 +183,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             echo outputError(array("msg" => "Product ID Is Required"));die();
         }
         
-        $fields = ["enTitle", "arTitle", "type", "enDetails", "arDetails", "discount", "discountType", "video", "preorder", "preorderText", "preorderTextAr", "sizeChart", "oneTime", "isImage", "collection", "giftCard", "width", "height", "depth", "weight", "imageurl", "hidden"];
+        $fields = ["enTitle", "arTitle", "type", "enDetails", "arDetails", "discount", "discountType", "video", "preorder", "preorderText", "preorderTextAr", "sizeChart", "oneTime", "isImage", "collection", "giftCard", "width", "height", "depth", "weight", "hidden"];
         $updateData = array();
         foreach($fields as $field){
             if(isset($data[$field])) $updateData[$field] = $data[$field];
