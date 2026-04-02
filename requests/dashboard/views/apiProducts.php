@@ -9,8 +9,22 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         $page = isset($_REQUEST["page"]) ? (int)$_REQUEST["page"] : 1;
         $limit = isset($_REQUEST["limit"]) ? (int)$_REQUEST["limit"] : 20;
         $offset = ($page - 1) * $limit;
+        $search = $_REQUEST["search"] ?? "";
+        $orderBy = $_REQUEST["orderBy"] ?? "id";
+        $orderDir = $_REQUEST["orderDir"] ?? "DESC";
 
         $where = "p.storeId = '{$storeId}' AND p.status = '0'";
+
+        // Search logic
+        if (!empty($search)) {
+            $searchEscaped = $dbconnect->real_escape_string($search);
+            $where .= " AND (p.enTitle LIKE '%{$searchEscaped}%' OR p.arTitle LIKE '%{$searchEscaped}%' OR p.id LIKE '%{$searchEscaped}%')";
+        }
+
+        // Sort mapping
+        $allowedSort = ["id", "enTitle", "arTitle", "date"];
+        $sortColumn = in_array($orderBy, $allowedSort) ? "p." . $orderBy : "p.id";
+        $sortDir = (strtoupper($orderDir) === "ASC") ? "ASC" : "DESC";
 
         // Get total count for pagination
         $totalCountResult = queryDB("SELECT COUNT(*) as total FROM products p WHERE {$where}");
@@ -23,7 +37,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 (SELECT i.imageurl FROM images i WHERE i.productId = p.id ORDER BY i.id ASC LIMIT 1) as image
                 FROM products p 
                 WHERE {$where} 
-                ORDER BY p.id DESC 
+                ORDER BY {$sortColumn} {$sortDir} 
                 LIMIT {$limit} OFFSET {$offset}";
         $products = queryDB($sql);
         
