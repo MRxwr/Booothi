@@ -81,8 +81,6 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 }
             }
         }
-        unset($categories); // Free memory
-
         // Get Extras/Add-ons with titles
         $extraIds = json_decode($product["extras"], true) ?: [];
         $product["selectedExtras"] = array();
@@ -99,7 +97,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 }
             }
         }
-        unset($extraIds); // Free memory
+         // Free memory
         $product["variants"] = [];
         // If simple product, get price/sku/quantity from attributes_products
         if( $product["type"] == 1 ){
@@ -115,7 +113,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             $variants = selectDB2("id, enTitle, arTitle, price, cost, sku, quantity, hidden", "attributes_products", "productId = '{$product["id"]}' AND  `status` = '0'");
             $product["variants"] = $variants ?: [];
         } 
-        
+        unset($product["extras"], $product["categoryId"], $product["storeId"], $product["status"], $product["subId"], $product["date"] ); // Remove raw IDs to save memory, we have the titles now
         echo outputData($product);die();
     }elseif( $action == "add" ){
         // Basic required fields
