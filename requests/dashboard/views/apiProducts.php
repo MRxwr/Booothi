@@ -219,6 +219,21 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         }else{
             echo outputError(array("msg" => "Failed to delete product"));
         }
+    }elseif( $action == "hide" ){
+        if( !isset($_REQUEST["productId"]) || empty($_REQUEST["productId"]) ){
+            echo outputError(array("msg" => "Product ID Is Required"));die();  
+        }
+        $product = selectDB("products", "id = '{$_REQUEST["productId"]}' AND storeId = '{$storeId}'");
+        if( !$product ){
+            echo outputError(array("msg" => "Product not found"));die();
+        }
+        $newHidden = ($product[0]["hidden"] == 1) ? 2 : 1;
+        if( updateDBNew("products", array("hidden" => $newHidden), "id = ? AND storeId = ?", [$_REQUEST["productId"], $storeId] ) ){
+            logStoreActivity("Products", "Toggled visibility for product: " . $_REQUEST["productId"]);
+            echo outputData(array("msg" => "Product visibility updated"));
+        }else{
+            echo outputError(array("msg" => "Failed to update visibility"));
+        }
     }elseif( $action == "toggleStatus" ){
         // Handle recent/bestSeller toggles
         if( !isset($data["productId"]) || !isset($data["field"]) ){
