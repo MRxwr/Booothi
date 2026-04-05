@@ -11,18 +11,18 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted employees for the store (excluding system admins/hidden accounts)
-        $employees = selectDBNew("employees", "status = ? AND storeId = ? AND hidden != ?", ["0", $storeId, "1"], "ORDER BY id DESC");
+        $employees = selectDBNew("employees", ["0", $storeId, "1"], "status = ? AND storeId = ? AND hidden != ?", "id DESC");
         
         // Enrich with Shop and Role details
         if ($employees) {
             foreach ($employees as &$emp) {
                 // Get Shop name
-                $shop = selectDBNew("shops", "id = ?", [$emp["shopId"]], "");
+                $shop = selectDBNew("shops", [$emp["shopId"]], "id = ?", "");
                 $emp["shopTitleEn"] = $shop ? $shop[0]["enTitle"] : "";
                 $emp["shopTitleAr"] = $shop ? $shop[0]["arTitle"] : "";
 
                 // Get Role name
-                $role = selectDBNew("roles", "id = ?", [$emp["empType"]], "");
+                $role = selectDBNew("roles", [$emp["empType"]], "id = ?", "");
                 $emp["roleTitleEn"] = $role ? $role[0]["enTitle"] : "";
                 $emp["roleTitleAr"] = $role ? $role[0]["arTitle"] : "";
                 
@@ -124,13 +124,13 @@ switch ($action) {
 
     case "getRoles":
         // Get list of available roles for the dropdown
-        $roles = selectDBNew("roles", "status = ? AND hidden = ?", ["0", "1"], "");
+        $roles = selectDBNew("roles", ["0", "1"], "status = ? AND hidden = ?", "");
         outputData($roles ?: []);
         break;
 
     case "getShops":
         // Get list of available shops for the dropdown
-        $shops = selectDBNew("shops", "status = ? AND storeId = ?", ["0", $storeId], "");
+        $shops = selectDBNew("shops", ["0", $storeId], "status = ? AND storeId = ?", "");
         outputData($shops ?: []);
         break;
 

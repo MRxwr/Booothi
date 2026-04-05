@@ -18,10 +18,10 @@ switch ($action) {
         $productIdScope = $_REQUEST["productId"];
 
         // Get all active categories for the store
-        $categories = selectDBNew("categories", "status = ? AND storeId = ?", ["0", $storeId], "ORDER BY rank ASC");
+        $categories = selectDBNew("categories", ["0", $storeId], "status = ? AND storeId = ?", "rank ASC");
         
         // Get current collections for this product
-        $currentCollections = selectDBNew("collections", "productId = ?", [$productIdScope], "");
+        $currentCollections = selectDBNew("collections", [$productIdScope], "productId = ?", "");
         $checkedCategoryIds = $currentCollections ? array_column($currentCollections, "categoryId") : [];
 
         $response = [];
@@ -49,7 +49,7 @@ switch ($action) {
         $newCategoryIds = $_POST["categoryIds"]; // Expected as an array
 
         // Verify the product belongs to the store
-        $productCheck = selectDBNew("products", "id = ? AND storeId = ?", [$productIdScope, $storeId], "");
+        $productCheck = selectDBNew("products", [$productIdScope, $storeId], "id = ? AND storeId = ?", "");
         if (!$productCheck) {
             outputError("Invalid Product ID.");
         }

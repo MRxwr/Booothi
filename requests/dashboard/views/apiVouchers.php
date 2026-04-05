@@ -11,7 +11,7 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted vouchers for the store
-        $vouchers = selectDBNew("vouchers", "status = ? AND storeId = ?", ["0", $storeId], "ORDER BY id DESC");
+        $vouchers = selectDBNew("vouchers", ["0", $storeId], "status = ? AND storeId = ?", "id DESC");
         if ($vouchers) {
             outputData($vouchers);
         } else {
@@ -94,7 +94,7 @@ switch ($action) {
             outputError("Voucher ID required.");
         }
 
-        $voucher = selectDBNew("vouchers", "id = ? AND storeId = ?", [$_REQUEST["id"], $storeId], "");
+        $voucher = selectDBNew("vouchers", [$_REQUEST["id"], $storeId], "id = ? AND storeId = ?", "");
         if ($voucher) {
             $items = json_decode($voucher[0]["items"], true) ?: [];
             outputData($items);
