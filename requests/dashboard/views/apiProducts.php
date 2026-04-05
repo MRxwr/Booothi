@@ -317,6 +317,56 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             }
         }
         echo outputError(array("msg" => "Failed to delete image or unauthorized"));
+    }elseif( $action == "getAttributes" ){
+        $attributes = selectDB2("id, enTitle, arTitle", "attributes", "status = '0'");
+        echo outputData(array("attributes" => $attributes ?: []));die();
+
+    }elseif( $action == "buildVariants" ){
+        if( !isset($data["attributes"]) || !is_array($data["attributes"]) ){
+            echo outputError(array("msg" => "Attributes array is required"));die();
+        }
+
+        // Build array of title arrays per attribute
+        $titleGroups = [];
+        foreach($data["attributes"] as $attr){
+            if( !isset($attr["titles"]) || !is_array($attr["titles"]) || empty($attr["titles"]) ) continue;
+            $attrInfo = selectDB2("enTitle, arTitle", "attributes", "id = '{$attr["attributeId"]}' AND status = '0'");
+            if( !$attrInfo ) continue;
+            $titleGroups[] = $attr["titles"];
+        }
+
+        if( empty($titleGroups) ){
+            echo outputError(array("msg" => "No valid attributes provided"));die();
+        }
+
+        // Cartesian product of all title groups
+        $combinations = [[]];
+        foreach($titleGroups as $group){
+            $newCombinations = [];
+            foreach($combinations as $existing){
+                foreach($group as $title){
+                    $newCombinations[] = array_merge($existing, [trim($title)]);
+                }
+            }
+            $combinations = $newCombinations;
+        }
+
+        // Build variant skeleton objects ready for client to fill
+        $variants = [];
+        foreach($combinations as $combo){
+            $variants[] = array(
+                "attribute" => implode("_", $combo),
+                "enTitle" => "",
+                "arTitle" => "",
+                "price" => "0",
+                "cost" => "0",
+                "sku" => "",
+                "quantity" => "0"
+            );
+        }
+
+        echo outputData(array("variants" => $variants));die();
+
     } else {
         echo outputError(array("msg" => "Invalid action specified"));
     }
