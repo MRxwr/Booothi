@@ -329,10 +329,10 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         // Build array of title arrays per attribute
         $titleGroups = [];
         foreach($data["attributes"] as $attr){
-            if( !isset($attr["titles"]) || !is_array($attr["titles"]) || empty($attr["titles"]) ) continue;
+            if( !isset($attr["title"]) || !is_array($attr["title"]) || empty($attr["title"]) ) continue;
             $attrInfo = selectDB2("enTitle, arTitle", "attributes", "id = '{$attr["attributeId"]}' AND status = '0'");
             if( !$attrInfo ) continue;
-            $titleGroups[] = $attr["titles"];
+            $titleGroups[] = $attr["title"];
         }
 
         if( empty($titleGroups) ){
