@@ -91,7 +91,7 @@ switch ($action) {
 
     case "hide":
         // Toggle voucher visibility (hidden=1 is visible, 2 is hidden)
-        if (!isset($_REQUEST["voucherId"]) || !isset($_REQUEST["hidden"])) {
+        if (!isset($_REQUEST["voucherId"]) ) {
             echo outputError(["msg" => "Voucher ID and hidden status required."]);die();
         }
 
