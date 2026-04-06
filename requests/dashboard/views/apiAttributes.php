@@ -4,7 +4,7 @@
 
 if (!isset($storeId)) {
     // Fallback if index.php hasn't defined $storeId
-    outputError("Authentication required.");
+    echo outputError(["msg" => "Authentication required."]);die();
 }
 
 $action = $_REQUEST["action"] ?? "";
@@ -23,7 +23,7 @@ switch ($action) {
     case "add":
         // Add a new attribute
         if (!isset($_POST["enTitle"]) || !isset($_POST["arTitle"])) {
-            echo outputError("Missing required fields."); die();
+            echo outputError(["msg" => "Missing required fields."]); die();
         }
 
         $insertData = [
@@ -38,14 +38,14 @@ switch ($action) {
             logStoreActivity($storeId, "Attribute Added: " . $_POST["enTitle"]);
             echo outputData(["message" => "Attribute added successfully."]); die();
         } else {
-            echo outputError("Failed to add attribute."); die();
+            echo outputError(["msg" => "Failed to add attribute."]); die();
         }
         break;
 
     case "update":
         // Update an existing attribute
         if (!isset($_POST["attributeId"]) || !isset($_POST["enTitle"]) || !isset($_POST["arTitle"])) {
-            echo outputError("Missing required fields."); die();
+            echo outputError(["msg" => "Missing required fields."]); die();
         }
 
         $attributeId = $_POST["attributeId"];
@@ -58,29 +58,29 @@ switch ($action) {
             logStoreActivity($storeId, "Attribute Updated: " . $_POST["enTitle"]);
             echo outputData(["message" => "Attribute updated successfully."]); die();
         } else {
-            echo outputError("Failed to update attribute or no changes made."); die();
+            echo outputError(["msg" => "Failed to update attribute or no changes made."]); die();
         }
         break;
     case "hide":
         if( !isset($_REQUEST["attributeId"]) || empty($_REQUEST["attributeId"]) ){
-            echo outputError(array("msg" => "Attribute ID Is Required"));die();  
+            echo outputError(["msg" => "Attribute ID Is Required"]);die();  
         }
         $attribute = selectDB("attributes", "id = '{$_REQUEST["attributeId"]}' AND storeId = '{$storeId}'");
         if( !$attribute ){
-            echo outputError(array("msg" => "Attribute not found"));die();
+            echo outputError(["msg" => "Attribute not found"]);die();
         }
         $newHidden = ($attribute[0]["hidden"] == 1) ? 2 : 1;
         if( updateDBNew("attributes", array("hidden" => $newHidden), "id = ? AND storeId = ?", [$_REQUEST["attributeId"], $storeId] ) ){
             logStoreActivity("Attributes", "Toggled visibility for attribute: " . $_REQUEST["attributeId"]);
             echo outputData(array("msg" => "Attribute visibility updated"));
         }else{
-            echo outputError(array("msg" => "Failed to update visibility"));
+            echo outputError(["msg" => "Failed to update visibility"]);
         }
         break;
     case "delete":
         // Soft delete an attribute (status = 1)
         if (!isset($_REQUEST["attributeId"])) {
-            echo outputError("Attribute ID required."); die();
+            echo outputError(["msg" => "Attribute ID required."]); die();
         }
 
         $attributeId = $_REQUEST["attributeId"];
@@ -90,11 +90,11 @@ switch ($action) {
             logStoreActivity($storeId, "Attribute Deleted ID: " . $attributeId);
             echo outputData(["message" => "Attribute deleted successfully."]); die();
         } else {
-            echo outputError("Failed to delete attribute."); die();
+            echo outputError(["msg" => "Failed to delete attribute."]); die();
         }
         break;
 
     default:
-        echo outputError("Invalid action."); die();
+        echo outputError(["msg" => "Invalid action."]); die();
         break;
 }
