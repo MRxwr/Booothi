@@ -48,6 +48,22 @@ switch ($action) {
             echo outputError(["msg" => "Missing required fields."]);die();
         }
 
+        // Check if email already exists
+        $existingEmail = selectDBNew("employees", [$_POST["email"], "1"], "email = ? AND status != ?", "");
+        if ($existingEmail) {
+            echo outputError(["msg" => "Email already exists."]);
+            die();
+        }
+
+        // Check if phone already exists (if provided)
+        if (!empty($_POST["phone"])) {
+            $existingPhone = selectDBNew("employees", [$_POST["phone"], "1"], "phone = ? AND status != ?", "");
+            if ($existingPhone) {
+                echo outputError(["msg" => "Phone number already exists."]);
+                die();
+            }
+        }
+
         $insertData = [
             "fullName" => $_POST["fullName"],
             "email"    => $_POST["email"],
@@ -75,6 +91,23 @@ switch ($action) {
         }
 
         $empId = $_POST["id"];
+
+        // Check if email already exists for another employee
+        $existingEmail = selectDBNew("employees", [$_POST["email"], $storeId, "1", $empId], "email = ? AND storeId = ? AND status != ? AND id != ?", "");
+        if ($existingEmail) {
+            echo outputError(["msg" => "Email already exists."]);
+            die();
+        }
+
+        // Check if phone already exists for another employee (if provided)
+        if (!empty($_POST["phone"])) {
+            $existingPhone = selectDBNew("employees", [$_POST["phone"], $storeId, "1", $empId], "phone = ? AND storeId = ? AND status != ? AND id != ?", "");
+            if ($existingPhone) {
+                echo outputError(["msg" => "Phone number already exists."]);
+                die();
+            }
+        }
+
         $updateData = [
             "fullName" => $_POST["fullName"],
             "email"    => $_POST["email"],
