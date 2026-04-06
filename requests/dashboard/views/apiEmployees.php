@@ -57,7 +57,7 @@ switch ($action) {
             "shopId"   => $_POST["shopId"] ?? "0",
             "storeId"  => $storeId,
             "status"   => "0",
-            "hidden"   => "0" 
+            "hidden"   => "1" 
         ];
 
         if (insertDB("employees", $insertData)) {
