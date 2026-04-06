@@ -48,16 +48,16 @@ switch ($action) {
             echo outputError(["msg" => "Missing required fields."]);die();
         }
 
-        // Check if email already exists (only among non-deleted employees)
-        $existingEmail = selectDBNew("employees", [$_POST["email"], $storeId, "0"], "email = ? AND storeId = ? AND is_deleted = ?", "");
+        // Check if email already exists globally (only among non-deleted employees)
+        $existingEmail = selectDBNew("employees", [$_POST["email"], "0"], "email = ? AND is_deleted = ?", "");
         if ($existingEmail) {
             echo outputError(["msg" => "Email already exists."]);
             die();
         }
 
-        // Check if phone already exists (if provided, only among non-deleted employees)
+        // Check if phone already exists globally (if provided, only among non-deleted employees)
         if (!empty($_POST["phone"])) {
-            $existingPhone = selectDBNew("employees", [$_POST["phone"], $storeId, "0"], "phone = ? AND storeId = ? AND is_deleted = ?", "");
+            $existingPhone = selectDBNew("employees", [$_POST["phone"], "0"], "phone = ? AND is_deleted = ?", "");
             if ($existingPhone) {
                 echo outputError(["msg" => "Phone number already exists."]);
                 die();
@@ -93,16 +93,16 @@ switch ($action) {
 
         $empId = $_POST["employeeId"];
 
-        // Check if email already exists for another non-deleted employee
-        $existingEmail = selectDBNew("employees", [$_POST["email"], $storeId, "0", $empId], "email = ? AND storeId = ? AND is_deleted = ? AND id != ?", "");
+        // Check if email already exists globally for another non-deleted employee
+        $existingEmail = selectDBNew("employees", [$_POST["email"], "0", $empId], "email = ? AND is_deleted = ? AND id != ?", "");
         if ($existingEmail) {
             echo outputError(["msg" => "Email already exists."]);
             die();
         }
 
-        // Check if phone already exists for another non-deleted employee (if provided)
+        // Check if phone already exists globally for another non-deleted employee (if provided)
         if (!empty($_POST["phone"])) {
-            $existingPhone = selectDBNew("employees", [$_POST["phone"], $storeId, "0", $empId], "phone = ? AND storeId = ? AND is_deleted = ? AND id != ?", "");
+            $existingPhone = selectDBNew("employees", [$_POST["phone"], "0", $empId], "phone = ? AND is_deleted = ? AND id != ?", "");
             if ($existingPhone) {
                 echo outputError(["msg" => "Phone number already exists."]);
                 die();
