@@ -40,7 +40,7 @@ switch ($action) {
 
         if (insertDB("roles", $insertData)) {
             logStoreActivity($storeId, "Role Added: " . $_POST["enTitle"]);
-            echo outputData(["message" => "Role added successfully."]); die();
+            echo outputData(["msg" => "Role added successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to add role."]); die();
         }
@@ -60,7 +60,7 @@ switch ($action) {
 
         if (updateDBNew("roles", $updateData, "id = ? AND storeId = ?", [$roleId, $storeId])) {
             logStoreActivity($storeId, "Role Updated: " . $_POST["enTitle"]);
-            echo outputData(["message" => "Role updated successfully."]); die();
+            echo outputData(["msg" => "Role updated successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to update role or no changes made."]); die();
         }
@@ -92,7 +92,7 @@ switch ($action) {
         $roleId = $_REQUEST["roleId"];
         if (updateDBNew("roles", ["status" => "1"], "id = ? AND storeId = ?", [$roleId, $storeId])) {
             logStoreActivity($storeId, "Role Deleted ID: " . $roleId);
-            echo outputData(["message" => "Role deleted successfully."]); die();
+            echo outputData(["msg" => "Role deleted successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to delete role."]); die();
         }
@@ -115,7 +115,7 @@ switch ($action) {
 
         if (updateDBNew("roles", ["pages" => $pagesJson], "id = ? AND storeId = ?", [$roleId, $storeId])) {
             logStoreActivity($storeId, "Role Permissions Updated ID: " . $roleId);
-            echo outputData(["message" => "Permissions updated successfully."]); die();
+            echo outputData(["msg" => "Permissions updated successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to update permissions."]); die();
         }

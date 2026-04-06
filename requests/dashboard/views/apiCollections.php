@@ -72,7 +72,7 @@ switch ($action) {
         }
 
         logStoreActivity($storeId, "Product Collections Updated (Product ID: $productIdScope, $count categories)");
-        echo outputData(["message" => "Collections updated successfully for $count categories."]);die();
+        echo outputData(["msg" => "Collections updated successfully for $count categories."]);die();
         break;
 
     default:

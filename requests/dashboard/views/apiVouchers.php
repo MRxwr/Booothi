@@ -39,7 +39,7 @@ switch ($action) {
 
         if (insertDB("vouchers", $insertData)) {
             logStoreActivity($storeId, "Voucher Added: " . $_POST["code"]);
-            echo outputData(["message" => "Voucher added successfully."]);die();
+            echo outputData(["msg" => "Voucher added successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to add voucher."]);die();
         }
@@ -68,7 +68,7 @@ switch ($action) {
 
         if (updateDBNew("vouchers", $updateData, "id = ? AND storeId = ?", [$voucherId, $storeId])) {
             logStoreActivity($storeId, "Voucher Updated: " . $_POST["code"]);
-            echo outputData(["message" => "Voucher updated successfully."]);die();
+            echo outputData(["msg" => "Voucher updated successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to update voucher or no changes made."]);die();
         }
@@ -83,7 +83,7 @@ switch ($action) {
         $voucherId = $_REQUEST["voucherId"];
         if (updateDBNew("vouchers", ["status" => "1"], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
             logStoreActivity($storeId, "Voucher Deleted ID: " . $voucherId);
-            echo outputData(["message" => "Voucher deleted successfully."]);die();
+            echo outputData(["msg" => "Voucher deleted successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to delete voucher."]);die();
         }
@@ -101,24 +101,44 @@ switch ($action) {
         if (updateDBNew("vouchers", ["hidden" => $hiddenValue], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
             $statusText = ($_REQUEST["hidden"] == "1") ? "Hidden" : "Visible";
             logStoreActivity($storeId, "Voucher visibility toggled to $statusText ID: " . $voucherId);
-            echo outputData(["message" => "Voucher visibility updated."]);die();
+            echo outputData(["msg" => "Voucher visibility updated."]);die();
         } else {
             echo outputError(["msg" => "Failed to update voucher visibility."]);die();
         }
         break;
     case "getItems":
-        // Get specific items associated with a voucher (if type != 1)
+        // Get specific items associated with a voucher (if type != 1) with full product details
         if (!isset($_REQUEST["voucherId"])) {
             echo outputError(["msg" => "Voucher ID required."]);die();
         }
 
         $voucher = selectDBNew("vouchers", [$_REQUEST["voucherId"], $storeId], "id = ? AND storeId = ?", "");
-        if ($voucher) {
-            $items = json_decode($voucher[0]["items"], true) ?: [];
-            echo outputData($items);die();
-        } else {
+        if (!$voucher) {
             echo outputError(["msg" => "Voucher not found."]);die();
         }
+
+        $itemIds = json_decode($voucher[0]["items"], true) ?: [];
+        
+        if (empty($itemIds)) {
+            echo outputData([]);die();
+        }
+
+        // Build WHERE clause for product IDs
+        $placeholders = implode(',', array_fill(0, count($itemIds), '?'));
+        $where = "p.id IN ($placeholders) AND p.storeId = ? AND p.status = '0'";
+        
+        // Prepare parameters (product IDs + storeId)
+        $params = array_merge($itemIds, [$storeId]);
+        
+        // Fetch full product details
+        $sql = "SELECT p.id, p.enTitle, p.arTitle,
+                (SELECT i.imageurl FROM images i WHERE i.productId = p.id ORDER BY i.id ASC LIMIT 1) as image
+                FROM products p 
+                WHERE {$where} 
+                ORDER BY p.id DESC";
+        
+        $products = queryDB($sql, $params);
+        echo outputData($products ?: []);die();
         break;
 
     case "saveItems":
@@ -132,7 +152,7 @@ switch ($action) {
 
         if (updateDBNew("vouchers", ["items" => $itemsJson], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
             logStoreActivity($storeId, "Voucher Items Updated ID: " . $voucherId);
-            echo outputData(["message" => "Voucher items updated successfully."]);die();
+            echo outputData(["msg" => "Voucher items updated successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to update voucher items."]);die();
         }

@@ -55,7 +55,7 @@ switch ($action) {
 
         if (insertDB("employees", $insertData)) {
             logStoreActivity($storeId, "Employee Added: " . $_POST["fullName"]);
-            echo outputData(["message" => "Employee added successfully."]);die();
+            echo outputData(["msg" => "Employee added successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to add employee."]);die();
         }
@@ -83,7 +83,7 @@ switch ($action) {
 
         if (updateDBNew("employees", $updateData, "id = ? AND storeId = ?", [$empId, $storeId])) {
             logStoreActivity($storeId, "Employee Updated: " . $_POST["fullName"]);
-            echo outputData(["message" => "Employee updated successfully."]);die();
+            echo outputData(["msg" => "Employee updated successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to update employee or no changes made."]);die();
         }
@@ -101,7 +101,7 @@ switch ($action) {
         if (updateDBNew("employees", ["hidden" => $lockedValue], "id = ? AND storeId = ?", [$empId, $storeId])) {
             $statusText = ($_REQUEST["locked"] == "1") ? "Locked" : "Unlocked";
             logStoreActivity($storeId, "Employee account $statusText ID: " . $empId);
-            echo outputData(["message" => "Employee account $statusText."]);die();
+            echo outputData(["msg" => "Employee account $statusText."]);die();
         } else {
             echo outputError(["msg" => "Failed to update employee status."]);die();
         }
@@ -116,7 +116,7 @@ switch ($action) {
         $empId = $_REQUEST["id"];
         if (updateDBNew("employees", ["status" => "1"], "id = ? AND storeId = ?", [$empId, $storeId])) {
             logStoreActivity($storeId, "Employee Deleted ID: " . $empId);
-            echo outputData(["message" => "Employee deleted successfully."]);die();
+            echo outputData(["msg" => "Employee deleted successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to delete employee."]);die();
         }
