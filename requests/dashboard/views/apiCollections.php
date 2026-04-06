@@ -55,12 +55,7 @@ switch ($action) {
         }
 
         // Delete existing collections for this product
-        // Note: Using raw SQL delete here as we don't have a deleteDBNew for raw WHERE yet
-        $delSql = "DELETE FROM `collections` WHERE `productId` = ?";
-        $stmt = $conn->prepare($delSql);
-        $stmt->bind_param("i", $productIdScope);
-        $stmt->execute();
-        $stmt->close();
+        deleteDBNew("collections", "productId = ?", [$productIdScope]);
 
         // Insert new associations
         $count = 0;

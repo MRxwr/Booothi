@@ -3,7 +3,7 @@
 // Action-based routing
 
 if (!isset($storeId)) {
-    outputError("Authentication required.");
+    echo outputError("Authentication required.");die();
 }
 
 $action = $_REQUEST["action"] ?? "";
@@ -29,16 +29,16 @@ switch ($action) {
                 // Remove sensitive info
                 unset($emp["password"]);
             }
-            outputData($employees);
+            echo outputData($employees);die();
         } else {
-            outputData([]);
+            echo outputData([]);die();
         }
         break;
 
     case "add":
         // Add a new employee
         if (!isset($_POST["fullName"]) || !isset($_POST["email"]) || !isset($_POST["password"])) {
-            outputError("Missing required fields.");
+            echo outputError("Missing required fields.");die();
         }
 
         $insertData = [
@@ -55,16 +55,16 @@ switch ($action) {
 
         if (insertDB("employees", $insertData)) {
             logStoreActivity($storeId, "Employee Added: " . $_POST["fullName"]);
-            outputData(["message" => "Employee added successfully."]);
+            echo outputData(["message" => "Employee added successfully."]);die();
         } else {
-            outputError("Failed to add employee.");
+            echo outputError("Failed to add employee.");die();
         }
         break;
 
     case "update":
         // Update an existing employee
         if (!isset($_POST["id"]) || !isset($_POST["fullName"]) || !isset($_POST["email"])) {
-            outputError("Missing required fields.");
+            echo outputError("Missing required fields.");die();
         }
 
         $empId = $_POST["id"];
@@ -83,16 +83,16 @@ switch ($action) {
 
         if (updateDBNew("employees", $updateData, "id = ? AND storeId = ?", [$empId, $storeId])) {
             logStoreActivity($storeId, "Employee Updated: " . $_POST["fullName"]);
-            outputData(["message" => "Employee updated successfully."]);
+            echo outputData(["message" => "Employee updated successfully."]);die();
         } else {
-            outputError("Failed to update employee or no changes made.");
+            echo outputError("Failed to update employee or no changes made.");die();
         }
         break;
 
     case "toggleLock":
         // Lock/Unlock employee account (hidden=2 is locked, 0 is active)
         if (!isset($_REQUEST["id"]) || !isset($_REQUEST["locked"])) {
-            outputError("Employee ID and lock status required.");
+            echo outputError("Employee ID and lock status required.");die();
         }
 
         $empId = $_REQUEST["id"];
@@ -101,40 +101,40 @@ switch ($action) {
         if (updateDBNew("employees", ["hidden" => $lockedValue], "id = ? AND storeId = ?", [$empId, $storeId])) {
             $statusText = ($_REQUEST["locked"] == "1") ? "Locked" : "Unlocked";
             logStoreActivity($storeId, "Employee account $statusText ID: " . $empId);
-            outputData(["message" => "Employee account $statusText."]);
+            echo outputData(["message" => "Employee account $statusText."]);die();
         } else {
-            outputError("Failed to update employee status.");
+            echo outputError("Failed to update employee status.");die();
         }
         break;
 
     case "delete":
         // Soft delete an employee
         if (!isset($_REQUEST["id"])) {
-            outputError("Employee ID required.");
+            echo outputError("Employee ID required.");die();
         }
 
         $empId = $_REQUEST["id"];
         if (updateDBNew("employees", ["status" => "1"], "id = ? AND storeId = ?", [$empId, $storeId])) {
             logStoreActivity($storeId, "Employee Deleted ID: " . $empId);
-            outputData(["message" => "Employee deleted successfully."]);
+            echo outputData(["message" => "Employee deleted successfully."]);die();
         } else {
-            outputError("Failed to delete employee.");
+            echo outputError("Failed to delete employee.");die();
         }
         break;
 
     case "getRoles":
         // Get list of available roles for the dropdown
         $roles = selectDBNew("roles", ["0", "1"], "status = ? AND hidden = ?", "");
-        outputData($roles ?: []);
+        echo outputData($roles ?: []);die();
         break;
 
     case "getShops":
         // Get list of available shops for the dropdown
         $shops = selectDBNew("shops", ["0", $storeId], "status = ? AND storeId = ?", "");
-        outputData($shops ?: []);
+        echo outputData($shops ?: []);die();
         break;
 
     default:
-        outputError("Invalid action.");
+        echo outputError("Invalid action.");die();
         break;
 }

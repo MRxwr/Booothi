@@ -3,7 +3,7 @@
 // Action-based routing
 
 if (!isset($storeId)) {
-    outputError("Authentication required.");
+    echo outputError("Authentication required.");die();
 }
 
 $action = $_REQUEST["action"] ?? "";
@@ -13,16 +13,16 @@ switch ($action) {
         // List all non-deleted vouchers for the store
         $vouchers = selectDBNew("vouchers", ["0", $storeId], "status = ? AND storeId = ?", "id DESC");
         if ($vouchers) {
-            outputData($vouchers);
+            echo outputData($vouchers);die();
         } else {
-            outputData([]);
+            echo outputData([]);die();
         }
         break;
 
     case "add":
         // Add a new voucher
         if (!isset($_POST["code"]) || !isset($_POST["type"]) || !isset($_POST["discount"])) {
-            outputError("Missing required fields.");
+            echo outputError("Missing required fields.");die();
         }
 
         $insertData = [
@@ -38,16 +38,16 @@ switch ($action) {
 
         if (insertDB("vouchers", $insertData)) {
             logStoreActivity($storeId, "Voucher Added: " . $_POST["code"]);
-            outputData(["message" => "Voucher added successfully."]);
+            echo outputData(["message" => "Voucher added successfully."]);die();
         } else {
-            outputError("Failed to add voucher.");
+            echo outputError("Failed to add voucher.");die();
         }
         break;
 
     case "update":
         // Update an existing voucher
         if (!isset($_POST["id"]) || !isset($_POST["code"])) {
-            outputError("Missing required fields.");
+            echo outputError("Missing required fields.");die();
         }
 
         $voucherId = $_POST["id"];
@@ -67,46 +67,46 @@ switch ($action) {
 
         if (updateDBNew("vouchers", $updateData, "id = ? AND storeId = ?", [$voucherId, $storeId])) {
             logStoreActivity($storeId, "Voucher Updated: " . $_POST["code"]);
-            outputData(["message" => "Voucher updated successfully."]);
+            echo outputData(["message" => "Voucher updated successfully."]);die();
         } else {
-            outputError("Failed to update voucher or no changes made.");
+            echo outputError("Failed to update voucher or no changes made.");die();
         }
         break;
 
     case "delete":
         // Soft delete a voucher (status = 1)
         if (!isset($_REQUEST["id"])) {
-            outputError("Voucher ID required.");
+            echo outputError("Voucher ID required.");die();
         }
 
         $voucherId = $_REQUEST["id"];
         if (updateDBNew("vouchers", ["status" => "1"], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
             logStoreActivity($storeId, "Voucher Deleted ID: " . $voucherId);
-            outputData(["message" => "Voucher deleted successfully."]);
+            echo outputData(["message" => "Voucher deleted successfully."]);die();
         } else {
-            outputError("Failed to delete voucher.");
+            echo outputError("Failed to delete voucher.");die();
         }
         break;
 
     case "getItems":
         // Get specific items associated with a voucher (if type != 1)
         if (!isset($_REQUEST["id"])) {
-            outputError("Voucher ID required.");
+            echo outputError("Voucher ID required.");die();
         }
 
         $voucher = selectDBNew("vouchers", [$_REQUEST["id"], $storeId], "id = ? AND storeId = ?", "");
         if ($voucher) {
             $items = json_decode($voucher[0]["items"], true) ?: [];
-            outputData($items);
+            echo outputData($items);die();
         } else {
-            outputError("Voucher not found.");
+            echo outputError("Voucher not found.");die();
         }
         break;
 
     case "saveItems":
         // Save items (JSON array) for a voucher
         if (!isset($_POST["id"]) || !isset($_POST["items"])) {
-            outputError("Voucher ID and items (array) required.");
+            echo outputError("Voucher ID and items (array) required.");die();
         }
 
         $voucherId = $_POST["id"];
@@ -114,13 +114,13 @@ switch ($action) {
 
         if (updateDBNew("vouchers", ["items" => $itemsJson], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
             logStoreActivity($storeId, "Voucher Items Updated ID: " . $voucherId);
-            outputData(["message" => "Voucher items updated successfully."]);
+            echo outputData(["message" => "Voucher items updated successfully."]);die();
         } else {
-            outputError("Failed to update voucher items.");
+            echo outputError("Failed to update voucher items.");die();
         }
         break;
 
     default:
-        outputError("Invalid action.");
+        echo outputError("Invalid action.");die();
         break;
 }
