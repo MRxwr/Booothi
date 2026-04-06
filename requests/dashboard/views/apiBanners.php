@@ -3,7 +3,7 @@
 // Action-based routing
 
 if (!isset($storeId)) {
-    outputError("Authentication required.");
+    echo outputError(["msg" => "Authentication required."]);die();
 }
 
 $action = $_REQUEST["action"] ?? "";
@@ -22,7 +22,7 @@ switch ($action) {
     case "add":
         // Add a new banner
         if (!isset($_POST["title"]) || !isset($_POST["link"])) {
-            echo outputError("Missing required fields."); die();
+            echo outputError(["msg" => "Missing required fields."]); die();
         }
 
         $insertData = [
@@ -44,14 +44,14 @@ switch ($action) {
             logStoreActivity($storeId, "Banner Added: " . $_POST["title"]);
             echo outputData(["message" => "Banner added successfully."]); die();
         } else {
-            echo outputError("Failed to add banner."); die();
+            echo outputError(["msg" => "Failed to add banner."]); die();
         }
         break;
 
     case "update":
         // Update an existing banner
         if (!isset($_POST["bannerId"]) || !isset($_POST["title"]) || !isset($_POST["link"])) {
-            echo outputError("Missing required fields."); die();
+            echo outputError(["msg" => "Missing required fields."]); die();
         } 
 
         $bannerId = $_POST["bannerId"];
@@ -70,31 +70,31 @@ switch ($action) {
             logStoreActivity($storeId, "Banner Updated: " . $_POST["title"]);
             echo outputData(["message" => "Banner updated successfully."]); die();
         } else {
-            echo outputError("Failed to update banner or no changes made."); die();
+            echo outputError(["msg" => "Failed to update banner or no changes made."]); die();
         }
         break;
 
     case "hide":
         if( !isset($_REQUEST["bannerId"]) || empty($_REQUEST["bannerId"]) ){
-            echo outputError(array("msg" => "Banner ID Is Required"));die();  
+            echo outputError(["msg" => "Banner ID Is Required"]);die();  
         }
         $banner = selectDB("banner", "id = '{$_REQUEST["bannerId"]}' AND storeId = '{$storeId}'");
         if( !$banner ){
-            echo outputError(array("msg" => "Banner not found"));die();
+            echo outputError(["msg" => "Banner not found"]);die();
         }
         $newHidden = ($banner[0]["hidden"] == 1) ? 2 : 1;
         if( updateDBNew("banner", array("hidden" => $newHidden), "id = ? AND storeId = ?", [$_REQUEST["bannerId"], $storeId] ) ){
             logStoreActivity("Banners", "Toggled visibility for banner: " . $_REQUEST["bannerId"]);
             echo outputData(array("msg" => "Banner visibility updated"));
         }else{
-            echo outputError(array("msg" => "Failed to update visibility"));
+            echo outputError(["msg" => "Failed to update visibility"]);
         }
         break;
 
     case "delete":
         // Soft delete a banner (status = 1)
         if (!isset($_REQUEST["bannerId"])) {
-            echo outputError("Banner ID required."); die();
+            echo outputError(["msg" => "Banner ID required."]); die();
         }
 
         $bannerId = $_REQUEST["bannerId"];
@@ -102,14 +102,14 @@ switch ($action) {
             logStoreActivity($storeId, "Banner Deleted ID: " . $bannerId);
             echo outputData(["message" => "Banner deleted successfully."]); die();
         } else {
-            echo outputError("Failed to delete banner."); die();
+            echo outputError(["msg" => "Failed to delete banner."]); die();
         }
         break;
 
     case "updateRank":
         // Update rank for multiple banners
         if (!isset($_POST["bannerId"]) || !isset($_POST["rank"]) || !is_array($_POST["bannerId"])) {
-            echo outputError("Invalid rank data."); die();
+            echo outputError(["msg" => "Invalid rank data."]); die();
         }
 
         reset($dbconnect); // Ensure we are ready for multiple updates
@@ -127,6 +127,6 @@ switch ($action) {
         break;
 
     default:
-        echo outputError("Invalid action."); die();
+        echo outputError(["msg" => "Invalid action."]);die();
         break;
 }

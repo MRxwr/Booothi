@@ -3,7 +3,7 @@
 // Action-based routing
 
 if (!isset($storeId)) {
-    echo outputError("Authentication required.");die();
+    echo outputError(["msg" => "Authentication required."]);die();
 }
 
 $action = $_REQUEST["action"] ?? "";
@@ -38,7 +38,7 @@ switch ($action) {
     case "add":
         // Add a new employee
         if (!isset($_POST["fullName"]) || !isset($_POST["email"]) || !isset($_POST["password"])) {
-            echo outputError("Missing required fields.");die();
+            echo outputError(["msg" => "Missing required fields."]);die();
         }
 
         $insertData = [
@@ -57,14 +57,14 @@ switch ($action) {
             logStoreActivity($storeId, "Employee Added: " . $_POST["fullName"]);
             echo outputData(["message" => "Employee added successfully."]);die();
         } else {
-            echo outputError("Failed to add employee.");die();
+            echo outputError(["msg" => "Failed to add employee."]);die();
         }
         break;
 
     case "update":
         // Update an existing employee
         if (!isset($_POST["id"]) || !isset($_POST["fullName"]) || !isset($_POST["email"])) {
-            echo outputError("Missing required fields.");die();
+            echo outputError(["msg" => "Missing required fields."]);die();
         }
 
         $empId = $_POST["id"];
@@ -85,14 +85,14 @@ switch ($action) {
             logStoreActivity($storeId, "Employee Updated: " . $_POST["fullName"]);
             echo outputData(["message" => "Employee updated successfully."]);die();
         } else {
-            echo outputError("Failed to update employee or no changes made.");die();
+            echo outputError(["msg" => "Failed to update employee or no changes made."]);die();
         }
         break;
 
     case "toggleLock":
         // Lock/Unlock employee account (hidden=2 is locked, 0 is active)
         if (!isset($_REQUEST["id"]) || !isset($_REQUEST["locked"])) {
-            echo outputError("Employee ID and lock status required.");die();
+            echo outputError(["msg" => "Employee ID and lock status required."]);die();
         }
 
         $empId = $_REQUEST["id"];
@@ -103,14 +103,14 @@ switch ($action) {
             logStoreActivity($storeId, "Employee account $statusText ID: " . $empId);
             echo outputData(["message" => "Employee account $statusText."]);die();
         } else {
-            echo outputError("Failed to update employee status.");die();
+            echo outputError(["msg" => "Failed to update employee status."]);die();
         }
         break;
 
     case "delete":
         // Soft delete an employee
         if (!isset($_REQUEST["id"])) {
-            echo outputError("Employee ID required.");die();
+            echo outputError(["msg" => "Employee ID required."]);die();
         }
 
         $empId = $_REQUEST["id"];
@@ -118,7 +118,7 @@ switch ($action) {
             logStoreActivity($storeId, "Employee Deleted ID: " . $empId);
             echo outputData(["message" => "Employee deleted successfully."]);die();
         } else {
-            echo outputError("Failed to delete employee.");die();
+            echo outputError(["msg" => "Failed to delete employee."]);die();
         }
         break;
 
@@ -135,6 +135,6 @@ switch ($action) {
         break;
 
     default:
-        echo outputError("Invalid action.");die();
+        echo outputError(["msg" => "Invalid action."]);die();
         break;
 }

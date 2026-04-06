@@ -3,7 +3,7 @@
 // Action-based routing
 
 if (!isset($storeId)) {
-    echo outputError("Authentication required.");die();
+    echo outputError(["msg" => "Authentication required."]);die();
 }
 
 $action = $_REQUEST["action"] ?? "";
@@ -26,7 +26,7 @@ switch ($action) {
     case "add":
         // Add a new extra
         if (!isset($_POST["enTitle"]) || !isset($_POST["arTitle"])) {
-            echo outputError("Missing required fields.");die();
+            echo outputError(["msg" => "Missing required fields."]);die();
         }
 
         $insertData = [
@@ -45,14 +45,14 @@ switch ($action) {
             logStoreActivity($storeId, "Extra Added: " . $_POST["enTitle"]);
             echo outputData(["message" => "Extra added successfully."]);die();
         } else {
-            echo outputError("Failed to add extra.");die();
+            echo outputError(["msg" => "Failed to add extra."]);die();
         }
         break;
 
     case "update":
         // Update an existing extra
         if (!isset($_POST["extraId"]) || !isset($_POST["enTitle"])) {
-            echo outputError("Missing required fields.");die();
+            echo outputError(["msg" => "Missing required fields."]);die();
         }
 
         $extraId = $_POST["extraId"];
@@ -69,14 +69,14 @@ switch ($action) {
             logStoreActivity($storeId, "Extra Updated: " . $_POST["enTitle"]);
             echo outputData(["message" => "Extra updated successfully."]);die();
         } else {
-            echo outputError("Failed to update extra or no changes made.");die();
+            echo outputError(["msg" => "Failed to update extra or no changes made."]);die();
         }
         break;
 
     case "delete":
         // Soft delete an extra
         if (!isset($_REQUEST["extraId"])) {
-            echo outputError("Extra ID required.");die();
+            echo outputError(["msg" => "Extra ID required."]);die();
         }
 
         $extraId = $_REQUEST["extraId"];
@@ -84,7 +84,7 @@ switch ($action) {
             logStoreActivity($storeId, "Extra Deleted ID: " . $extraId);
             echo outputData(["message" => "Extra deleted successfully."]);die();
         } else {
-            echo outputError("Failed to delete extra.");die();
+            echo outputError(["msg" => "Failed to delete extra."]);die();
         }
         break;
 
@@ -92,23 +92,23 @@ switch ($action) {
 
     case "hide":
         if( !isset($_REQUEST["extraId"]) || empty($_REQUEST["extraId"]) ){
-            echo outputError(array("msg" => "Extra ID Is Required"));die();  
+            echo outputError(["msg" => "Extra ID Is Required"]);die();  
         }
         $extra = selectDB("extras", "id = '{$_REQUEST["extraId"]}' AND storeId = '{$storeId}'");
         if( !$extra ){
-            echo outputError(array("msg" => "Extra not found"));die();
+            echo outputError(["msg" => "Extra not found"]);die();
         }
         $newHidden = ($extra[0]["hidden"] == 1) ? 2 : 1;
-        if( updateDBNew("extras", array("hidden" => $newHidden), "id = ? AND storeId = ?", [$_REQUEST["extraId"], $storeId] ) ){
+        if( updateDBNew("extras", ["hidden" => $newHidden], "id = ? AND storeId = ?", [$_REQUEST["extraId"], $storeId] ) ){
             logStoreActivity("Extras", "Toggled visibility for extra: " . $_REQUEST["extraId"]);
-            echo outputData(array("msg" => "Extra visibility updated"));
+            echo outputData(["msg" => "Extra visibility updated"]);
         }else{
-            echo outputError(array("msg" => "Failed to update visibility"));
+            echo outputError(["msg" => "Failed to update visibility"]);
         }
         break;
     case "listVariants":
         if (!isset($_REQUEST["extraId"])) {
-            echo outputError("Extra ID required.");die();
+            echo outputError(["msg" => "Extra ID required."]);die();
         }
         $extraId = $_REQUEST["extraId"];
         $extra = selectDBNew("extras", [$extraId, $storeId], "id = ? AND storeId = ?", "");
@@ -116,14 +116,14 @@ switch ($action) {
             $variants = json_decode($extra[0]["variants"], true) ?: ["enTitle" => [], "arTitle" => []];
             echo outputData($variants);die();
         } else {
-            echo outputError("Extra not found.");die();
+            echo outputError(["msg" => "Extra not found."]);die();
         }
         break;
 
     case "saveVariants":
         // Expects 'extraId' and 'enTitle' (array), 'arTitle' (array)
         if (!isset($_POST["extraId"]) || !isset($_POST["enTitle"]) || !is_array($_POST["enTitle"])) {
-            echo outputError("Invalid variant data.");die();
+            echo outputError(["msg" => "Invalid variant data."]);die();
         }
 
         $extraId = $_POST["extraId"];
@@ -138,11 +138,11 @@ switch ($action) {
             logStoreActivity($storeId, "Extra Variants Updated ID: " . $extraId);
             echo outputData(["message" => "Variants updated successfully."]);die();
         } else {
-            echo outputError("Failed to update variants.");die();
+            echo outputError(["msg" => "Failed to update variants."]);die();
         }
         break;
 
     default:
-        echo outputError("Invalid action.");die();
+        echo outputError(["msg" => "Invalid action."]);die();
         break;
 }

@@ -3,7 +3,7 @@
 // Action-based routing
 
 if (!isset($storeId)) {
-    outputError("Authentication required.");
+    echo outputError(["msg" => "Authentication required."]);die();
 }
 
 /**
@@ -142,7 +142,7 @@ switch ($action) {
     case "details":
         // Get full details of a specific order
         if (!isset($_REQUEST["orderId"]) || empty($_REQUEST["orderId"])) {
-            echo outputError("Order ID required."); die();
+            echo outputError(["msg" => "Order ID required."]); die();
         }
 
         $orderId = $_REQUEST["orderId"];
@@ -233,14 +233,14 @@ switch ($action) {
             
             echo outputData($data); die();
         } else {
-            echo outputError("Order not found."); die();
+            echo outputError(["msg" => "Order not found."]); die();
         }
         break;
 
     case "updateStatus":
         // Update order status (0: Pending, 1: Paid/Confirmed, etc.)
         if (!isset($_POST["orderId"]) || !isset($_POST["status"])) {
-            echo outputError("Order ID and status required."); die();
+            echo outputError(["msg" => "Order ID and status required."]); die();
         }
 
         $orderId = $_POST["orderId"];
@@ -250,11 +250,11 @@ switch ($action) {
             logStoreActivity($storeId, "Order Status Updated ID: $orderId to $newStatus");
             echo outputData(["message" => "Order status updated successfully."]); die();
         } else {
-            echo outputError("Failed to update order status."); die();
+            echo outputError(["msg" => "Failed to update order status."]); die();
         }
         break;
 
     default:
-        echo outputError("Invalid action."); die();
+        echo outputError(["msg" => "Invalid action."]); die();
         break;
 }

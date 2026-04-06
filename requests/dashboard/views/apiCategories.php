@@ -1,6 +1,6 @@
 <?php
 if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
-    echo outputError(array("msg" => "Action is required"));die();  
+    echo outputError(["msg" => "Action is required"]);die();  
 }else{
     $action = $_REQUEST["action"];
     $data = $_POST;
@@ -13,10 +13,10 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         echo outputData($response);
     }elseif( $action == "add" ){
         if( !isset($data["enTitle"]) || empty($data["enTitle"]) ){
-            echo outputError(array("msg" => "English Title Is Required"));die();  
+            echo outputError(["msg" => "English Title Is Required"]);die();  
         }
         if( !isset($data["arTitle"]) || empty($data["arTitle"]) ){
-            echo outputError(array("msg" => "Arabic Title Is Required"));die();  
+            echo outputError(["msg" => "Arabic Title Is Required"]);die();  
         }
         
         $insertData = array(
@@ -53,7 +53,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         }
     }elseif( $action == "update" ){
         if( !isset($data["categoryId"]) || empty($data["categoryId"]) ){
-            echo outputError(array("msg" => "Category ID Is Required"));die();  
+            echo outputError(["msg" => "Category ID Is Required"]);die();  
         }
         
         $updateData = array();
@@ -73,7 +73,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         }
         
         if( empty($updateData) ){
-            echo outputError(array("msg" => "No data to update"));die();
+            echo outputError(["msg" => "No data to update"]);die();
         }
 
         if( updateDBNew("categories", $updateData, "id = ? AND storeId = ?", [$data["categoryId"], $storeId] ) ){
@@ -84,32 +84,32 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         }
     }elseif( $action == "hide" ){
         if( !isset($data["categoryId"]) || empty($data["categoryId"]) ){
-            echo outputError(array("msg" => "Category ID Is Required"));die();  
+            echo outputError(["msg" => "Category ID Is Required"]);die();  
         }
         $category = selectDB("categories", "id = '{$data["categoryId"]}' AND storeId = '{$storeId}'");
         if( !$category ){
-            echo outputError(array("msg" => "Category not found"));die();
+            echo outputError(["msg" => "Category not found"]);die();
         }
         $newHidden = ($category[0]["hidden"] == 1) ? 2 : 1;
         if( updateDBNew("categories", array("hidden" => $newHidden), "id = ? AND storeId = ?", [$data["categoryId"], $storeId] ) ){
             logStoreActivity("Categories", "Toggled visibility for category: " . $data["categoryId"]);
             echo outputData(array("msg" => "Category visibility updated"));
         }else{
-            echo outputError(array("msg" => "Failed to update visibility"));
+            echo outputError(["msg" => "Failed to update visibility"]);
         }
     }elseif( $action == "delete" ){
         if( !isset($data["categoryId"]) || empty($data["categoryId"]) ){
-            echo outputError(array("msg" => "Category ID Is Required"));die();  
+            echo outputError(["msg" => "Category ID Is Required"]);die();  
         }
         if( updateDBNew("categories", array("status" => "1"), "id = ? AND storeId = ?", [$data["categoryId"], $storeId] ) ){
             logStoreActivity("Categories", "Deleted category ID: " . $data["categoryId"]);
             echo outputData(array("msg" => "Category deleted successfully"));
         }else{
-            echo outputError(array("msg" => "Failed to delete category"));
+            echo outputError(["msg" => "Failed to delete category"]);
         }
     }elseif( $action == "updateRank" ){
         if( !isset($data["ranks"]) || !is_array($data["ranks"]) ){
-            echo outputError(array("msg" => "Ranks array is required"));die();
+            echo outputError(["msg" => "Ranks array is required"]);die();
         }
         foreach($data["ranks"] as $item){
             if(isset($item["id"]) && isset($item["rank"])){
@@ -118,7 +118,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         }
         echo outputData(array("msg" => "Ranks updated successfully"));
     } else {
-        echo outputError(array("msg" => "Invalid action specified"));
+        echo outputError(["msg" => "Invalid action specified"]);die();
     }
 }
 ?>
