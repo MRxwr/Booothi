@@ -55,7 +55,7 @@ switch ($action) {
         }
 
         // Delete existing collections for this product
-        deleteDBNew("collections", "productId = ?", [$productIdScope]);
+        deleteDBNew("collections", [$productIdScope], "productId = ?");
 
         // Insert new associations
         $count = 0;
