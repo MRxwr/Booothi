@@ -281,4 +281,153 @@ function whatsappUltraMsg($order){
 		$data = array();
 	}
 }
+
+function whatsappUltraMsgImage($to,$eventId, $inviteeLink){
+	GLOBAL $_SERVER;
+	if( $whatsappNoti = selectDB("settings","`id` = '1'") ){
+		$event = selectDB("events","`id` = '{$eventId}'");
+		$messageDetails = json_decode($whatsappNoti[0]["whatsappNoti"],true);
+		if( $messageDetails["status"] != 1 ){
+			$data = array();
+			return $data; // Return the empty array instead of null		
+			}else{
+			// Shorten the invitee link
+			$shortLink = shortenUrl($inviteeLink);
+			$messageDetails["caption"] = "{$event[0]["whatsappCaption"]} \n\n{$shortLink}";
+			$messageDetails["image"] = "https://{$_SERVER['HTTP_HOST']}/logos/{$event[0]["whatsappImage"]}";
+			$data = array(
+				'token' => "{$whatsappNoti[0]["whatsappToken"]}",
+				'to' => "{$to}",
+				'image' => "{$messageDetails["image"]}",
+				'caption' => "{$messageDetails["caption"]}",
+			);
+			$curl = curl_init();
+			curl_setopt_array($curl, array(
+				CURLOPT_URL => "https://api.ultramsg.com/{$messageDetails["InstanceId"]}/messages/image",
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_ENCODING => "",
+				CURLOPT_MAXREDIRS => 10,
+				CURLOPT_TIMEOUT => 30,
+				CURLOPT_SSL_VERIFYHOST => 0,
+				CURLOPT_SSL_VERIFYPEER => 0,
+				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+				CURLOPT_CUSTOMREQUEST => "POST",
+				CURLOPT_POSTFIELDS => http_build_query($data),
+				CURLOPT_HTTPHEADER => array(
+					"content-type: application/x-www-form-urlencoded"
+				),
+			));
+			$response = curl_exec($curl);
+			curl_close($curl);
+			return $response;
+		}
+	}else{
+		$data = array();
+		return $data;
+	}
+}
+
+function whatsappUltraMsgVerify($to, $code){
+	if( $whatsappNoti = selectDB("settings","`id` = '1'") ){
+		$messageDetails = json_decode($whatsappNoti[0]["whatsappNoti"],true);
+		if( $messageDetails["status"] != 1 ){
+			$data = array();
+			return $data;		
+			}else{
+			$data = array(
+				'token' => "{$whatsappNoti[0]["whatsappToken"]}",
+				'to' => "{$to}",
+				'body' => "Hello, your verification code is: {$code}. Please use it to complete your registration. \n\n 7yyak.com",
+			);
+			$curl = curl_init();
+			curl_setopt_array($curl, array(
+				CURLOPT_URL => "https://api.ultramsg.com/{$messageDetails["InstanceId"]}/messages/chat",
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_ENCODING => "",
+				CURLOPT_MAXREDIRS => 10,
+				CURLOPT_TIMEOUT => 30,
+				CURLOPT_SSL_VERIFYHOST => 0,
+				CURLOPT_SSL_VERIFYPEER => 0,
+				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+				CURLOPT_CUSTOMREQUEST => "POST",
+				CURLOPT_POSTFIELDS => http_build_query($data),
+				CURLOPT_HTTPHEADER => array(
+					"content-type: application/x-www-form-urlencoded"
+				),
+			));
+			$response = curl_exec($curl);
+			curl_close($curl);
+			return $response;
+		}
+	}else{
+		$data = array();
+		return $data;
+	}
+}
+
+// Send WhatsApp message for password reset (Forget Password)
+function whatsappUltraMsgForgetPassword($to, $code) {
+	if ($whatsappNoti = selectDB("settings", "`id` = '1'") ) {
+		$messageDetails = json_decode($whatsappNoti[0]["whatsappNoti"], true);
+		if ($messageDetails["status"] != 1) {
+			return false;
+		} else {
+			$data = array(
+				'token' => "{$whatsappNoti[0]["whatsappToken"]}",
+				'to' => "{$to}",
+				'body' => "Hello, your password reset code is: {$code}. Please use it to reset your password.\n\n7yyak.com",
+			);
+			$curl = curl_init();
+			curl_setopt_array($curl, array(
+				CURLOPT_URL => "https://api.ultramsg.com/{$messageDetails["InstanceId"]}/messages/chat",
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_ENCODING => "",
+				CURLOPT_MAXREDIRS => 10,
+				CURLOPT_TIMEOUT => 30,
+				CURLOPT_SSL_VERIFYHOST => 0,
+				CURLOPT_SSL_VERIFYPEER => 0,
+				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+				CURLOPT_CUSTOMREQUEST => "POST",
+				CURLOPT_POSTFIELDS => http_build_query($data),
+				CURLOPT_HTTPHEADER => array(
+					"content-type: application/x-www-form-urlencoded"
+				),
+			));
+			$response = curl_exec($curl);
+			curl_close($curl);
+			return $response;
+		}
+	} else {
+		return false;
+	}
+}
+
+// Link shortener function
+function shortenUrl($url) {
+	// Using is.gd API as a free link shortener
+	$apiUrl = "https://is.gd/create.php?format=simple&url=" . urlencode($url);
+	
+	$curl = curl_init();
+	curl_setopt_array($curl, array(
+		CURLOPT_URL => $apiUrl,
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_TIMEOUT => 10,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_SSL_VERIFYHOST => 0,
+		CURLOPT_SSL_VERIFYPEER => 0,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => "GET",
+	));
+	
+	$response = curl_exec($curl);
+	$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+	curl_close($curl);
+	
+	// If shortening fails, return the original URL
+	if ($httpCode == 200 && !empty($response) && filter_var($response, FILTER_VALIDATE_URL)) {
+		return trim($response);
+	} else {
+		return $url; // Return original URL if shortening fails
+	}
+}
 ?>
