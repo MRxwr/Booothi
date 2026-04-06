@@ -11,7 +11,7 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted vouchers for the store
-        $vouchers = selectDBNew("vouchers", ["0", $storeId], "status = ? AND storeId = ?", "id DESC");
+        $vouchers = selectDB2New("id, code, type, discountType, discount, startDate, endDate, items, hidden", "vouchers", ["0", $storeId], "status = ? AND storeId = ?", "id DESC");
         if ($vouchers) {
             echo outputData($vouchers);die();
         } else {
@@ -33,6 +33,7 @@ switch ($action) {
             "startDate"    => $_POST["startDate"],
             "endDate"      => $_POST["endDate"],
             "storeId"      => $storeId,
+            "hidden"       => "1", // Default to active/visible
             "status"       => "0"
         ];
 
@@ -88,6 +89,23 @@ switch ($action) {
         }
         break;
 
+    case "hide":
+        // Toggle voucher visibility (hidden=1 is visible, 2 is hidden)
+        if (!isset($_REQUEST["id"]) || !isset($_REQUEST["hidden"])) {
+            echo outputError("Voucher ID and hidden status required.");die();
+        }
+
+        $voucherId = $_REQUEST["id"];
+        $hiddenValue = ($_REQUEST["hidden"] == "1") ? "2" : "1";
+
+        if (updateDBNew("vouchers", ["hidden" => $hiddenValue], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
+            $statusText = ($_REQUEST["hidden"] == "1") ? "Hidden" : "Visible";
+            logStoreActivity($storeId, "Voucher visibility toggled to $statusText ID: " . $voucherId);
+            echo outputData(["message" => "Voucher visibility updated."]);die();
+        } else {
+            echo outputError("Failed to update voucher visibility.");die();
+        }
+        break;
     case "getItems":
         // Get specific items associated with a voucher (if type != 1)
         if (!isset($_REQUEST["id"])) {
