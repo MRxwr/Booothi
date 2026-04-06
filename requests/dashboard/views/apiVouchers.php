@@ -3,7 +3,7 @@
 // Action-based routing
 
 if (!isset($storeId)) {
-    echo outputError("Authentication required.");die();
+    echo outputError(["msg" => "Authentication required."]);die();
 }
 
 $action = $_REQUEST["action"] ?? "";
@@ -22,7 +22,7 @@ switch ($action) {
     case "add":
         // Add a new voucher
         if (!isset($_POST["code"]) || !isset($_POST["type"]) || !isset($_POST["discount"])) {
-            echo outputError("Missing required fields.");die();
+            echo outputError(["msg" => "Missing required fields."]);die();
         }
 
         $insertData = [
@@ -41,14 +41,14 @@ switch ($action) {
             logStoreActivity($storeId, "Voucher Added: " . $_POST["code"]);
             echo outputData(["message" => "Voucher added successfully."]);die();
         } else {
-            echo outputError("Failed to add voucher.");die();
+            echo outputError(["msg" => "Failed to add voucher."]);die();
         }
         break;
 
     case "update":
         // Update an existing voucher
         if (!isset($_POST["voucherId"]) || !isset($_POST["code"])) {
-            echo outputError("Missing required fields.");die();
+            echo outputError(["msg" => "Missing required fields."]);die();
         }
 
         $voucherId = $_POST["voucherId"];
@@ -70,14 +70,14 @@ switch ($action) {
             logStoreActivity($storeId, "Voucher Updated: " . $_POST["code"]);
             echo outputData(["message" => "Voucher updated successfully."]);die();
         } else {
-            echo outputError("Failed to update voucher or no changes made.");die();
+            echo outputError(["msg" => "Failed to update voucher or no changes made."]);die();
         }
         break;
 
     case "delete":
         // Soft delete a voucher (status = 1)
         if (!isset($_REQUEST["voucherId"])) {
-            echo outputError("Voucher ID required.");die();
+            echo outputError(["msg" => "Voucher ID required."]);die();
         }
 
         $voucherId = $_REQUEST["voucherId"];
@@ -85,14 +85,14 @@ switch ($action) {
             logStoreActivity($storeId, "Voucher Deleted ID: " . $voucherId);
             echo outputData(["message" => "Voucher deleted successfully."]);die();
         } else {
-            echo outputError("Failed to delete voucher.");die();
+            echo outputError(["msg" => "Failed to delete voucher."]);die();
         }
         break;
 
     case "hide":
         // Toggle voucher visibility (hidden=1 is visible, 2 is hidden)
         if (!isset($_REQUEST["voucherId"]) || !isset($_REQUEST["hidden"])) {
-            echo outputError("Voucher ID and hidden status required.");die();
+            echo outputError(["msg" => "Voucher ID and hidden status required."]);die();
         }
 
         $voucherId = $_REQUEST["voucherId"];
@@ -103,13 +103,13 @@ switch ($action) {
             logStoreActivity($storeId, "Voucher visibility toggled to $statusText ID: " . $voucherId);
             echo outputData(["message" => "Voucher visibility updated."]);die();
         } else {
-            echo outputError("Failed to update voucher visibility.");die();
+            echo outputError(["msg" => "Failed to update voucher visibility."]);die();
         }
         break;
     case "getItems":
         // Get specific items associated with a voucher (if type != 1)
         if (!isset($_REQUEST["voucherId"])) {
-            echo outputError("Voucher ID required.");die();
+            echo outputError(["msg" => "Voucher ID required."]);die();
         }
 
         $voucher = selectDBNew("vouchers", [$_REQUEST["voucherId"], $storeId], "id = ? AND storeId = ?", "");
@@ -117,14 +117,14 @@ switch ($action) {
             $items = json_decode($voucher[0]["items"], true) ?: [];
             echo outputData($items);die();
         } else {
-            echo outputError("Voucher not found.");die();
+            echo outputError(["msg" => "Voucher not found."]);die();
         }
         break;
 
     case "saveItems":
         // Save items (JSON array) for a voucher
         if (!isset($_POST["voucherId"]) || !isset($_POST["items"])) {
-            echo outputError("Voucher ID and items (array) required.");die();
+            echo outputError(["msg" => "Voucher ID and items (array) required."]);die();
         }
 
         $voucherId = $_POST["voucherId"];
@@ -134,11 +134,11 @@ switch ($action) {
             logStoreActivity($storeId, "Voucher Items Updated ID: " . $voucherId);
             echo outputData(["message" => "Voucher items updated successfully."]);die();
         } else {
-            echo outputError("Failed to update voucher items.");die();
+            echo outputError(["msg" => "Failed to update voucher items."]);die();
         }
         break;
 
     default:
-        echo outputError("Invalid action.");die();
+        echo outputError(["msg" => "Invalid action."]);die();
         break;
 }
