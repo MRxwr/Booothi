@@ -37,6 +37,7 @@ switch ($action) {
             "type"        => $_POST["type"] ?? "0",
             "priceBy"     => $_POST["priceBy"] ?? "0",
             "storeId"     => $storeId,
+            "hidden"      => "1", // Default to active/visible
             "status"      => "0"
         ];
 
