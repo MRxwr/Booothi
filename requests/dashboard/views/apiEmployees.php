@@ -29,10 +29,17 @@ switch ($action) {
                 // Remove sensitive info
                 unset($emp["password"]);
             }
-            echo outputData($employees);die();
-        } else {
-            echo outputData([]);die();
         }
+        
+        // Get all available shops and roles for dropdowns
+        $shops = selectDBNew("shops", ["0", $storeId], "status = ? AND storeId = ?", "") ?: [];
+        $roles = selectDBNew("roles", ["0", "1", $storeId], "status = ? AND hidden = ? AND storeId = ?", "") ?: [];
+        
+        echo outputData([
+            "employees" => $employees ?: [],
+            "shops" => $shops ?: [],
+            "roles" => $roles ?: []
+        ]);die();
         break;
 
     case "add":
@@ -89,7 +96,7 @@ switch ($action) {
         }
         break;
 
-    case "toggleLock":
+    case "hide":
         // Lock/Unlock employee account (hidden=2 is locked, 0 is active)
         if (!isset($_REQUEST["id"]) || !isset($_REQUEST["locked"])) {
             echo outputError(["msg" => "Employee ID and lock status required."]);die();
@@ -124,7 +131,7 @@ switch ($action) {
 
     case "getRoles":
         // Get list of available roles for the dropdown
-        $roles = selectDBNew("roles", ["0", "1"], "status = ? AND hidden = ?", "");
+        $roles = selectDBNew("roles", ["0", "1", $storeId], "status = ? AND hidden = ? AND storeId = ?", "");
         echo outputData($roles ?: []);die();
         break;
 
