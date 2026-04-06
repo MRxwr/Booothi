@@ -11,7 +11,7 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted employees for the store (excluding system admins/hidden accounts)
-        $employees = selectDBNew("employees", ["0", $storeId, "1"], "status = ? AND storeId = ? AND hidden != ?", "id DESC");
+        $employees = selectDBNew("employees", ["0", $storeId, "1"], "status = ? AND storeId = ? AND hidden = ?", "id DESC");
         
         // Enrich with Shop and Role details
         if ($employees) {
