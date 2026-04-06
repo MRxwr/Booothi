@@ -82,7 +82,7 @@ switch ($action) {
 
         $voucherId = $_REQUEST["voucherId"];
         if (updateDBNew("vouchers", ["status" => "1"], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
-            logStoreActivity($storeId, "Voucher Deleted ID: " . $voucherId);
+            logStoreActivity("Vouchers", "Voucher Deleted ID: " . $voucherId);
             echo outputData(["msg" => "Voucher deleted successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to delete voucher."]);die();
