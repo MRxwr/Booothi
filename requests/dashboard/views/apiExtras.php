@@ -3,7 +3,7 @@
 // Action-based routing
 
 if (!isset($storeId)) {
-    outputError("Authentication required.");
+    echo outputError("Authentication required.");die();
 }
 
 $action = $_REQUEST["action"] ?? "";
@@ -11,22 +11,22 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted extras for the store
-        $extras = selectDBNew("extras", "status = ? AND storeId = ?", ["0", $storeId], "ORDER BY id DESC");
+        $extras = selectDBNew("extras", ["0", $storeId], "status = ? AND storeId = ?", "id DESC");
         if ($extras) {
             foreach ($extras as &$extra) {
                 // Decode variants if they exist
                 $extra["variants"] = json_decode($extra["variants"], true);
             }
-            outputData($extras);
+            echo outputData($extras);die();
         } else {
-            outputData([]);
+            echo outputData([]);die();
         }
         break;
 
     case "add":
         // Add a new extra
         if (!isset($_POST["enTitle"]) || !isset($_POST["arTitle"])) {
-            outputError("Missing required fields.");
+            echo outputError("Missing required fields.");die();
         }
 
         $insertData = [
@@ -42,16 +42,16 @@ switch ($action) {
 
         if (insertDB("extras", $insertData)) {
             logStoreActivity($storeId, "Extra Added: " . $_POST["enTitle"]);
-            outputData(["message" => "Extra added successfully."]);
+            echo outputData(["message" => "Extra added successfully."]);die();
         } else {
-            outputError("Failed to add extra.");
+            echo outputError("Failed to add extra.");die();
         }
         break;
 
     case "update":
         // Update an existing extra
         if (!isset($_POST["id"]) || !isset($_POST["enTitle"])) {
-            outputError("Missing required fields.");
+            echo outputError("Missing required fields.");die();
         }
 
         $extraId = $_POST["id"];
@@ -66,24 +66,24 @@ switch ($action) {
 
         if (updateDBNew("extras", $updateData, "id = ? AND storeId = ?", [$extraId, $storeId])) {
             logStoreActivity($storeId, "Extra Updated: " . $_POST["enTitle"]);
-            outputData(["message" => "Extra updated successfully."]);
+            echo outputData(["message" => "Extra updated successfully."]);die();
         } else {
-            outputError("Failed to update extra or no changes made.");
+            echo outputError("Failed to update extra or no changes made.");die();
         }
         break;
 
     case "delete":
         // Soft delete an extra
         if (!isset($_REQUEST["id"])) {
-            outputError("Extra ID required.");
+            echo outputError("Extra ID required.");die();
         }
 
         $extraId = $_REQUEST["id"];
         if (updateDBNew("extras", ["status" => "1"], "id = ? AND storeId = ?", [$extraId, $storeId])) {
             logStoreActivity($storeId, "Extra Deleted ID: " . $extraId);
-            outputData(["message" => "Extra deleted successfully."]);
+            echo outputData(["message" => "Extra deleted successfully."]);die();
         } else {
-            outputError("Failed to delete extra.");
+            echo outputError("Failed to delete extra.");die();
         }
         break;
 
@@ -91,21 +91,21 @@ switch ($action) {
 
     case "listVariants":
         if (!isset($_REQUEST["id"])) {
-            outputError("Extra ID required.");
+            echo outputError("Extra ID required.");die();
         }
-        $extra = selectDBNew("extras", "id = ? AND storeId = ?", [$_REQUEST["id"], $storeId], "");
+        $extra = selectDBNew("extras", [$_REQUEST["id"], $storeId], "id = ? AND storeId = ?", "");
         if ($extra) {
             $variants = json_decode($extra[0]["variants"], true) ?: ["enTitle" => [], "arTitle" => []];
-            outputData($variants);
+            echo outputData($variants);die();
         } else {
-            outputError("Extra not found.");
+            echo outputError("Extra not found.");die();
         }
         break;
 
     case "saveVariants":
         // Expects 'id' and 'enTitle' (array), 'arTitle' (array)
         if (!isset($_POST["id"]) || !isset($_POST["enTitle"]) || !is_array($_POST["enTitle"])) {
-            outputError("Invalid variant data.");
+            echo outputError("Invalid variant data.");die();
         }
 
         $extraId = $_POST["id"];
@@ -118,13 +118,13 @@ switch ($action) {
 
         if (updateDBNew("extras", ["variants" => $variantsJson], "id = ? AND storeId = ?", [$extraId, $storeId])) {
             logStoreActivity($storeId, "Extra Variants Updated ID: " . $extraId);
-            outputData(["message" => "Variants updated successfully."]);
+            echo outputData(["message" => "Variants updated successfully."]);die();
         } else {
-            outputError("Failed to update variants.");
+            echo outputError("Failed to update variants.");die();
         }
         break;
 
     default:
-        outputError("Invalid action.");
+        echo outputError("Invalid action.");die();
         break;
 }

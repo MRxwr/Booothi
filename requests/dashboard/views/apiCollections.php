@@ -3,7 +3,7 @@
 // Action-based routing
 
 if (!isset($storeId)) {
-    outputError("Authentication required.");
+    echo outputError("Authentication required.");die();
 }
 
 $action = $_REQUEST["action"] ?? "";
