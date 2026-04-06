@@ -11,7 +11,7 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted employees for the store (excluding system admins/hidden accounts)
-        $employees = selectDB2New("id, fullName, email, phone, empType, shopId, hidden", "employees", ["0", $storeId], "status = ? AND storeId = ?", "id DESC");
+        $employees = selectDB2New("id, fullName, email, phone, empType, shopId, hidden", "employees", ["0", $storeId], "is_deleted = ? AND storeId = ?", "id DESC");
         
         // Enrich with Shop and Role details
         if ($employees) {
@@ -48,16 +48,16 @@ switch ($action) {
             echo outputError(["msg" => "Missing required fields."]);die();
         }
 
-        // Check if email already exists
-        $existingEmail = selectDBNew("employees", [$_POST["email"], "1"], "email = ? AND status != ?", "");
+        // Check if email already exists (only among non-deleted employees)
+        $existingEmail = selectDBNew("employees", [$_POST["email"], $storeId, "0"], "email = ? AND storeId = ? AND is_deleted = ?", "");
         if ($existingEmail) {
             echo outputError(["msg" => "Email already exists."]);
             die();
         }
 
-        // Check if phone already exists (if provided)
+        // Check if phone already exists (if provided, only among non-deleted employees)
         if (!empty($_POST["phone"])) {
-            $existingPhone = selectDBNew("employees", [$_POST["phone"], "1"], "phone = ? AND status != ?", "");
+            $existingPhone = selectDBNew("employees", [$_POST["phone"], $storeId, "0"], "phone = ? AND storeId = ? AND is_deleted = ?", "");
             if ($existingPhone) {
                 echo outputError(["msg" => "Phone number already exists."]);
                 die();
@@ -73,7 +73,8 @@ switch ($action) {
             "shopId"   => $_POST["shopId"] ?? "0",
             "storeId"  => $storeId,
             "status"   => "0",
-            "hidden"   => "1" 
+            "hidden"   => "1",
+            "is_deleted" => "0"
         ];
 
         if (insertDB("employees", $insertData)) {
@@ -92,16 +93,16 @@ switch ($action) {
 
         $empId = $_POST["employeeId"];
 
-        // Check if email already exists for another employee
-        $existingEmail = selectDBNew("employees", [$_POST["email"], $storeId, "1", $empId], "email = ? AND storeId = ? AND status != ? AND id != ?", "");
+        // Check if email already exists for another non-deleted employee
+        $existingEmail = selectDBNew("employees", [$_POST["email"], $storeId, "0", $empId], "email = ? AND storeId = ? AND is_deleted = ? AND id != ?", "");
         if ($existingEmail) {
             echo outputError(["msg" => "Email already exists."]);
             die();
         }
 
-        // Check if phone already exists for another employee (if provided)
+        // Check if phone already exists for another non-deleted employee (if provided)
         if (!empty($_POST["phone"])) {
-            $existingPhone = selectDBNew("employees", [$_POST["phone"], $storeId, "1", $empId], "phone = ? AND storeId = ? AND status != ? AND id != ?", "");
+            $existingPhone = selectDBNew("employees", [$_POST["phone"], $storeId, "0", $empId], "phone = ? AND storeId = ? AND is_deleted = ? AND id != ?", "");
             if ($existingPhone) {
                 echo outputError(["msg" => "Phone number already exists."]);
                 die();
@@ -152,13 +153,13 @@ switch ($action) {
         break;
 
     case "delete":
-        // Soft delete an employee
+        // Soft delete an employee using is_deleted flag (also set status for future use)
         if (!isset($_REQUEST["employeeId"])) {
             echo outputError(["msg" => "Employee ID required."]);die();
         }
 
         $empId = $_REQUEST["employeeId"];
-        if (updateDBNew("employees", ["status" => "1"], "id = ? AND storeId = ?", [$empId, $storeId])) {
+        if (updateDBNew("employees", ["is_deleted" => "1", "status" => "1"], "id = ? AND storeId = ?", [$empId, $storeId])) {
             logStoreActivity($storeId, "Employee Deleted ID: " . $empId);
             echo outputData(["msg" => "Employee deleted successfully."]);die();
         } else {
