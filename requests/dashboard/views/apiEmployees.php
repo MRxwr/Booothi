@@ -131,7 +131,7 @@ switch ($action) {
         break;
 
     case "hide":
-        // Lock/Unlock employee account (hidden=2 is locked, 0 is active)
+        // Lock/Unlock employee account (hidden=2 is locked, 1 is active)
         if (!isset($_REQUEST["employeeId"]) ) {
             echo outputError(["msg" => "Employee ID required."]);die();
         }
@@ -141,7 +141,7 @@ switch ($action) {
         if (!$employee) {
             echo outputError(["msg" => "Employee not found."]);die();
         }
-        $lockedValue = ($employee[0]["locked"] == "1") ? "2" : "0";
+        $lockedValue = ($employee[0]["locked"] == "1") ? "2" : "1";
 
         if (updateDBNew("employees", ["hidden" => $lockedValue], "id = ? AND storeId = ?", [$empId, $storeId])) {
             $statusText = ($lockedValue == "2") ? "Locked" : "Unlocked";
