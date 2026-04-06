@@ -89,6 +89,22 @@ switch ($action) {
 
     // --- Variants Management (Inside the extras table 'variants' JSON column) ---
 
+    case "hide":
+        if( !isset($_REQUEST["extraId"]) || empty($_REQUEST["extraId"]) ){
+            echo outputError(array("msg" => "Extra ID Is Required"));die();  
+        }
+        $extra = selectDB("extras", "id = '{$_REQUEST["extraId"]}' AND storeId = '{$storeId}'");
+        if( !$extra ){
+            echo outputError(array("msg" => "Extra not found"));die();
+        }
+        $newHidden = ($extra[0]["hidden"] == 1) ? 2 : 1;
+        if( updateDBNew("extras", array("hidden" => $newHidden), "id = ? AND storeId = ?", [$_REQUEST["extraId"], $storeId] ) ){
+            logStoreActivity("Extras", "Toggled visibility for extra: " . $_REQUEST["extraId"]);
+            echo outputData(array("msg" => "Extra visibility updated"));
+        }else{
+            echo outputError(array("msg" => "Failed to update visibility"));
+        }
+        break;
     case "listVariants":
         if (!isset($_REQUEST["extraId"])) {
             echo outputError("Extra ID required.");die();
