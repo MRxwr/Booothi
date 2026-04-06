@@ -50,11 +50,11 @@ switch ($action) {
 
     case "update":
         // Update an existing extra
-        if (!isset($_POST["id"]) || !isset($_POST["enTitle"])) {
+        if (!isset($_POST["extraId"]) || !isset($_POST["enTitle"])) {
             echo outputError("Missing required fields.");die();
         }
 
-        $extraId = $_POST["id"];
+        $extraId = $_POST["extraId"];
         $updateData = [
             "enTitle"     => $_POST["enTitle"],
             "arTitle"     => $_POST["arTitle"],
@@ -74,11 +74,11 @@ switch ($action) {
 
     case "delete":
         // Soft delete an extra
-        if (!isset($_REQUEST["id"])) {
+        if (!isset($_REQUEST["extraId"])) {
             echo outputError("Extra ID required.");die();
         }
 
-        $extraId = $_REQUEST["id"];
+        $extraId = $_REQUEST["extraId"];
         if (updateDBNew("extras", ["status" => "1"], "id = ? AND storeId = ?", [$extraId, $storeId])) {
             logStoreActivity($storeId, "Extra Deleted ID: " . $extraId);
             echo outputData(["message" => "Extra deleted successfully."]);die();
@@ -90,10 +90,11 @@ switch ($action) {
     // --- Variants Management (Inside the extras table 'variants' JSON column) ---
 
     case "listVariants":
-        if (!isset($_REQUEST["id"])) {
+        if (!isset($_REQUEST["extraId"])) {
             echo outputError("Extra ID required.");die();
         }
-        $extra = selectDBNew("extras", [$_REQUEST["id"], $storeId], "id = ? AND storeId = ?", "");
+        $extraId = $_REQUEST["extraId"];
+        $extra = selectDBNew("extras", [$extraId, $storeId], "id = ? AND storeId = ?", "");
         if ($extra) {
             $variants = json_decode($extra[0]["variants"], true) ?: ["enTitle" => [], "arTitle" => []];
             echo outputData($variants);die();
@@ -103,12 +104,12 @@ switch ($action) {
         break;
 
     case "saveVariants":
-        // Expects 'id' and 'enTitle' (array), 'arTitle' (array)
-        if (!isset($_POST["id"]) || !isset($_POST["enTitle"]) || !is_array($_POST["enTitle"])) {
+        // Expects 'extraId' and 'enTitle' (array), 'arTitle' (array)
+        if (!isset($_POST["extraId"]) || !isset($_POST["enTitle"]) || !is_array($_POST["enTitle"])) {
             echo outputError("Invalid variant data.");die();
         }
 
-        $extraId = $_POST["id"];
+        $extraId = $_POST["extraId"];
         $variants = [
             "enTitle" => $_POST["enTitle"],
             "arTitle" => $_POST["arTitle"]
