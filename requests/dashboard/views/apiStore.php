@@ -8,7 +8,7 @@ switch ($action) {
 
     case "list":
         $stores = selectDB2New(
-            "id, title, storeCode, email, phone, country, currency, language, maintenanceMode, status,
+            "id, title, storeCode, email, phone, country, currency, language, maintenanceMode, hidden,
              logo, bgImage, sizeChartImage, theme, categoryView, productView, showCategoryTitle, showLogo,
              websiteColor, headerButton, shippingMethod, package, startDate, amount,
              giftCard, emailOpt, enableInvoiceImage, userDiscount, inStore, noAddress, noAddressDelivery,
