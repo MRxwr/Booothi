@@ -32,7 +32,7 @@ switch ($action) {
         }
         
         // Get all available shops and roles for dropdowns
-        $shops = selectD2New("id, enTitle, arTitle", "shops", ["0", $storeId], "status = ? AND storeId = ?", "") ?: [];
+        $shops = selectDB2New("id, enTitle, arTitle", "shops", ["0", $storeId], "status = ? AND storeId = ?", "") ?: [];
         $roles = selectDB2New("id, enTitle, arTitle", "roles", ["0", "1", $storeId], "status = ? AND hidden = ? AND storeId = ?", "") ?: [];
         
         echo outputData([
