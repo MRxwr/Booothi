@@ -36,13 +36,13 @@ switch ($action) {
             }
         }
         
-        outputData($response);
+        echo outputData($response);die();
         break;
 
     case "save":
         // Save (sync) categories for a product
         if (!isset($_POST["productId"]) || !isset($_POST["categoryIds"])) {
-            outputError("Product ID and Category IDs (array) required.");
+            echo outputError("Product ID and Category IDs (array) required.");die();
         }
 
         $productIdScope = $_POST["productId"];
@@ -51,7 +51,7 @@ switch ($action) {
         // Verify the product belongs to the store
         $productCheck = selectDBNew("products", [$productIdScope, $storeId], "id = ? AND storeId = ?", "");
         if (!$productCheck) {
-            outputError("Invalid Product ID.");
+            echo outputError("Invalid Product ID.");die();
         }
 
         // Delete existing collections for this product
@@ -77,10 +77,10 @@ switch ($action) {
         }
 
         logStoreActivity($storeId, "Product Collections Updated (Product ID: $productIdScope, $count categories)");
-        outputData(["message" => "Collections updated successfully for $count categories."]);
+        echo outputData(["message" => "Collections updated successfully for $count categories."]);die();
         break;
 
     default:
-        outputError("Invalid action.");
+        echo outputError("Invalid action.");die();
         break;
 }
