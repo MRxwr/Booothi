@@ -11,7 +11,7 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted extras for the store
-        $extras = selectDBNew("extras", ["0", $storeId], "status = ? AND storeId = ?", "id DESC");
+        $extras = selectDB2New("id, enTitle, arTitle, price, is_required, type, priceBy, variants, hidden", "extras", ["0", $storeId], "status = ? AND storeId = ?", "id DESC");
         if ($extras) {
             foreach ($extras as &$extra) {
                 // Decode variants if they exist

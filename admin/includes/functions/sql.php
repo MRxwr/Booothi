@@ -100,6 +100,46 @@ function selectDBNew($table, $placeHolders, $where, $order){
     }
 }
 
+function selectDB2New($select, $table, $placeHolders, $where, $order){
+    GLOBAL $dbconnect;
+    $check = [';', '"'];
+    $where = str_replace($check, "", $where);
+    $sql = "SELECT {$select} FROM `{$table}`";
+    if(!empty($where)) {
+        $sql .= " WHERE {$where}";
+    }
+    if(!empty($order)) {
+        $sql .= " ORDER BY {$order}";
+    }
+    if( $table == "employees" && strstr($where,"email") ){
+        $array = array(
+            "userId" => 0,
+            "username" => 0,
+            "module" => "Login",
+            "action" => "Select",
+            "sqlQuery" => json_encode(array("table"=>$table,"data"=>$placeHolders,"where"=>$where)),
+        );
+        LogsHistory($array);
+    }
+    if($stmt = $dbconnect->prepare($sql)) {
+        $types = str_repeat('s', count($placeHolders));
+        $stmt->bind_param($types, ...$placeHolders);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $array = array();
+        while ($row = $result->fetch_assoc()) {
+            $array[] = $row;
+        }
+        if(isset($array) && is_array($array)) {
+            return $array;
+        }else{
+            return 0;
+        }
+    }else{
+        return 0;
+    }
+}
+
 function selectDB($table, $where){
     GLOBAL $dbconnect;
     $check = [';', '"'];
