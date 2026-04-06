@@ -141,7 +141,7 @@ switch ($action) {
         if (!$employee) {
             echo outputError(["msg" => "Employee not found."]);die();
         }
-        $lockedValue = ($employee[0]["locked"] == "1") ? "2" : "1";
+        $lockedValue = ($employee[0]["hidden"] == "1") ? "2" : "1";
 
         if (updateDBNew("employees", ["hidden" => $lockedValue], "id = ? AND storeId = ?", [$empId, $storeId])) {
             $statusText = ($lockedValue == "2") ? "Locked" : "Unlocked";
