@@ -38,7 +38,7 @@ switch ($action) {
         ];
 
         if (insertDB("vouchers", $insertData)) {
-            logStoreActivity($storeId, "Voucher Added: " . $_POST["code"]);
+            logStoreActivity("Vouchers", "Voucher Added: " . $_POST["code"]);
             echo outputData(["msg" => "Voucher added successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to add voucher."]);die();
@@ -67,7 +67,7 @@ switch ($action) {
         }
 
         if (updateDBNew("vouchers", $updateData, "id = ? AND storeId = ?", [$voucherId, $storeId])) {
-            logStoreActivity($storeId, "Voucher Updated: " . $_POST["code"]);
+            logStoreActivity("Vouchers", "Voucher Updated: " . $_POST["code"]);
             echo outputData(["msg" => "Voucher updated successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to update voucher or no changes made."]);die();
@@ -103,7 +103,7 @@ switch ($action) {
         $hiddenValue = ($voucher[0]["hidden"] == "1") ? "2" : "1";
         if (updateDBNew("vouchers", ["hidden" => $hiddenValue], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
             $statusText = ($hiddenValue == "2") ? "Hidden" : "Visible";
-            logStoreActivity($storeId, "Voucher visibility toggled to $statusText ID: " . $voucherId);
+            logStoreActivity("Vouchers", "Voucher visibility toggled to $statusText ID: " . $voucherId);
             echo outputData(["msg" => "Voucher visibility updated."]);die();
         } else {
             echo outputError(["msg" => "Failed to update voucher visibility."]);die();
@@ -151,7 +151,7 @@ switch ($action) {
         $itemsJson = json_encode($_POST["items"]);
 
         if (updateDBNew("vouchers", ["items" => $itemsJson], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
-            logStoreActivity($storeId, "Voucher Items Updated ID: " . $voucherId);
+            logStoreActivity("Vouchers", "Voucher Items Updated ID: " . $voucherId);
             echo outputData(["msg" => "Voucher items updated successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to update voucher items."]);die();

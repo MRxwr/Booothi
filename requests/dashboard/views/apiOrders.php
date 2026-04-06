@@ -247,7 +247,7 @@ switch ($action) {
         $newStatus = $_POST["status"];
 
         if (updateDBNew("orders2", ["status" => $newStatus], "id = ? AND storeId = ?", [$orderId, $storeId])) {
-            logStoreActivity($storeId, "Order Status Updated ID: $orderId to $newStatus");
+            logStoreActivity("Orders", "Order Status Updated ID: $orderId to $newStatus");
             echo outputData(["msg" => "Order status updated successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to update order status."]); die();

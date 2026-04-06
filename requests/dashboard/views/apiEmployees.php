@@ -78,7 +78,7 @@ switch ($action) {
         ];
 
         if (insertDB("employees", $insertData)) {
-            logStoreActivity($storeId, "Employee Added: " . $_POST["fullName"]);
+            logStoreActivity("Employees", "Employee Added: " . $_POST["fullName"]);
             echo outputData(["msg" => "Employee added successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to add employee."]);die();
@@ -123,7 +123,7 @@ switch ($action) {
         }
 
         if (updateDBNew("employees", $updateData, "id = ? AND storeId = ?", [$empId, $storeId])) {
-            logStoreActivity($storeId, "Employee Updated: " . $_POST["fullName"]);
+            logStoreActivity("Employees", "Employee Updated: " . $_POST["fullName"]);
             echo outputData(["msg" => "Employee updated successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to update employee or no changes made."]);die();
@@ -145,7 +145,7 @@ switch ($action) {
 
         if (updateDBNew("employees", ["hidden" => $lockedValue], "id = ? AND storeId = ?", [$empId, $storeId])) {
             $statusText = ($lockedValue == "2") ? "Locked" : "Unlocked";
-            logStoreActivity($storeId, "Employee account $statusText ID: " . $empId);
+            logStoreActivity("Employees", "Employee account $statusText ID: " . $empId);
             echo outputData(["msg" => "Employee account $statusText."]);die();
         } else {
             echo outputError(["msg" => "Failed to update employee status."]);die();
@@ -160,7 +160,7 @@ switch ($action) {
 
         $empId = $_REQUEST["employeeId"];
         if (updateDBNew("employees", ["is_deleted" => "1", "status" => "1"], "id = ? AND storeId = ?", [$empId, $storeId])) {
-            logStoreActivity($storeId, "Employee Deleted ID: " . $empId);
+            logStoreActivity("Employees", "Employee Deleted ID: " . $empId);
             echo outputData(["msg" => "Employee deleted successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to delete employee."]);die();

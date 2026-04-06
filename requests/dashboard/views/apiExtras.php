@@ -42,7 +42,7 @@ switch ($action) {
         ];
 
         if (insertDB("extras", $insertData)) {
-            logStoreActivity($storeId, "Extra Added: " . $_POST["enTitle"]);
+            logStoreActivity("Extras", "Extra Added: " . $_POST["enTitle"]);
             echo outputData(["msg" => "Extra added successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to add extra."]);die();
@@ -66,7 +66,7 @@ switch ($action) {
         ];
 
         if (updateDBNew("extras", $updateData, "id = ? AND storeId = ?", [$extraId, $storeId])) {
-            logStoreActivity($storeId, "Extra Updated: " . $_POST["enTitle"]);
+            logStoreActivity("Extras", "Extra Updated: " . $_POST["enTitle"]);
             echo outputData(["msg" => "Extra updated successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to update extra or no changes made."]);die();
@@ -81,7 +81,7 @@ switch ($action) {
 
         $extraId = $_REQUEST["extraId"];
         if (updateDBNew("extras", ["status" => "1"], "id = ? AND storeId = ?", [$extraId, $storeId])) {
-            logStoreActivity($storeId, "Extra Deleted ID: " . $extraId);
+            logStoreActivity("Extras", "Extra Deleted ID: " . $extraId);
             echo outputData(["msg" => "Extra deleted successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to delete extra."]);die();
@@ -135,7 +135,7 @@ switch ($action) {
         $variantsJson = json_encode($variants, JSON_UNESCAPED_UNICODE);
 
         if (updateDBNew("extras", ["variants" => $variantsJson], "id = ? AND storeId = ?", [$extraId, $storeId])) {
-            logStoreActivity($storeId, "Extra Variants Updated ID: " . $extraId);
+            logStoreActivity("Extras", "Extra Variants Updated ID: " . $extraId);
             echo outputData(["msg" => "Variants updated successfully."]);die();
         } else {
             echo outputError(["msg" => "Failed to update variants."]);die();

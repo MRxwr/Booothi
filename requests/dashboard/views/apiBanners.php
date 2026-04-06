@@ -41,7 +41,7 @@ switch ($action) {
         }
 
         if (insertDB("banner", $insertData)) {
-            logStoreActivity($storeId, "Banner Added: " . $_POST["title"]);
+            logStoreActivity("Banners", "Banner Added: " . $_POST["title"]);
             echo outputData(["msg" => "Banner added successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to add banner."]); die();
@@ -67,7 +67,7 @@ switch ($action) {
         }
 
         if (updateDBNew("banner", $updateData, "id = ? AND storeId = ?", [$bannerId, $storeId])) {
-            logStoreActivity($storeId, "Banner Updated: " . $_POST["title"]);
+            logStoreActivity("Banners", "Banner Updated: " . $_POST["title"]);
             echo outputData(["msg" => "Banner updated successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to update banner or no changes made."]); die();
@@ -99,7 +99,7 @@ switch ($action) {
 
         $bannerId = $_REQUEST["bannerId"];
         if (updateDBNew("banner", ["status" => "1"], "id = ? AND storeId = ?", [$bannerId, $storeId])) {
-            logStoreActivity($storeId, "Banner Deleted ID: " . $bannerId);
+            logStoreActivity("Banners", "Banner Deleted ID: " . $bannerId);
             echo outputData(["msg" => "Banner deleted successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to delete banner."]); die();
@@ -122,7 +122,7 @@ switch ($action) {
             }
         }
 
-        logStoreActivity($storeId, "Banner Ranks Updated ($successCount items)");
+        logStoreActivity("Banners", "Banner Ranks Updated ($successCount items)");
         echo outputData(["msg" => "Ranks updated successfully for $successCount items."]); die();
         break;
 

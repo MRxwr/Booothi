@@ -35,7 +35,7 @@ switch ($action) {
         ];
 
         if (insertDB("attributes", $insertData)) {
-            logStoreActivity($storeId, "Attribute Added: " . $_POST["enTitle"]);
+            logStoreActivity("Attributes", "Attribute Added: " . $_POST["enTitle"]);
             echo outputData(["msg" => "Attribute added successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to add attribute."]); die();
@@ -55,7 +55,7 @@ switch ($action) {
         ];
 
         if (updateDBNew("attributes", $updateData, "id = ? AND storeId = ?", [$attributeId, $storeId])) {
-            logStoreActivity($storeId, "Attribute Updated: " . $_POST["enTitle"]);
+            logStoreActivity("Attributes", "Attribute Updated: " . $_POST["enTitle"]);
             echo outputData(["msg" => "Attribute updated successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to update attribute or no changes made."]); die();
@@ -87,7 +87,7 @@ switch ($action) {
         $updateData = ["status" => "1"];
 
         if (updateDBNew("attributes", $updateData, "id = ? AND storeId = ?", [$attributeId, $storeId])) {
-            logStoreActivity($storeId, "Attribute Deleted ID: " . $attributeId);
+            logStoreActivity("Attributes", "Attribute Deleted ID: " . $attributeId);
             echo outputData(["msg" => "Attribute deleted successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to delete attribute."]); die();

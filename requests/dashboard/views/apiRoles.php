@@ -39,7 +39,7 @@ switch ($action) {
         ];
 
         if (insertDB("roles", $insertData)) {
-            logStoreActivity($storeId, "Role Added: " . $_POST["enTitle"]);
+            logStoreActivity("Roles", "Role Added: " . $_POST["enTitle"]);
             echo outputData(["msg" => "Role added successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to add role."]); die();
@@ -59,7 +59,7 @@ switch ($action) {
         ];
 
         if (updateDBNew("roles", $updateData, "id = ? AND storeId = ?", [$roleId, $storeId])) {
-            logStoreActivity($storeId, "Role Updated: " . $_POST["enTitle"]);
+            logStoreActivity("Roles", "Role Updated: " . $_POST["enTitle"]);
             echo outputData(["msg" => "Role updated successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to update role or no changes made."]); die();
@@ -91,7 +91,7 @@ switch ($action) {
 
         $roleId = $_REQUEST["roleId"];
         if (updateDBNew("roles", ["status" => "1"], "id = ? AND storeId = ?", [$roleId, $storeId])) {
-            logStoreActivity($storeId, "Role Deleted ID: " . $roleId);
+            logStoreActivity("Roles", "Role Deleted ID: " . $roleId);
             echo outputData(["msg" => "Role deleted successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to delete role."]); die();
@@ -114,7 +114,7 @@ switch ($action) {
         $pagesJson = json_encode($_POST["pages"]);
 
         if (updateDBNew("roles", ["pages" => $pagesJson], "id = ? AND storeId = ?", [$roleId, $storeId])) {
-            logStoreActivity($storeId, "Role Permissions Updated ID: " . $roleId);
+            logStoreActivity("Roles", "Role Permissions Updated ID: " . $roleId);
             echo outputData(["msg" => "Permissions updated successfully."]); die();
         } else {
             echo outputError(["msg" => "Failed to update permissions."]); die();
