@@ -47,11 +47,11 @@ switch ($action) {
 
     case "update":
         // Update an existing voucher
-        if (!isset($_POST["id"]) || !isset($_POST["code"])) {
+        if (!isset($_POST["voucherId"]) || !isset($_POST["code"])) {
             echo outputError("Missing required fields.");die();
         }
 
-        $voucherId = $_POST["id"];
+        $voucherId = $_POST["voucherId"];
         $updateData = [
             "code"         => $_POST["code"],
             "type"         => $_POST["type"],
@@ -76,11 +76,11 @@ switch ($action) {
 
     case "delete":
         // Soft delete a voucher (status = 1)
-        if (!isset($_REQUEST["id"])) {
+        if (!isset($_REQUEST["voucherId"])) {
             echo outputError("Voucher ID required.");die();
         }
 
-        $voucherId = $_REQUEST["id"];
+        $voucherId = $_REQUEST["voucherId"];
         if (updateDBNew("vouchers", ["status" => "1"], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
             logStoreActivity($storeId, "Voucher Deleted ID: " . $voucherId);
             echo outputData(["message" => "Voucher deleted successfully."]);die();
@@ -91,11 +91,11 @@ switch ($action) {
 
     case "hide":
         // Toggle voucher visibility (hidden=1 is visible, 2 is hidden)
-        if (!isset($_REQUEST["id"]) || !isset($_REQUEST["hidden"])) {
+        if (!isset($_REQUEST["voucherId"]) || !isset($_REQUEST["hidden"])) {
             echo outputError("Voucher ID and hidden status required.");die();
         }
 
-        $voucherId = $_REQUEST["id"];
+        $voucherId = $_REQUEST["voucherId"];
         $hiddenValue = ($_REQUEST["hidden"] == "1") ? "2" : "1";
 
         if (updateDBNew("vouchers", ["hidden" => $hiddenValue], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
@@ -108,11 +108,11 @@ switch ($action) {
         break;
     case "getItems":
         // Get specific items associated with a voucher (if type != 1)
-        if (!isset($_REQUEST["id"])) {
+        if (!isset($_REQUEST["voucherId"])) {
             echo outputError("Voucher ID required.");die();
         }
 
-        $voucher = selectDBNew("vouchers", [$_REQUEST["id"], $storeId], "id = ? AND storeId = ?", "");
+        $voucher = selectDBNew("vouchers", [$_REQUEST["voucherId"], $storeId], "id = ? AND storeId = ?", "");
         if ($voucher) {
             $items = json_decode($voucher[0]["items"], true) ?: [];
             echo outputData($items);die();
@@ -123,11 +123,11 @@ switch ($action) {
 
     case "saveItems":
         // Save items (JSON array) for a voucher
-        if (!isset($_POST["id"]) || !isset($_POST["items"])) {
+        if (!isset($_POST["voucherId"]) || !isset($_POST["items"])) {
             echo outputError("Voucher ID and items (array) required.");die();
         }
 
-        $voucherId = $_POST["id"];
+        $voucherId = $_POST["voucherId"];
         $itemsJson = json_encode($_POST["items"]);
 
         if (updateDBNew("vouchers", ["items" => $itemsJson], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
