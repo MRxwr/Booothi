@@ -11,18 +11,18 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted employees for the store (excluding system admins/hidden accounts)
-        $employees = selectDBNew("employees", ["0", $storeId, "1"], "status = ? AND storeId = ? AND hidden = ?", "id DESC");
+        $employees = selectDB2New("id, fullName, email, phone, empType, shopId, hidden", "employees", ["0", $storeId, "1"], "status = ? AND storeId = ? AND hidden = ?", "id DESC");
         
         // Enrich with Shop and Role details
         if ($employees) {
             foreach ($employees as &$emp) {
                 // Get Shop name
-                $shop = selectDBNew("shops", [$emp["shopId"]], "id = ?", "");
+                $shop = selectDB2New("id, enTitle, arTitle", "shops", [$emp["shopId"]], "id = ?", "") ?: [];
                 $emp["shopTitleEn"] = $shop ? $shop[0]["enTitle"] : "";
                 $emp["shopTitleAr"] = $shop ? $shop[0]["arTitle"] : "";
 
                 // Get Role name
-                $role = selectDBNew("roles", [$emp["empType"]], "id = ?", "");
+                $role = selectDB2New("id, enTitle, arTitle", "roles", [$emp["empType"]], "id = ?", "") ?: [];
                 $emp["roleTitleEn"] = $role ? $role[0]["enTitle"] : "";
                 $emp["roleTitleAr"] = $role ? $role[0]["arTitle"] : "";
                 
