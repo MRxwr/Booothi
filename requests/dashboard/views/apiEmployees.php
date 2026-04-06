@@ -86,11 +86,11 @@ switch ($action) {
 
     case "update":
         // Update an existing employee
-        if (!isset($_POST["id"]) || !isset($_POST["fullName"]) || !isset($_POST["email"])) {
+        if (!isset($_POST["employeeId"]) || !isset($_POST["fullName"]) || !isset($_POST["email"])) {
             echo outputError(["msg" => "Missing required fields."]);die();
         }
 
-        $empId = $_POST["id"];
+        $empId = $_POST["employeeId"];
 
         // Check if email already exists for another employee
         $existingEmail = selectDBNew("employees", [$_POST["email"], $storeId, "1", $empId], "email = ? AND storeId = ? AND status != ? AND id != ?", "");
@@ -131,15 +131,19 @@ switch ($action) {
 
     case "hide":
         // Lock/Unlock employee account (hidden=2 is locked, 0 is active)
-        if (!isset($_REQUEST["id"]) || !isset($_REQUEST["locked"])) {
-            echo outputError(["msg" => "Employee ID and lock status required."]);die();
+        if (!isset($_REQUEST["employeeId"]) ) {
+            echo outputError(["msg" => "Employee ID required."]);die();
         }
 
-        $empId = $_REQUEST["id"];
-        $lockedValue = ($_REQUEST["locked"] == "1") ? "2" : "0";
+        $empId = $_REQUEST["employeeId"];
+        $employee = selectDBNew("employees", [$empId, $storeId], "id = ? AND storeId = ?", "");
+        if (!$employee) {
+            echo outputError(["msg" => "Employee not found."]);die();
+        }
+        $lockedValue = ($employee[0]["locked"] == "1") ? "2" : "0";
 
         if (updateDBNew("employees", ["hidden" => $lockedValue], "id = ? AND storeId = ?", [$empId, $storeId])) {
-            $statusText = ($_REQUEST["locked"] == "1") ? "Locked" : "Unlocked";
+            $statusText = ($lockedValue == "2") ? "Locked" : "Unlocked";
             logStoreActivity($storeId, "Employee account $statusText ID: " . $empId);
             echo outputData(["msg" => "Employee account $statusText."]);die();
         } else {
@@ -149,11 +153,11 @@ switch ($action) {
 
     case "delete":
         // Soft delete an employee
-        if (!isset($_REQUEST["id"])) {
+        if (!isset($_REQUEST["employeeId"])) {
             echo outputError(["msg" => "Employee ID required."]);die();
         }
 
-        $empId = $_REQUEST["id"];
+        $empId = $_REQUEST["employeeId"];
         if (updateDBNew("employees", ["status" => "1"], "id = ? AND storeId = ?", [$empId, $storeId])) {
             logStoreActivity($storeId, "Employee Deleted ID: " . $empId);
             echo outputData(["msg" => "Employee deleted successfully."]);die();

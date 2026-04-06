@@ -92,14 +92,17 @@ switch ($action) {
     case "hide":
         // Toggle voucher visibility (hidden=1 is visible, 2 is hidden)
         if (!isset($_REQUEST["voucherId"]) ) {
-            echo outputError(["msg" => "Voucher ID and hidden status required."]);die();
+            echo outputError(["msg" => "Voucher ID required."]);die();
         }
 
         $voucherId = $_REQUEST["voucherId"];
-        $hiddenValue = ($_REQUEST["hidden"] == "1") ? "2" : "1";
-
+        $voucher = selectDBNew("vouchers", [$voucherId, $storeId], "id = ? AND storeId = ?", "");
+        if (!$voucher) {
+            echo outputError(["msg" => "Voucher not found."]);die();
+        }
+        $hiddenValue = ($voucher[0]["hidden"] == "1") ? "2" : "1";
         if (updateDBNew("vouchers", ["hidden" => $hiddenValue], "id = ? AND storeId = ?", [$voucherId, $storeId])) {
-            $statusText = ($_REQUEST["hidden"] == "1") ? "Hidden" : "Visible";
+            $statusText = ($hiddenValue == "2") ? "Hidden" : "Visible";
             logStoreActivity($storeId, "Voucher visibility toggled to $statusText ID: " . $voucherId);
             echo outputData(["msg" => "Voucher visibility updated."]);die();
         } else {
