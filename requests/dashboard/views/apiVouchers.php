@@ -123,21 +123,18 @@ switch ($action) {
             echo outputData([]);die();
         }
 
-        // Build WHERE clause for product IDs
-        $placeholders = implode(',', array_fill(0, count($itemIds), '?'));
-        $where = "p.id IN ($placeholders) AND p.storeId = ? AND p.status = '0'";
-        
-        // Prepare parameters (product IDs + storeId)
-        $params = array_merge($itemIds, [$storeId]);
+        // Sanitize IDs and build IN clause
+        $sanitizedIds = array_map('intval', $itemIds);
+        $idsList = implode(',', $sanitizedIds);
         
         // Fetch full product details
         $sql = "SELECT p.id, p.enTitle, p.arTitle,
                 (SELECT i.imageurl FROM images i WHERE i.productId = p.id ORDER BY i.id ASC LIMIT 1) as image
                 FROM products p 
-                WHERE {$where} 
+                WHERE p.id IN ({$idsList}) AND p.storeId = '{$storeId}' AND p.status = '0'
                 ORDER BY p.id DESC";
         
-        $products = queryDB($sql, $params);
+        $products = queryDB($sql);
         echo outputData($products ?: []);die();
         break;
 
