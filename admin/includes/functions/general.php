@@ -69,6 +69,12 @@ function generateRandomString() {
     return substr($hex, 0, 8);
 }
 
+// generate random 6 digis number \\
+function generateRandomNumber() {
+	$number = random_int(100000, 999999);
+	return $number;
+}
+
 // make sure that phone numbers are in english \\
 function convertMobileNumber($phone){
 	$arabic = ['١','٢','٣','٤','٥','٦','٧','٨','٩','٠'];

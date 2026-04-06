@@ -337,7 +337,7 @@ function whatsappUltraMsgVerify($to, $code){
 			$data = array(
 				'token' => "{$whatsappNoti[0]["whatsappToken"]}",
 				'to' => "{$to}",
-				'body' => "Hello, your verification code is: {$code}. Please use it to complete your registration. \n\n 7yyak.com",
+				'body' => "Hello, your verification code is: {$code}. Please use it to complete your login. \n\n Booothi.com",
 			);
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
@@ -375,7 +375,7 @@ function whatsappUltraMsgForgetPassword($to, $code) {
 			$data = array(
 				'token' => "{$whatsappNoti[0]["whatsappToken"]}",
 				'to' => "{$to}",
-				'body' => "Hello, your password reset code is: {$code}. Please use it to reset your password.\n\n7yyak.com",
+				'body' => "Hello, your password reset code is: {$code}. Please use it to reset your password.\n\nBooothi.com",
 			);
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
