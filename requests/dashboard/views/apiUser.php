@@ -138,6 +138,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     "permissions"   => json_encode($permissions),
                     "hidden"  => "1",
                 ]);
+                /*
                 $role = selectDB("roles", "storeId = '{$store[0]["id"]}' AND enTitle = 'Store Owner'");
                 $roleId = $role[0]["id"];
                 $shop = selectDB("shops", "storeId = '{$store[0]["id"]}' AND enTitle = 'Online Store'");
@@ -146,6 +147,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 updateDB("employees", ["storeId" => $store[0]["id"], "empType" => $roleId, "shopId" => $shopId], "keepMeAlive = '{$token}'");
                 logStoreActivity("Store Creation", "New store created: " . $data["title"]);
                 echo outputData(["msg" => "Store created successfully"]);die();
+                */
             }else{
                 echo outputError(["msg" => "Failed to create store"]);die();
             }
