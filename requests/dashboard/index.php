@@ -5,7 +5,7 @@ require_once("../../admin/includes/functions.php");
 
 // check user token \\
 $skipTokenEndpoints = ["user"];
-if ( isset($_GET["endpoint"]) && in_array($_GET["endpoint"], $skipTokenEndpoints) ){
+if ( isset($_GET["endpoint"]) && in_array(strtolower($_GET["endpoint"]), $skipTokenEndpoints) ){
 }else{
 	if( !checkToken() ){
 		echo outputError(array("msg" => "Unauthorized token"));die();

@@ -7,11 +7,7 @@ function checkToken(){
 		return false;
 	}
 	if( $checkToken = selectDBNew("employees",[$token],"`keepMeAlive` = ?", "") ){
-		if( $checkToken[0]["keepMeAlive"] == $token ){
-			return $checkToken[0]["storeId"];
-		}else{
-			return false;
-		}
+		return $checkToken[0]["storeId"];
 	}
 	return false;
 };
