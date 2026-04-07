@@ -75,7 +75,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 "keepMeAlive"    => $employeeToken
             ];
             if( insertDB("employees", $insertData) ){
-                logStoreActivity("Registration", "New employee registered: " . $data["fullName"]);
+                //logStoreActivity("Registration", "New employee registered: " . $data["fullName"]);
                 echo outputData(["msg" => "Registration successful", "token" => $employeeToken, "isRegister" => false, "isStore" => true]);die();
             }else{
                 echo outputError(["msg" => "Failed to register employee"]);die();  
