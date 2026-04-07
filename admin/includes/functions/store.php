@@ -12,7 +12,7 @@ function logStoreActivity($module = null, $activity = null){
     $employeeId = getEmployeeDetails();
     $insertData = array(
         "employeeId" => $employeeId ? $employeeId["id"] : null,
-        "storeId" => $storeId,
+        "storeId" => $storeId ?? 0,
         "module" => $module ?? null,
         "activity" => $activity ?? null,
         "date" => date("Y-m-d H:i:s"),
