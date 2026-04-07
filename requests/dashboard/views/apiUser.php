@@ -45,7 +45,6 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 }
                 $employeeToken = generateToken();
                 updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
-                die(" test 4");
                 logStoreActivity("Login", "Employee logged in: " . $employee[0]["fullName"]);
                 die(" test 5");
                 deleteDB("otp_codes", "id = '{$otp[0]["id"]}'");
