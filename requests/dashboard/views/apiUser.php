@@ -8,12 +8,13 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         if( !isset($data["phone"]) || empty($data["phone"]) ){
             echo outputError(["msg" => "Phone is required"]);die();  
         }
+        $otpCode = generateRandomNumber();
         insertDB("otp_codes", [
             "phone" => $data["phone"],
-            "code" => generateRandomNumber(),
+            "code" => $otpCode,
             "type" => "login"
         ]);
-        whatsappUltraMsgVerify($data["phone"], "login");
+        whatsappUltraMsgVerify($data["phone"], $otpCode);
         echo outputData(["msg" => "OTP sent successfully"]);die();
     }elseif( $action == "verify" ){
         if( !isset($data["phone"]) || empty($data["phone"]) ){
