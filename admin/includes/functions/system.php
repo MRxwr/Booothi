@@ -225,7 +225,7 @@ function uploadImageToStoreFolder($imageLocation, $storeId, $subDir){
 	if( isset($response["success"]) && $response["success"] == true ){
 		if( $storeData = selectDBNew("stores", [$storeId], "`id` = ?", "") ){
 			$storeCode = $storeData[0]["storeCode"];
-			$basePath = (strpos($_SERVER['REQUEST_URI'], '/requests/dashboard/') !== false) ? "logos/" : "../logos/";
+			$basePath = (strpos($_SERVER['REQUEST_URI'], '/requests/dashboard/') !== false) ? "../../logos/" : "../logos/";
 			$targetDir = $basePath . $storeCode . "/" . $subDir . "/";
 			if( !is_dir($targetDir) ){
 				mkdir($targetDir, 0755, true);
