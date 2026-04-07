@@ -27,18 +27,18 @@ switch ($action) {
             ""
         );
 
-        if ($store) {
+        if ($store && isset($store[0])) {
             $store = $store[0];
-            $store["enAbout"]    = urldecode($store["enAbout"]);
-            $store["arAbout"]    = urldecode($store["arAbout"]);
-            $store["enPrivacy"]  = urldecode($store["enPrivacy"]);
-            $store["arPrivacy"]  = urldecode($store["arPrivacy"]);
-            $store["enTerms"]    = urldecode($store["enTerms"]);
-            $store["arTerms"]    = urldecode($store["arTerms"]);
-            $store["socialMedia"]            = json_decode($store["socialMedia"], true) ?: [];
-            $store["whatsappNoti"]           = json_decode($store["whatsappNoti"], true) ?: [];
-            $store["internationalDelivery"]  = json_decode($store["internationalDelivery"], true) ?: [];
-            $store["expressDelivery"]        = json_decode($store["expressDelivery"], true) ?: [];
+            $store["enAbout"]    = isset($store["enAbout"]) ? urldecode($store["enAbout"]) : "";
+            $store["arAbout"]    = isset($store["arAbout"]) ? urldecode($store["arAbout"]) : "";
+            $store["enPrivacy"]  = isset($store["enPrivacy"]) ? urldecode($store["enPrivacy"]) : "";
+            $store["arPrivacy"]  = isset($store["arPrivacy"]) ? urldecode($store["arPrivacy"]) : "";
+            $store["enTerms"]    = isset($store["enTerms"]) ? urldecode($store["enTerms"]) : "";
+            $store["arTerms"]    = isset($store["arTerms"]) ? urldecode($store["arTerms"]) : "";
+            $store["socialMedia"]            = (isset($store["socialMedia"]) && !empty($store["socialMedia"])) ? json_decode($store["socialMedia"], true) : [];
+            $store["whatsappNoti"]           = (isset($store["whatsappNoti"]) && !empty($store["whatsappNoti"])) ? json_decode($store["whatsappNoti"], true) : [];
+            $store["internationalDelivery"]  = (isset($store["internationalDelivery"]) && !empty($store["internationalDelivery"])) ? json_decode($store["internationalDelivery"], true) : [];
+            $store["expressDelivery"]        = (isset($store["expressDelivery"]) && !empty($store["expressDelivery"])) ? json_decode($store["expressDelivery"], true) : [];
             
             echo outputData(["store" => $store]);die();
         } else {
