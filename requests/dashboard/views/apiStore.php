@@ -20,7 +20,7 @@ switch ($action) {
              giftCard, emailOpt, enableInvoiceImage, userDiscount, inStore, noAddress, noAddressDelivery,
              whatsappNoti, socialMedia, internationalDelivery, expressDelivery,
              enAbout, arAbout, enPrivacy, arPrivacy, enTerms, arTerms,
-             paymentAPIKey, enDeliveryTime, arDeliveryTime",
+             paymentAPIKey, enDeveliveryTime, arDeveliveryTime",
             "stores",
             [$storeId],
             "id = ?",
@@ -57,7 +57,7 @@ switch ($action) {
             "enableInvoiceImage", "userDiscount", "inStore", "noAddress",
             "noAddressDelivery", "theme", "categoryView", "productView",
             "showCategoryTitle", "showLogo", "websiteColor", "headerButton",
-            "enDeliveryTime", "arDeliveryTime"
+            "enDeveliveryTime", "arDeveliveryTime"
         ];
 
         foreach ($textFields as $field) {
