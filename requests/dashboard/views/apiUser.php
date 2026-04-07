@@ -48,7 +48,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 deleteDB("otp_codes", "id = '{$otp[0]["id"]}'");
                 echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken, "isRegister" => false, "isStore" => false]);die();
             }else{
-                echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false]);die();
+                echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false, "token" => ""]);die();
             }
         }else{
             echo outputError(["msg" => "Invalid OTP code"]);die();
