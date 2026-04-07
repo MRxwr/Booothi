@@ -4,14 +4,18 @@ require_once("../../admin/includes/config.php");
 require_once("../../admin/includes/functions.php");
 
 // check user token \\
-if( !checkToken() ){
-	echo outputError(array("msg" => "Unauthorized token"));die();
+$skipTokenEndpoints = ["user"];
+if ( isset($_GET["endpoint"]) && in_array($_GET["endpoint"], $skipTokenEndpoints) ){
 }else{
-	$storeId = checkToken();
-	if ( !getStoreDetails($storeId) ){
-		echo outputError(array("msg" => "Store not found, Please try again later"));die();
+	if( !checkToken() ){
+		echo outputError(array("msg" => "Unauthorized token"));die();
 	}else{
-		$storeDetails = getStoreDetails($storeId);
+		$storeId = checkToken();
+		if ( !getStoreDetails($storeId) ){
+			echo outputError(array("msg" => "Store not found, Please try again later"));die();
+		}else{
+			$storeDetails = getStoreDetails($storeId);
+		}
 	}
 }
 
