@@ -303,7 +303,7 @@ function whatsappUltraMsgImage($to,$eventId, $inviteeLink){
 			);
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
-				CURLOPT_URL => "https://api.ultramsg.com/{$messageDetails["InstanceId"]}/messages/image",
+				CURLOPT_URL => "https://api.ultramsg.com/{$whatsappNoti[0]["instanceId"]}/messages/image",
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_ENCODING => "",
 				CURLOPT_MAXREDIRS => 10,
@@ -345,7 +345,7 @@ function whatsappUltraMsgVerify($to, $code){
 			);
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
-				CURLOPT_URL => "https://api.ultramsg.com/{$messageDetails["InstanceId"]}/messages/chat",
+				CURLOPT_URL => "https://api.ultramsg.com/{$whatsappNoti[0]["instanceId"]}/messages/chat",
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_ENCODING => "",
 				CURLOPT_MAXREDIRS => 10,
@@ -383,7 +383,7 @@ function whatsappUltraMsgForgetPassword($to, $code) {
 			);
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
-				CURLOPT_URL => "https://api.ultramsg.com/{$messageDetails["InstanceId"]}/messages/chat",
+				CURLOPT_URL => "https://api.ultramsg.com/{$whatsappNoti[0]["instanceId"]}/messages/chat",
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_ENCODING => "",
 				CURLOPT_MAXREDIRS => 10,
