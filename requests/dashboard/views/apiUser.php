@@ -94,18 +94,18 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         if( !isset($data["email"]) || empty($data["email"]) ){
             echo outputError(["msg" => "Email is required"]);die();  
         }
-        if( selectDB("stores", "url = '{$data["url"]}'") ){
+        if( selectDB("stores", "storeCode = '{$data["url"]}'") ){
             echo outputError(["msg" => "Store URL already exists, Please choose another one"]);die();
         }else{
             $insertData = [
                 "title" => $data["title"],
-                "url"   => $data["url"],
+                "storeCode"   => $data["url"],
                 "phone" => $data["phone"],
                 "email" => $data["email"]
             ];
             if( insertDB("stores", $insertData) ){
                 //get store id
-                $store = selectDB("stores", "url = '{$data["url"]}'");
+                $store = selectDB("stores", "storeCode = '{$data["url"]}'");
                 //create shop called Online Store
                 insertDB("shops", [
                     "storeId" => $store[0]["id"],
