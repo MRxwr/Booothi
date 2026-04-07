@@ -48,7 +48,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 deleteDB("otp_codes", "id = '{$otp[0]["id"]}'");
                 echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken, "isRegister" => false, "isStore" => false]);die();
             }else{
-                echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false, "token" => ""]);die();
+                echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false]);die();
             }
         }else{
             echo outputError(["msg" => "Invalid OTP code"]);die();
@@ -105,7 +105,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             ];
             if( insertDB("stores", $insertData) ){
                 //get store id
-                $store = selectDB("stores", "storeCode = '{$data["url"]}'");
+                $store = selectDB("stores", "url = '{$data["url"]}'");
                 //create shop called Online Store
                 insertDB("shops", [
                     "storeId" => $store[0]["id"],
@@ -138,7 +138,6 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     "permissions"   => json_encode($permissions),
                     "hidden"  => "1",
                 ]);
-                /*
                 $role = selectDB("roles", "storeId = '{$store[0]["id"]}' AND enTitle = 'Store Owner'");
                 $roleId = $role[0]["id"];
                 $shop = selectDB("shops", "storeId = '{$store[0]["id"]}' AND enTitle = 'Online Store'");
@@ -147,7 +146,6 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 updateDB("employees", ["storeId" => $store[0]["id"], "empType" => $roleId, "shopId" => $shopId], "keepMeAlive = '{$token}'");
                 logStoreActivity("Store Creation", "New store created: " . $data["title"]);
                 echo outputData(["msg" => "Store created successfully"]);die();
-                */
             }else{
                 echo outputError(["msg" => "Failed to create store"]);die();
             }
