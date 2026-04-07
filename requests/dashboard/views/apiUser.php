@@ -138,9 +138,9 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     "permissions"   => json_encode($permissions),
                     "hidden"  => "1",
                 ]);
-                $role = selectDB("roles", "storeId = '{$store[0]["id"]}'");
+                $role = selectDB("roles", "storeId = '{$store[0]["id"]}' AND enTitle = 'Store Owner'");
                 $roleId = $role[0]["id"];
-                $shop = selectDB("shops", "storeId = '{$store[0]["id"]}'");
+                $shop = selectDB("shops", "storeId = '{$store[0]["id"]}' AND enTitle = 'Online Store'");
                 $shopId = $shop[0]["id"];
                 $token = getToken();
                 updateDB("employees", ["storeId" => $store[0]["id"], "empType" => $roleId, "shopId" => $shopId], "keepMeAlive = '{$token}'");

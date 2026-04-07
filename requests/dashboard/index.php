@@ -18,7 +18,7 @@ if ( isset($_GET["endpoint"]) && in_array(strtolower($_GET["endpoint"]), $skipTo
 		}
 	}
 }
-die();
+
 // get viewed page from pages folder \\
 if( isset($_GET["endpoint"]) && searchFile("views","api{$_GET["endpoint"]}.php") ){
 	require_once("views/".searchFile("views","api{$_GET["endpoint"]}.php"));
