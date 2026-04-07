@@ -97,7 +97,6 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         if( selectDB("stores", "storeCode = '{$data["url"]}'") ){
             echo outputError(["msg" => "Store URL already exists, Please choose another one"]);die();
         }else{
-            /*
             $insertData = [
                 "title" => $data["title"],
                 "storeCode"   => $data["url"],
@@ -106,7 +105,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             ];
             if( insertDB("stores", $insertData) ){
                 //get store id
-                $store = selectDB("stores", "url = '{$data["url"]}'");
+                $store = selectDB("stores", "storeCode = '{$data["url"]}'");
                 //create shop called Online Store
                 insertDB("shops", [
                     "storeId" => $store[0]["id"],
@@ -150,7 +149,6 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             }else{
                 echo outputError(["msg" => "Failed to create store"]);die();
             }
-                */
         }
     }else{
         echo outputError(["msg" => "Invalid action specified"]);die();
