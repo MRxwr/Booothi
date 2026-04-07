@@ -44,7 +44,6 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false]);die();
                 }
                 $employeeToken = generateToken();
-                die(" test 3");
                 updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
                 die(" test 4");
                 logStoreActivity("Login", "Employee logged in: " . $employee[0]["fullName"]);
