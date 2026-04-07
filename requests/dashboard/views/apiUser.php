@@ -45,6 +45,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 $employeeToken = generateToken();
                 updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
                 logStoreActivity("Login", "Employee logged in: " . $employee[0]["fullName"]);
+                deleteDB("otp_codes", "id = '{$otp[0]["id"]}'");
                 echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken, "isRegister" => false, "isStore" => false]);die();
             }else{
                 echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false]);die();
@@ -75,7 +76,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             ];
             if( insertDB("employees", $insertData) ){
                 logStoreActivity("Registration", "New employee registered: " . $data["fullName"]);
-                echo outputData(["msg" => "Registration successful", "token" => $employeeToken]);die();
+                echo outputData(["msg" => "Registration successful", "token" => $employeeToken, "isRegister" => false, "isStore" => true]);die();
             }else{
                 echo outputError(["msg" => "Failed to register employee"]);die();  
             }
