@@ -101,7 +101,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 $store = selectDB("stores", "url = '{$data["url"]}'");
                 //create shop called Online Store
                 insertDB("shops", [
-                    "storeId" => $store["id"],
+                    "storeId" => $store[0]["id"],
                     "enTitle" => "Online Store",
                     "arTitle" => "المتجر الإلكتروني",
                     "hidden" => "1",
@@ -125,18 +125,18 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     // Add more modules and permissions as needed
                 ];
                 insertDB("roles", [
-                    "storeId" => $store["id"],
+                    "storeId" => $store[0]["id"],
                     "enTitle" => "Store Owner",
                     "arTitle" => "مالك المتجر",
                     "permissions"   => json_encode($permissions),
                     "hidden"  => "1",
                 ]);
-                $role = selectDB("roles", "storeId = '{$store["id"]}' AND enTitle = 'Store Owner'");
-                $roleId = $role["id"];
-                $shop = selectDB("shops", "storeId = '{$store["id"]}' AND enTitle = 'Online Store'");
-                $shopId = $shop["id"];
+                $role = selectDB("roles", "storeId = '{$store[0]["id"]}' AND enTitle = 'Store Owner'");
+                $roleId = $role[0]["id"];
+                $shop = selectDB("shops", "storeId = '{$store[0]["id"]}' AND enTitle = 'Online Store'");
+                $shopId = $shop[0]["id"];
                 $token = getToken();
-                updateDB("employees", ["storeId" => $store["id"], "empType" => $roleId, "shopId" => $shopId], "keepMeAlive = '{$token}'");
+                updateDB("employees", ["storeId" => $store[0]["id"], "empType" => $roleId, "shopId" => $shopId], "keepMeAlive = '{$token}'");
                 logStoreActivity("Store Creation", "New store created: " . $data["title"]);
                 echo outputData(["msg" => "Store created successfully"]);die();
             }else{
