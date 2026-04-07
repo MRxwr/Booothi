@@ -23,6 +23,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         if( !isset($data["code"]) || empty($data["code"]) ){
             echo outputError(["msg" => "OTP code is required"]);die();  
         }
+        die("ok 1");
         if( $otp = selectDB("otp_codes", "`phone` = '{$data["phone"]}' AND `code` = '{$data["code"]}' AND `type` = 'login'") ){
             if( $employee = selectDB("employees", "phone = '{$data["phone"]}'") ){
                 if( $employee[0]["storeId"] == "0" ){
