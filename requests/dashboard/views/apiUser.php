@@ -1,5 +1,4 @@
 <?php
-echo "die";die();
 if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
     echo outputError(["msg" => "Action is required"]);die();  
 }else{
