@@ -25,7 +25,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         }
         if( $otp = selectDB("otp_codes", "`phone` = '{$data["phone"]}' AND `code` = '{$data["code"]}' AND `type` = 'login'") ){
             if( $employee = selectDB("employees", "phone = '{$data["phone"]}'") ){
-                die(" test ");
+                
                 if( $employee[0]["storeId"] == "0" ){
                     $employeeToken = generateToken();
                     updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
@@ -43,6 +43,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee[0]["id"]}'");
                     echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false]);die();
                 }
+                die(" test 2");
                 $employeeToken = generateToken();
                 updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
                 logStoreActivity("Login", "Employee logged in: " . $employee[0]["fullName"]);
