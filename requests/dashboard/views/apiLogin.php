@@ -23,9 +23,20 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             echo outputError(["msg" => "OTP code is required"]);die();  
         }
         if( $otp = selectDB("otp_codes", "`phone` = '{$data["phone"]}' AND `code` = '{$data["code"]}' AND `type` = 'login'") ){
-            if( $employee = selectDB("employees", "phone = '{$data["phone"]}'") ){
+            if( $employee = selectDB("employees", "phone = '{$data["phone"]}' AND `keepMeAlive` != ''") ){
+                if ( $employee["hidden"] == "1" ){
+                    updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee["id"]}'");
+                    echo outputError(["msg" => "Your account is locked, Please contact support"]);die();
+                }
+                if( $employee["status"] == "1" ){
+                    updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee["id"]}'");
+                    echo outputError(["msg" => "No store assigned to this account, Please contact support"]);die();
+                }
+                if( $employee["is_deleted"] == "1" ){
+                    updateDB("employees", ["phone" => "Deleted " . $employee["phone"], "email" => "Deleted " . $employee["email"], "keepMeAlive" => ""], "id = '{$employee["id"]}'");
+                }
                 $employeeToken = generateToken();
-                updateDB("employees", ["token" => $employeeToken], "id = '{$employee["id"]}'");
+                updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee["id"]}'");
                 logStoreActivity("Login", "Employee logged in: " . $employee["enName"]);
                 echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken]);die();
             }else{
@@ -104,8 +115,12 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     "employees" => ["view", "add", "update", "delete"],
                     "customers" => ["view", "add", "update", "delete"],
                     "vouchers"  => ["view", "add", "update", "delete"],
-                    "Banners"   => ["view", "add", "update", "delete"],
-                sa
+                    "banners"   => ["view", "add", "update", "delete"],
+                    "exstras"    => ["view", "add", "update", "delete"],
+                    "roles"    => ["view", "add", "update", "delete"],
+                    "employees"    => ["view", "add", "update", "delete"],
+                    "shops"    => ["view", "add", "update", "delete"],
+                    "stores"    => ["view", "add", "update", "delete"],
                     // Add more modules and permissions as needed
                 ];
                 insertDB("roles", [
@@ -115,6 +130,12 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     "permissions"   => json_encode($permissions),
                     "hidden"  => "1",
                 ]);
+                $role = selectDB("roles", "storeId = '{$store["id"]}' AND enTitle = 'Store Owner'");
+                $roleId = $role["id"];
+                $shop = selectDB("shops", "storeId = '{$store["id"]}' AND enTitle = 'Online Store'");
+                $shopId = $shop["id"];
+                $token = getToken();
+                updateDB("employees", ["storeId" => $store["id"], "empType" => $roleId, "shopId" => $shopId], "keepMeAlive = '{$token}'");
                 logStoreActivity("Store Creation", "New store created: " . $data["title"]);
                 echo outputData(["msg" => "Store created successfully"]);die();
             }else{
