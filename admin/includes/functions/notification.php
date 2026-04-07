@@ -332,8 +332,12 @@ function whatsappUltraMsgVerify($to, $code){
 		$messageDetails = json_decode($whatsappNoti[0]["whatsappNoti"],true);
 		if( $messageDetails["status"] != 1 ){
 			$data = array();
-			return $data;		
-			}else{
+			return 0;	
+		}else{
+			// add 965 country code if not exists
+			if ( substr($to, 0, 3) != "965" ){
+				$to = "965" . $to;
+			}
 			$data = array(
 				'token' => "{$whatsappNoti[0]["whatsappToken"]}",
 				'to' => "{$to}",
@@ -361,7 +365,7 @@ function whatsappUltraMsgVerify($to, $code){
 		}
 	}else{
 		$data = array();
-		return $data;
+		return 0;
 	}
 }
 
