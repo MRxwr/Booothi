@@ -43,10 +43,10 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee[0]["id"]}'");
                     echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false]);die();
                 }
-                die(" test 2");
                 $employeeToken = generateToken();
                 updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
                 logStoreActivity("Login", "Employee logged in: " . $employee[0]["fullName"]);
+                die(" test 2");
                 deleteDB("otp_codes", "id = '{$otp[0]["id"]}'");
                 echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken, "isRegister" => false, "isStore" => false]);die();
             }else{
