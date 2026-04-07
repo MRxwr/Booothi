@@ -24,24 +24,30 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             echo outputError(["msg" => "OTP code is required"]);die();  
         }
         if( $otp = selectDB("otp_codes", "`phone` = '{$data["phone"]}' AND `code` = '{$data["code"]}' AND `type` = 'login'") ){
-            if( $employee = selectDB("employees", "phone = '{$data["phone"]}' AND `keepMeAlive` != ''") ){
+            if( $employee = selectDB("employees", "phone = '{$data["phone"]}'") ){
+                if( $employee[0]["storeId"] == "0" ){
+                    $employeeToken = generateToken();
+                    updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
+                    echo outputError(["msg" => "No store assigned to this account, Please contact support", "token" => $employeeToken]);die();
+                }
                 if ( $employee[0]["hidden"] == "2" ){
                     updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee[0]["id"]}'");
                     echo outputError(["msg" => "Your account is locked, Please contact support"]);die();
                 }
                 if( $employee[0]["status"] == "1" ){
                     updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee[0]["id"]}'");
-                    echo outputError(["msg" => "No store assigned to this account, Please contact support"]);die();
+                    echo outputError(["msg" => "Your account is inactive, Please contact support"]);die();
                 }
                 if( $employee[0]["is_deleted"] == "1" ){
-                    updateDB("employees", ["phone" => "Deleted " . $employee[0]["phone"], "email" => "Deleted " . $employee[0]["email"], "keepMeAlive" => ""], "id = '{$employee[0]["id"]}'");
+                    updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee[0]["id"]}'");
+                    echo outputError(["msg" => "Your account is deleted, Please contact support"]);die();
                 }
                 $employeeToken = generateToken();
                 updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
-                logStoreActivity("Login", "Employee logged in: " . $employee[0]["enName"]);
+                logStoreActivity("Login", "Employee logged in: " . $employee[0]["fullName"]);
                 echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken]);die();
             }else{
-                echo outputError(["msg" => "Phone number not found, Please register now"]);die();
+                echo outputError(["msg" => "Could not find employee, Please register now"]);die();
             }
         }else{
             echo outputError(["msg" => "Invalid OTP code"]);die();
