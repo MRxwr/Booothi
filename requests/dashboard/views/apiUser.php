@@ -15,6 +15,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             "type" => "login"
         ]);
         whatsappUltraMsgVerify($data["phone"], $otpCode);
+        logStoreActivity("OTP Sent", "OTP sent to phone: " . $data["phone"], 0);
         echo outputData(["msg" => "OTP sent successfully"]);die();
     }elseif( $action == "verify" ){
         if( !isset($data["phone"]) || empty($data["phone"]) ){
@@ -46,6 +47,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 $employeeToken = generateToken();
                 updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
                 deleteDB("otp_codes", "id = '{$otp[0]["id"]}'");
+                logStoreActivity("OTP Verified", "OTP verified for phone: " . $data["phone"], $employee[0]["storeId"]);
                 echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken, "isRegister" => false, "isStore" => false]);die();
             }else{
                 echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false]);die();
@@ -75,7 +77,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 "keepMeAlive"    => $employeeToken
             ];
             if( insertDB("employees", $insertData) ){
-                //logStoreActivity("Registration", "New employee registered: " . $data["fullName"]);
+                logStoreActivity("Registration", "New employee registered: " . $data["fullName"], 0);
                 echo outputData(["msg" => "Registration successful", "token" => $employeeToken, "isRegister" => false, "isStore" => true]);die();
             }else{
                 echo outputError(["msg" => "Failed to register employee"]);die();  
