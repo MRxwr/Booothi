@@ -26,7 +26,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         }
         if( $otp = selectDB("otp_codes", "`phone` = '{$data["phone"]}' AND `code` = '{$data["code"]}' AND `type` = 'login'") ){
             deleteDB("otp_codes", "phone = '{$data["phone"]}'");
-            if( $employee = selectDB("employees", "phone = '{$data["phone"]}'") ){
+            if( $employee = selectDB("employees", "phone = '{$data["phone"]}' AND `is_deleted` = '0'") ){
                 if( $employee[0]["storeId"] == "0" ){
                     $employeeToken = generateToken();
                     updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
@@ -39,10 +39,6 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 if( $employee[0]["status"] == "1" ){
                     updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee[0]["id"]}'");
                     echo outputError(["msg" => "Your account is inactive, Please contact support", "isRegister" => false, "isStore" => false]);die();
-                }
-                if( $employee[0]["is_deleted"] == "1" ){
-                    updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee[0]["id"]}'");
-                    echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false]);die();
                 }
                 $employeeToken = generateToken();
                 updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
