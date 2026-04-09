@@ -25,8 +25,8 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             echo outputError(["msg" => "OTP code is required"]);die();  
         }
         if( $otp = selectDB("otp_codes", "`phone` = '{$data["phone"]}' AND `code` = '{$data["code"]}' AND `type` = 'login'") ){
+            deleteDB("otp_codes", "phone = '{$data["phone"]}'");
             if( $employee = selectDB("employees", "phone = '{$data["phone"]}'") ){
-                
                 if( $employee[0]["storeId"] == "0" ){
                     $employeeToken = generateToken();
                     updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
@@ -46,7 +46,6 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 }
                 $employeeToken = generateToken();
                 updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
-                deleteDB("otp_codes", "phone = '{$data["phone"]}'");
                 logStoreActivity("OTP Verified", "OTP verified for phone: " . $data["phone"], $employee[0]["storeId"]);
                 echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken, "isRegister" => false, "isStore" => false]);die();
             }else{
