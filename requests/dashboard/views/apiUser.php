@@ -131,7 +131,6 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     "stores"    => ["view", "add", "update", "delete"],
                     // Add more modules and permissions as needed
                 ];
-                die(json_encode($permissions));
                 insertDB("roles", [
                     "storeId" => $store[0]["id"],
                     "enTitle" => "Store Owner",
