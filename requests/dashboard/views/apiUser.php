@@ -103,7 +103,6 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 "phone" => $data["phone"],
                 "email" => $data["email"]
             ];
-            die(json_encode($insertData));
             if( insertDB("stores", $insertData) ){
                 //get store id
                 $store = selectDB("stores", "storeCode = '{$data["url"]}'");
@@ -146,7 +145,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 $shopId = $shop[0]["id"];
                 $token = getToken();
                 updateDB("employees", ["storeId" => $store[0]["id"], "empType" => $roleId, "shopId" => $shopId], "keepMeAlive = '{$token}'");
-                logStoreActivity("Store Creation", "New store created: " . $data["title"]);
+                logStoreActivity("Store Creation", "New store created: " . $data["title"], $store[0]["id"]);
                 echo outputData(["msg" => "Store created successfully"]);die();
             }else{
                 echo outputError(["msg" => "Failed to create store"]);die();
