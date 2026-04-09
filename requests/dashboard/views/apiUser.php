@@ -103,6 +103,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 "phone" => $data["phone"],
                 "email" => $data["email"]
             ];
+            die(json_encode($insertData));
             if( insertDB("stores", $insertData) ){
                 //get store id
                 $store = selectDB("stores", "storeCode = '{$data["url"]}'");
@@ -131,6 +132,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     "stores"    => ["view", "add", "update", "delete"],
                     // Add more modules and permissions as needed
                 ];
+                die(json_encode($permissions));
                 insertDB("roles", [
                     "storeId" => $store[0]["id"],
                     "enTitle" => "Store Owner",
