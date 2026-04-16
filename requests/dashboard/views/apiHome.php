@@ -1,7 +1,7 @@
 <?php
 $response["storeDetails"] = array(
 	"title" => $storeDetails["title"],
-	"logo" => "{$storeDetails["storeCode"]}/logos/{$storeDetails["logo"]}",
+	"logo" => "{$storeDetails["logo"]}",
 );
 
 $today = date("Y-m-d");
