@@ -90,7 +90,24 @@ switch ($action) {
 
         if (isset($_POST["paymentOptions"])) {
             $po = $_POST["paymentOptions"];
-            $data["paymentOptions"] = is_array($po) ? json_encode($po) : $po;
+            $poArray = [
+                [
+                    "isOn" => "{$paymentOptions[0]}",
+                    "enTitle" => "Cash on Delivery",
+                    "arTitle" => "الدفع عند الاستلام"
+                ],
+                [
+                    "isOn" => "{$paymentOptions[1]}",
+                    "enTitle" => "Link Payment",
+                    "arTitle" => "الدفع عبر الرابط"
+                ],
+                [
+                    "isOn" => "{$paymentOptions[2]}",
+                    "enTitle" => "Online Payment",
+                    "arTitle" => "الدفع عبر الإنترنت"
+                ]
+            ];
+            $data["paymentOptions"] = is_array($poArray) ? json_encode($poArray) : $poArray;
         }
 
         // Handle file uploads
