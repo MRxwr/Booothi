@@ -293,8 +293,8 @@ if( isset($_GET["error"]) && $_GET["error"] == "3" ){
 											if ( $paymentOptions[$i]["isOn"] == "1" ){
 												$paymentClassLabelId = str_replace("-","",str_replace("/","",str_replace(" ","",direction($paymentOptions[$i]["enTitle"],$paymentOptions[$i]["arTitle"]))));
 												?>
-												<div class="col-sm-4 col-4 col-md-4" id="<?php echo ($i+1) ?>p_m">
-													<a class="<?php echo $paymentClassLabelId ?>" id="<?php echo $paymentOptions[$i]["paymentId"] ?>"><label id="pMethods<?php echo ($i+1) ?>" class="pMethods radiocardwrapper">
+												<div class="col-sm-4 col-4 col-md-4" id="<?php echo $paymentOptions[$i]["paymentId"] ?>p_m">
+													<a class="<?php echo $paymentClassLabelId ?>" id="<?php echo $paymentOptions[$i]["paymentId"] ?>"><label id="pMethods<?php echo $paymentOptions[$i]["paymentId"] ?>" class="pMethods radiocardwrapper">
 														<?php /* <i class="<?php echo $paymentOptions[$i]["icon"] ?>"></i> */ ?>
 														<span class="cardcontent d-block"><?php echo direction($paymentOptions[$i]["enTitle"],$paymentOptions[$i]["arTitle"]) ?></span> 
 													</label></a>
