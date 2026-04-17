@@ -40,6 +40,12 @@ switch ($action) {
             $store["internationalDelivery"]  = (isset($store["internationalDelivery"]) && !empty($store["internationalDelivery"])) ? json_decode($store["internationalDelivery"], true) : [];
             $store["expressDelivery"]        = (isset($store["expressDelivery"]) && !empty($store["expressDelivery"])) ? json_decode($store["expressDelivery"], true) : [];
             $store["paymentOptions"]         = (isset($store["paymentOptions"]) && !empty($store["paymentOptions"])) ? json_decode($store["paymentOptions"], true) : [];
+            if( is_array($store["paymentOptions"]) ){
+                for( $i = 0; $i < sizeof($store["paymentOptions"]); $i++ ){
+                    unset($store["paymentOptions"][$i]["paymentId"]);
+                    unset($store["paymentOptions"][$i]["icon"]);
+                }
+            }
             
             echo outputData(["store" => $store]);die();
         } else {
