@@ -46,6 +46,11 @@ switch ($action) {
                     unset($store["paymentOptions"][$i]["icon"]);
                 }
             }
+            $store["contactInfo"] = [
+                "whatsapp" => "96560090944",
+                "enMsg" => "To activate online payments, please contact us via WhatsApp",
+                "arMsg" => "لتفعيل الدفع الإلكتروني، يرجى التواصل معنا عبر الواتساب"
+            ];
             
             echo outputData(["store" => $store]);die();
         } else {
