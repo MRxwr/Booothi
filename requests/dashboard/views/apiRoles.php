@@ -111,6 +111,9 @@ switch ($action) {
         }
 
         $roleId = $_POST["roleId"];
+        if (is_string($_POST["pages"])) {
+            $pagesJson = json_encode([$_POST["pages"]]);
+        }
         $pagesJson = json_encode($_POST["pages"]);
 
         if (updateDBNew("roles", ["pages" => $pagesJson], "id = ? AND storeId = ?", [$roleId, $storeId])) {
