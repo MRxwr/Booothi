@@ -92,17 +92,17 @@ switch ($action) {
             $po = $_POST["paymentOptions"];
             $poArray = [
                 [
-                    "isOn" => "{$paymentOptions[0]["isOn"]}",
+                    "isOn" => "{$po[0]["isOn"]}",
                     "enTitle" => "Cash on Delivery",
                     "arTitle" => "الدفع عند الاستلام"
                 ],
                 [
-                    "isOn" => "{$paymentOptions[1]["isOn"]}",
+                    "isOn" => "{$po[1]["isOn"]}",
                     "enTitle" => "Link Payment",
                     "arTitle" => "الدفع عبر الرابط"
                 ],
                 [
-                    "isOn" => "{$paymentOptions[2]["isOn"]}",
+                    "isOn" => "{$po[2]["isOn"]}",
                     "enTitle" => "Online Payment",
                     "arTitle" => "الدفع عبر الإنترنت"
                 ]
