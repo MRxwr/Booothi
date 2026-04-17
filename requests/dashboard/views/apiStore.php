@@ -20,7 +20,7 @@ switch ($action) {
              giftCard, emailOpt, enableInvoiceImage, userDiscount, inStore, noAddress, noAddressDelivery,
              whatsappNoti, socialMedia, internationalDelivery, expressDelivery,
              enAbout, arAbout, enPrivacy, arPrivacy, enTerms, arTerms,
-             paymentAPIKey, enDeveliveryTime, arDeveliveryTime",
+             paymentAPIKey, enDeveliveryTime, arDeveliveryTime, paymentOptions",
             "stores",
             [$storeId],
             "id = ?",
@@ -39,6 +39,7 @@ switch ($action) {
             $store["whatsappNoti"]           = (isset($store["whatsappNoti"]) && !empty($store["whatsappNoti"])) ? json_decode($store["whatsappNoti"], true) : [];
             $store["internationalDelivery"]  = (isset($store["internationalDelivery"]) && !empty($store["internationalDelivery"])) ? json_decode($store["internationalDelivery"], true) : [];
             $store["expressDelivery"]        = (isset($store["expressDelivery"]) && !empty($store["expressDelivery"])) ? json_decode($store["expressDelivery"], true) : [];
+            $store["paymentOptions"]         = (isset($store["paymentOptions"]) && !empty($store["paymentOptions"])) ? json_decode($store["paymentOptions"], true) : [];
             
             echo outputData(["store" => $store]);die();
         } else {
@@ -85,6 +86,11 @@ switch ($action) {
         if (isset($_POST["expressDelivery"])) {
             $ed = $_POST["expressDelivery"];
             $data["expressDelivery"] = is_array($ed) ? json_encode($ed) : $ed;
+        }
+
+        if (isset($_POST["paymentOptions"])) {
+            $po = $_POST["paymentOptions"];
+            $data["paymentOptions"] = is_array($po) ? json_encode($po) : $po;
         }
 
         // Handle file uploads

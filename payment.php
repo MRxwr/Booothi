@@ -86,7 +86,7 @@ $price = $price * ((100-$userDiscount)/100);
 // call payapi to get payment link \\
 $address = json_decode($_POST["address"],true);
 if( isset($_POST["expressDelivery"]) && !empty($_POST["expressDelivery"]) ){
-	$address["shipping"] = $_POST["expressDelivery"];
+	$address["shipping"] = $expressDelivery["charge"];
 	$address["express"] = 1;
 }else{
 	$address["express"] = 0;
@@ -179,6 +179,10 @@ $data = array(
 // sending user to pay and view details \\
 if( insertDB("orders2",$data) ){
 	if ( $_POST["paymentMethod"] == 10 ){
+		$_SESSION["createKW"]["pMethod"] = $_POST["paymentMethod"];
+		$_SESSION["createKW"]["orderId"] = $gatewayId;
+		header("Location: index?v=Details&c={$gatewayId}");die();
+	}elseif ( $_POST["paymentMethod"] == 4 ){
 		$_SESSION["createKW"]["pMethod"] = $_POST["paymentMethod"];
 		$_SESSION["createKW"]["orderId"] = $gatewayId;
 		header("Location: index?v=Details&c={$gatewayId}");die();
