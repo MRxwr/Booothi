@@ -4,7 +4,7 @@ require_once("../../admin/includes/config.php");
 require_once("../../admin/includes/functions.php");
 
 // check user token \\
-$skipTokenEndpoints = ["user"];
+$skipTokenEndpoints = ["user","tabs"];
 if ( isset($_GET["endpoint"]) && in_array(strtolower($_GET["endpoint"]), $skipTokenEndpoints) ){
 }else{
 	if( !checkToken() ){
