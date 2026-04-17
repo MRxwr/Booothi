@@ -288,14 +288,14 @@ if( isset($_GET["error"]) && $_GET["error"] == "3" ){
 								</div>
 								<div class="row form-row d-flex payment-box">
 									<?php
-									if( $pMethods = selectDB("p_methods","`hidden` = '1' AND `status` = '0' ORDER BY `rank` ASC")){
-										for( $i  = 0; $i < sizeof($pMethods); $i++){
-											$paymentClassLabelId = str_replace("-","",str_replace("/","",str_replace(" ","",direction($pMethods[$i]["enTitle"],$pMethods[$i]["arTitle"]))));
+									if( is_array($paymentOptions)){
+										for( $i  = 0; $i < sizeof($paymentOptions); $i++){
+											$paymentClassLabelId = str_replace("-","",str_replace("/","",str_replace(" ","",direction($paymentOptions[$i]["enTitle"],$paymentOptions[$i]["arTitle"]))));
 											?>
-											<div class="col-sm-4 col-4 col-md-4" id="<?php echo $pMethods[$i]["paymentId"] ?>p_m">
-												<a class="<?php echo $paymentClassLabelId ?>" id="<?php echo $pMethods[$i]["paymentId"] ?>"><label id="pMethods<?php echo $pMethods[$i]["paymentId"] ?>" class="pMethods radiocardwrapper">
-													<img src="<?php echo encryptImage("logos/{$pMethods[$i]["icon"]}") ?>" style="width:40px;height:25px" class="d-block">
-													<span class="cardcontent d-block"><?php echo direction($pMethods[$i]["enTitle"],$pMethods[$i]["arTitle"]) ?></span>
+											<div class="col-sm-4 col-4 col-md-4" id="<?php echo $paymentOptions[$i]["paymentId"] ?>p_m">
+												<a class="<?php echo $paymentClassLabelId ?>" id="<?php echo $paymentOptions[$i]["paymentId"] ?>"><label id="pMethods<?php echo $paymentOptions[$i]["paymentId"] ?>" class="pMethods radiocardwrapper">
+													<i class="<?php echo $paymentOptions[$i]["icon"] ?>"></i>
+													<span class="cardcontent d-block"><?php echo direction($paymentOptions[$i]["enTitle"],$paymentOptions[$i]["arTitle"]) ?></span>
 												</label></a>
 											</div>
 											<?php

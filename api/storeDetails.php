@@ -30,6 +30,7 @@ if( $storeDetails = selectDBNew("stores",[$_GET["storeCode"]],"`storeCode` = ?",
 	$inStore = $storeDetails[0]["inStore"];
 	$noAddressDelivery = $storeDetails[0]["noAddressDelivery"];
 	$expressDelivery = json_decode($storeDetails[0]["expressDelivery"], true);
+	$paymentOptions = json_decode($storeDetails[0]["paymentOptions"], true);
 	$storeSocialMediaLinks = json_decode($storeDetails[0]["socialMedia"], true);
 }else{
 	header ("LOCATION: default.php");die();

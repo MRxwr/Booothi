@@ -94,17 +94,24 @@ switch ($action) {
                 [
                     "isOn" => "{$po[0]["isOn"]}",
                     "enTitle" => "Cash on Delivery",
-                    "arTitle" => "الدفع عند الاستلام"
+                    "arTitle" => "الدفع عند الاستلام", 
+                    "paymentId" => "10",
+                    "icon" => "fa fa-money-bill-wave"
                 ],
                 [
                     "isOn" => "{$po[1]["isOn"]}",
                     "enTitle" => "Link Payment",
-                    "arTitle" => "الدفع عبر الرابط"
+                    "arTitle" => "الدفع عبر الرابط",
+                    "paymentId" => "4",
+                    "icon" => "fa fa-link"
+
                 ],
                 [
                     "isOn" => "{$po[2]["isOn"]}",
                     "enTitle" => "Online Payment",
-                    "arTitle" => "الدفع عبر الإنترنت"
+                    "arTitle" => "الدفع عبر الإنترنت",
+                    "paymentId" => "1",
+                    "icon" => "fa fa-credit-card"
                 ]
             ];
             $data["paymentOptions"] = is_array($poArray) ? json_encode($poArray) : $poArray;
