@@ -40,10 +40,11 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee[0]["id"]}'");
                     echo outputError(["msg" => "Your account is inactive, Please contact support", "isRegister" => false, "isStore" => false]);die();
                 }
+                $employeeRole = selectDB("roles", "id = '{$employee[0]["empType"]}'");
                 $employeeToken = generateToken();
                 updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
                 logStoreActivity("OTP Verified", "OTP verified for phone: " . $data["phone"], $employee[0]["storeId"]);
-                echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken, "isRegister" => false, "isStore" => false]);die();
+                echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken, "isRegister" => false, "isStore" => false, "roles" => $employeeRole[0]["pages"]]);die();
             }else{
                 echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false]);die();
             }
@@ -110,29 +111,10 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     "arTitle" => "المتجر الإلكتروني",
                     "hidden" => "1",
                 ]);
-                // create role called Store Owner with all permissions
-                $permissions = [
-                    "dashboard" => ["view"],
-                    "orders" => ["view", "add", "update", "delete"],
-                    "products" => ["view", "add", "update", "delete"],
-                    "categories" => ["view", "add", "update", "delete"],
-                    "attributes" => ["view", "add", "update", "delete"],
-                    "employees" => ["view", "add", "update", "delete"],
-                    "customers" => ["view", "add", "update", "delete"],
-                    "vouchers"  => ["view", "add", "update", "delete"],
-                    "banners"   => ["view", "add", "update", "delete"],
-                    "exstras"    => ["view", "add", "update", "delete"],
-                    "roles"    => ["view", "add", "update", "delete"],
-                    "employees"    => ["view", "add", "update", "delete"],
-                    "shops"    => ["view", "add", "update", "delete"],
-                    "stores"    => ["view", "add", "update", "delete"],
-                    // Add more modules and permissions as needed
-                ];
                 insertDB("roles", [
                     "storeId" => $store[0]["id"],
                     "enTitle" => "Store Owner",
                     "arTitle" => "مالك المتجر",
-                    "permissions"   => json_encode($permissions),
                     "hidden"  => "1",
                 ]);
                 $role = selectDB("roles", "storeId = '{$store[0]["id"]}' AND enTitle = 'Store Owner'");
