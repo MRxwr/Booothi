@@ -44,7 +44,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 $employeeToken = generateToken();
                 updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
                 logStoreActivity("OTP Verified", "OTP verified for phone: " . $data["phone"], $employee[0]["storeId"]);
-                echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken, "isRegister" => false, "isStore" => false, "roles" => $employeeRole[0]["pages"]]);die();
+                echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken, "isRegister" => false, "isStore" => false, "roles" => json_decode($employeeRole[0]["pages"], true)]);die();
             }else{
                 echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false]);die();
             }
