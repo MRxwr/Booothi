@@ -30,15 +30,15 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 if( $employee[0]["storeId"] == "0" ){
                     $employeeToken = generateToken();
                     updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
-                    echo outputError(["msg" => "No store assigned to this account, Please contact support", "token" => $employeeToken, "isRegister" => false, "isStore" => true]);die();
+                    echo outputError(["msg" => "No store assigned to this account, Please contact support", "token" => $employeeToken, "isRegister" => false, "isStore" => true, "roles" => []]);die();
                 }
                 if ( $employee[0]["hidden"] == "2" ){
                     updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee[0]["id"]}'");
-                    echo outputError(["msg" => "Your account is locked, Please contact support", "isRegister" => false, "isStore" => false]);die();
+                    echo outputError(["msg" => "Your account is locked, Please contact support", "isRegister" => false, "isStore" => false, "roles" => []]);die();
                 }
                 if( $employee[0]["status"] == "1" ){
                     updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee[0]["id"]}'");
-                    echo outputError(["msg" => "Your account is inactive, Please contact support", "isRegister" => false, "isStore" => false]);die();
+                    echo outputError(["msg" => "Your account is inactive, Please contact support", "isRegister" => false, "isStore" => false, "roles" => []]);die();
                 }
                 $employeeRole = selectDB("roles", "id = '{$employee[0]["empType"]}'");
                 $employeeToken = generateToken();
@@ -46,7 +46,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                 logStoreActivity("OTP Verified", "OTP verified for phone: " . $data["phone"], $employee[0]["storeId"]);
                 echo outputData(["msg" => "OTP verified successfully", "token" => $employeeToken, "isRegister" => false, "isStore" => false, "roles" => json_decode($employeeRole[0]["pages"], true)]);die();
             }else{
-                echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false]);die();
+                echo outputError(["msg" => "Could not find employee, Please register now", "isRegister" => true, "isStore" => false, "roles" => []]);die();
             }
         }else{
             echo outputError(["msg" => "Invalid OTP code"]);die();
@@ -74,7 +74,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             ];
             if( insertDB("employees", $insertData) ){
                 logStoreActivity("Registration", "New employee registered: " . $data["fullName"], 0);
-                echo outputData(["msg" => "Registration successful", "token" => $employeeToken, "isRegister" => false, "isStore" => true]);die();
+                echo outputData(["msg" => "Registration successful", "token" => $employeeToken, "isRegister" => false, "isStore" => true, "roles" => []]);die();
             }else{
                 echo outputError(["msg" => "Failed to register employee"]);die();  
             }
