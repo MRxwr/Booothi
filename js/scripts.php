@@ -940,16 +940,15 @@ $(function(){
 		$('#place').val('4');
 	}); 
 	<?php
-	if( $pMethods = selectDB("p_methods","`hidden` = '1' AND `status` = '0' ORDER BY `rank` ASC")){
-		for( $i  = 0; $i < sizeof($pMethods); $i++){
-			$paymentClassLabelId = str_replace("-","",str_replace("/","",str_replace(" ","",direction($pMethods[$i]["enTitle"],$pMethods[$i]["arTitle"]))));
+	if( is_array($paymentOptions) ){
+		for( $i  = 0; $i < sizeof($paymentOptions); $i++){
+			$paymentClassLabelId = str_replace("-","",str_replace("/","",str_replace(" ","",direction($paymentOptions[$i]["enTitle"],$paymentOptions[$i]["arTitle"]))));
 			?>
 			$('.<?php echo $paymentClassLabelId ?>').click(function(){
 				var payId = $(this).attr("id");
 				$('.pMethods').removeClass('active');
 				$('#pMethods'+payId).addClass('active');
-				$('#pMethod').val("<?php echo $pMethods[$i]["paymentId"] ?>");
-				//alert('<?php echo direction("Visa/Master Tax (2.5%) Will be add","سيتم اضافة 2.5% عمولة الفيزا/الماستر") ?>');
+				$('#pMethod').val(payId);
 			});
 			<?php
 		}
