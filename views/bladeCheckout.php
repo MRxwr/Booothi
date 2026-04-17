@@ -288,7 +288,7 @@ if( isset($_GET["error"]) && $_GET["error"] == "3" ){
 								</div>
 								<div class="row form-row d-flex payment-box">
 									<?php
-									if( is_array($paymentOptions)){
+									if( is_array($paymentOptions) ){
 										for( $i  = 0; $i < sizeof($paymentOptions); $i++){
 											$paymentClassLabelId = str_replace("-","",str_replace("/","",str_replace(" ","",direction($paymentOptions[$i]["enTitle"],$paymentOptions[$i]["arTitle"]))));
 											?>
