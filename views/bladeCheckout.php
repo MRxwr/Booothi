@@ -295,7 +295,7 @@ if( isset($_GET["error"]) && $_GET["error"] == "3" ){
 											<div class="col-sm-4 col-4 col-md-4" id="<?php echo $paymentOptions[$i]["paymentId"] ?>p_m">
 												<a class="<?php echo $paymentClassLabelId ?>" id="<?php echo $paymentOptions[$i]["paymentId"] ?>"><label id="pMethods<?php echo $paymentOptions[$i]["paymentId"] ?>" class="pMethods radiocardwrapper">
 													<i class="<?php echo $paymentOptions[$i]["icon"] ?>"></i>
-													<span class="cardcontent d-block"><?php echo direction($paymentOptions[$i]["enTitle"],$paymentOptions[$i]["arTitle"]) ?></span>
+													<span class="cardcontent d-block"><?php echo direction($paymentOptions[$i]["enTitle"],$paymentOptions[$i]["arTitle"]) ?></span> 
 												</label></a>
 											</div>
 											<?php
