@@ -61,7 +61,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         if( !isset($data["phone"]) || empty($data["phone"]) ){
             echo outputError(["msg" => "Phone is required"]);die();  
         }
-        if( selectDB("employees", "phone = '{$data["phone"]}'") ){
+        if( selectDB("employees", "phone = '{$data["phone"]}' AND `is_deleted` = '0'") ){
             echo outputError(["msg" => "Phone number already exists, Please login instead"]);die();  
         }else{
             $employeeToken = generateToken();
