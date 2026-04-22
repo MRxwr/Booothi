@@ -63,17 +63,15 @@ if ($action == "list") {
                 "totalEntries" => $totalEntries
             ]
         ]);die();
-        echo json_encode([
-            "status" => "success", 
-            "data" => $subscriptions,
+    } else {
+        echo outputData([
+            "subscriptions" => [],
             "pagination" => [
                 "currentPage" => $page,
                 "totalPages" => $totalPages,
                 "totalEntries" => $totalEntries
             ]
-        ]);
-    } else {
-        echo json_encode(["status" => "success", "data" => [], "msg" => "No subscriptions found"]);
+        ]);die();
     }
 }elseif ($action == "packages") {
     // List all available packages for purchase
@@ -112,7 +110,9 @@ if ($action == "list") {
                 "duration" => $package['duration']
             ];
         }
-        echo json_encode(["status" => "success", "data" => $response]);
+        echo outputData([
+            "packages" => $response
+        ]);die();
     } else {
         echo outputError(["msg" => "No packages available."]);
     }
