@@ -32,6 +32,23 @@ if( $storeDetails = selectDBNew("stores",[$_GET["storeCode"]],"`storeCode` = ?",
 	$expressDelivery = json_decode($storeDetails[0]["expressDelivery"], true);
 	$paymentOptions = json_decode($storeDetails[0]["paymentOptions"], true);
 	$storeSocialMediaLinks = json_decode($storeDetails[0]["socialMedia"], true);
+
+	// Check if store has active duration otherwise turn on maintenance mode automatically \\
+	$sql = "SELECT SUM(p.days) as totalDays 
+			FROM subscriptions s 
+			JOIN packages p ON s.packageId = p.id 
+			WHERE s.storeId = ? AND s.status = 1";
+	$totalDaysSub = queryDB($sql, [$storeID]);
+	$totalDays = $totalDaysSub[0]["totalDays"] ?? 0;
+	$dateStart = $storeDetails[0]["date"];
+	$expiryDate = date('Y-m-d H:i:s', strtotime($dateStart . " + {$totalDays} days"));
+
+	if ( date("Y-m-d H:i:s") > $expiryDate && $storeDetails[0]["maintenanceMode"] != 1 ){
+		updateDB("stores", ["maintenanceMode" => 1], "`id` = '{$storeID}'");
+		$maintenanceMode = 1;
+	} else {
+		$maintenanceMode = $storeDetails[0]["maintenanceMode"];
+	}
 }else{
 	header ("LOCATION: default.php");die();
 }
