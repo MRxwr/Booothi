@@ -30,13 +30,16 @@ if( isset($_POST["updateRank"]) ){
 }
 
 if( isset($_POST["title"]) ){
-	$_POST["storeId"] = ( $_POST["storeId"] == 0 ) ? $storeId : $_POST["storeId"];
 	$id = (int)$_POST["update"];
 	unset($_POST["update"]);
     $_POST["title"] = json_encode($_POST["title"], JSON_UNESCAPED_UNICODE);
     $_POST["subtitle"] = json_encode($_POST["subtitle"], JSON_UNESCAPED_UNICODE);
     $_POST["details"] = json_encode($_POST["details"], JSON_UNESCAPED_UNICODE);
     $_POST["priceSubtitle"] = json_encode($_POST["priceSubtitle"], JSON_UNESCAPED_UNICODE);
+    $_POST["duration"] = (int)$_POST["duration"];
+    $_POST["discountType"] = (int)$_POST["discountType"];
+    $_POST["image"] = "";
+    
 	if ( $id == 0 ){
 		if (is_uploaded_file($_FILES['image']['tmp_name'])) {
 			$_POST["image"] = uploadImageSystemFolder($_FILES['image']['tmp_name'], "packages");
@@ -249,7 +252,7 @@ if( isset($_POST["title"]) ){
                 <label id="arPriceSubtitleVal<?php echo $packages[$i]["id"]?>"><?php echo $priceSubtitle["ar"] ?></label>
                 <label id="discountVal<?php echo $packages[$i]["id"]?>"><?php echo $packages[$i]["discount"] ?></label>
                 <label id="discountTypeVal<?php echo $packages[$i]["id"]?>"><?php echo $packages[$i]["discountType"] ?></label>
-                <label id="duration<?php echo $packages[$i]["id"]?>"><?php echo $packages[$i]["duration"] ?></label>
+                <label id="durationVal<?php echo $packages[$i]["id"]?>"><?php echo $packages[$i]["duration"] ?></label>
             </div>
 			
 			</td>
@@ -283,7 +286,7 @@ if( isset($_POST["title"]) ){
         $("input[name='priceSubtitle[en]']").val($("#enPriceSubtitleVal"+id).text());
         $("input[name='priceSubtitle[ar]']").val($("#arPriceSubtitleVal"+id).text());
         $("input[name='discount']").val($("#discountVal"+id).text());
-        $("input[name='duration']").val($("#duration"+id).text());
+        $("input[name='duration']").val($("#durationVal"+id).text());
         $("select[name='discountType']").val($("#discountTypeVal"+id).text());
 
         if (tinymce.get("enDetails")) {
