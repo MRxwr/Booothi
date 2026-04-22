@@ -1,7 +1,6 @@
 <?php
 require("../admin/includes/config.php");
 require("../admin/includes/functions.php");
-require("../admin/includes/functions/payment.php");
 
 // Set header to HTML because this is a callback page
 header("Content-Type: text/html; charset=utf-8");
