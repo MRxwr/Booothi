@@ -4,6 +4,25 @@ $response["storeDetails"] = array(
 	"logo" => "{$storeDetails["logo"]}",
 );
 
+// Get the latest successful subscription to determine remaining days
+$sqlSub = "SELECT s.date, p.duration 
+           FROM subscriptions as s 
+           JOIN packages as p ON s.packageId = p.id 
+           WHERE s.storeId = '{$storeId}' AND s.status = '1' 
+           ORDER BY s.id DESC LIMIT 1";
+
+$remainingDays = 0;
+if ($subResult = queryDB($sqlSub)) {
+    $startDate = $subResult[0]["date"];
+    $durationInDays = (int)$subResult[0]["duration"]; // Duration is in days
+    $expiryDate = date('Y-m-d', strtotime($startDate . " + $durationInDays days"));
+    $todayDate = date('Y-m-d');
+    $diff = strtotime($expiryDate) - strtotime($todayDate);
+    $remainingDays = round($diff / (60 * 60 * 24));
+}
+
+$response["storeDetails"]["remainingDays"] = ($remainingDays < 0) ? "0" : (string)$remainingDays;
+
 $today = date("Y-m-d");
 $lastMonth = date("Y-m-d", mktime(0, 0, 0, date("m") - 1, date("d"), date("Y")));
 $tomorrow = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d") + 1, date("Y")));
