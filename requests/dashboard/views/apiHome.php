@@ -4,11 +4,11 @@ $response["storeDetails"] = array(
 	"logo" => "{$storeDetails["logo"]}",
 );
 
-// Get all successful subscriptions ordered by date
-$sqlSubs = "SELECT s.date, p.duration 
+// Get all successful or processed subscriptions
+$sqlSubs = "SELECT s.id, s.date, p.duration, s.status
             FROM subscriptions as s 
             JOIN packages as p ON s.packageId = p.id 
-            WHERE s.storeId = '{$storeId}' AND s.status = '1' 
+            WHERE s.storeId = '{$storeId}' AND s.status IN ('1', '3') 
             ORDER BY s.date ASC";
 
 $remainingDays = 0;
@@ -20,13 +20,19 @@ if ($subs = queryDB($sqlSubs)) {
         $purchaseDate = strtotime(date('Y-m-d', strtotime($sub["date"])));
         $durationDays = (int)$sub["duration"];
         
-        // If this is the first package or current one expired before this purchase
+        // Calculate new potential expiry
         if ($currentExpiry === null || $purchaseDate > $currentExpiry) {
-            $currentExpiry = strtotime("+{$durationDays} days", $purchaseDate);
+            $tempExpiry = strtotime("+{$durationDays} days", $purchaseDate);
         } else {
-            // Purchase was made during an active package, append duration
-            $currentExpiry = strtotime("+{$durationDays} days", $currentExpiry);
+            $tempExpiry = strtotime("+{$durationDays} days", $currentExpiry);
         }
+
+        // If this package is already fully consumed (expired before today), mark as status 3
+        if ($tempExpiry < $today && $sub["status"] == '1') {
+            updateDB("subscriptions", ["status" => "3"], "id = '{$sub["id"]}'");
+        }
+        
+        $currentExpiry = $tempExpiry;
     }
     
     if ($currentExpiry) {
