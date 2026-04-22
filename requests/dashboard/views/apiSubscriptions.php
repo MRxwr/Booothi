@@ -54,7 +54,6 @@ if ($action == "list") {
             
             $sub["date"] = timeZoneConverter($sub["date"]);
             unset($sub["packageTitle"]);
-            unset($sub["date"]);
         }
         echo outputData([
             "subscriptions" => $subscriptions,
