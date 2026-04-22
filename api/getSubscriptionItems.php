@@ -39,7 +39,8 @@ if( $subscriptions = queryDB($sql) ){
     $statusText = [
         0 => direction("Pending", "انتظار"),
         1 => direction("Success", "ناجح"),
-        2 => direction("Failed", "فاشلة")
+        2 => direction("Failed", "فاشلة"),
+        3 => direction("Expired", "منتهية")
     ];
     $statusBgColor = ["default", "success", "danger"];
 

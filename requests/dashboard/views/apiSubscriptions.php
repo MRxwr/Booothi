@@ -40,7 +40,8 @@ if ($action == "list") {
         $statusMap = [
             0 => ["en" => "Pending", "ar" => "انتظار"],
             1 => ["en" => "Success", "ar" => "ناجح"],
-            2 => ["en" => "Failed", "ar" => "فاشلة"]
+            2 => ["en" => "Failed", "ar" => "فاشلة"],
+            3 => ["en" => "Expired", "ar" => "منتهية"]
         ];
 
         foreach ($subscriptions as &$sub) {
