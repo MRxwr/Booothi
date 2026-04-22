@@ -28,7 +28,7 @@ if ($action == "list") {
     $totalPages = ceil($totalEntries / $limit);
 
     // Fetch records
-    $sql = "SELECT s.orderId, s.gatewayId, s.price, s.status, s.date, e.fullName, p.title as packageTitle 
+    $sql = "SELECT s.orderId, s.gatewayId, s.date, p.title as packageTitle, s.price, e.fullName, s.status
             FROM subscriptions as s 
             LEFT JOIN packages as p ON s.packageId = p.id 
             LEFT JOIN employees as e ON s.employeeId = e.id
