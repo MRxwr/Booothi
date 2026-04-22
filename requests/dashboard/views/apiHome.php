@@ -4,21 +4,35 @@ $response["storeDetails"] = array(
 	"logo" => "{$storeDetails["logo"]}",
 );
 
-// Get the latest successful subscription to determine remaining days
-$sqlSub = "SELECT s.date, p.duration 
-           FROM subscriptions as s 
-           JOIN packages as p ON s.packageId = p.id 
-           WHERE s.storeId = '{$storeId}' AND s.status = '1' 
-           ORDER BY s.id DESC LIMIT 1";
+// Get all successful subscriptions ordered by date
+$sqlSubs = "SELECT s.date, p.duration 
+            FROM subscriptions as s 
+            JOIN packages as p ON s.packageId = p.id 
+            WHERE s.storeId = '{$storeId}' AND s.status = '1' 
+            ORDER BY s.date ASC";
 
 $remainingDays = 0;
-if ($subResult = queryDB($sqlSub)) {
-    $startDate = $subResult[0]["date"];
-    $durationInDays = (int)$subResult[0]["duration"]; // Duration is in days
-    $expiryDate = date('Y-m-d', strtotime($startDate . " + $durationInDays days"));
-    $todayDate = date('Y-m-d');
-    $diff = strtotime($expiryDate) - strtotime($todayDate);
-    $remainingDays = round($diff / (60 * 60 * 24));
+if ($subs = queryDB($sqlSubs)) {
+    $currentExpiry = null;
+    $today = strtotime(date('Y-m-d'));
+    
+    foreach ($subs as $sub) {
+        $purchaseDate = strtotime(date('Y-m-d', strtotime($sub["date"])));
+        $durationDays = (int)$sub["duration"];
+        
+        // If this is the first package or current one expired before this purchase
+        if ($currentExpiry === null || $purchaseDate > $currentExpiry) {
+            $currentExpiry = strtotime("+{$durationDays} days", $purchaseDate);
+        } else {
+            // Purchase was made during an active package, append duration
+            $currentExpiry = strtotime("+{$durationDays} days", $currentExpiry);
+        }
+    }
+    
+    if ($currentExpiry) {
+        $diff = $currentExpiry - $today;
+        $remainingDays = round($diff / (60 * 60 * 24));
+    }
 }
 
 $response["storeDetails"]["remainingDays"] = ($remainingDays < 0) ? "0" : (string)$remainingDays;
