@@ -7,7 +7,7 @@ header("Content-Type: text/html; charset=utf-8");
 
 // Try different keys from callback URL (matching checkInvoice.php logic)
 $orderId = $_GET['orderId'] ?? $_GET['requested_order_id'] ?? $_GET['Id'] ?? ''; 
-$status = $_GET['status'] ?? '';
+$status = $_GET['status'] ?? $_GET['result'] ?? '';
 
 if (empty($orderId)) {
     echo "<h1>Error: Missing order ID</h1>";
