@@ -34,14 +34,16 @@ if( $storeDetails = selectDBNew("stores",[$_GET["storeCode"]],"`storeCode` = ?",
 	$storeSocialMediaLinks = json_decode($storeDetails[0]["socialMedia"], true);
 
 	// Check if store has active duration otherwise turn on maintenance mode automatically \\
-	$sql = "SELECT SUM(p.days) as totalDays 
+	$sql = "SELECT p.duration, s.date as subscriptionDate
 			FROM subscriptions s 
 			JOIN packages p ON s.packageId = p.id 
-			WHERE s.storeId = ? AND s.status = 1";
-	$totalDaysSub = queryDB($sql, [$storeID]);
-	$totalDays = $totalDaysSub[0]["totalDays"] ?? 0;
-	$dateStart = $storeDetails[0]["date"];
-	$expiryDate = date('Y-m-d H:i:s', strtotime($dateStart . " + {$totalDays} days"));
+			WHERE s.storeId = '{$storeID}' AND s.status = 1
+			ORDER BY s.id DESC
+			LIMIT 1";
+	$lastSub = queryDB($sql);
+	$duration = $lastSub[0]["duration"] ?? 0;
+	$dateStart = $lastSub[0]["subscriptionDate"] ?? $storeDetails[0]["date"];
+	$expiryDate = date('Y-m-d H:i:s', strtotime($dateStart . " + {$duration} days"));
 
 	if ( date("Y-m-d H:i:s") > $expiryDate && $storeDetails[0]["maintenanceMode"] != 1 ){
 		updateDB("stores", ["maintenanceMode" => 1], "`id` = '{$storeID}'");
