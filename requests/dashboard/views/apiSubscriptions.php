@@ -81,14 +81,22 @@ elseif ($action == "packages") {
             
             $response[] = [
                 "id" => $package['id'],
-                "titleEn" => $title['en'] ?? '',
-                "titleAr" => $title['ar'] ?? '',
-                "subtitleEn" => $subtitle['en'] ?? '',
-                "subtitleAr" => $subtitle['ar'] ?? '',
-                "detailsEn" => $details['en'] ?? '',
-                "detailsAr" => $details['ar'] ?? '',
-                "priceSubtitleEn" => $priceSubtitle['en'] ?? '',
-                "priceSubtitleAr" => $priceSubtitle['ar'] ?? '',
+                "title" => array(
+                    "en" => $title['en'] ?? '',
+                    "ar" => $title['ar'] ?? ''
+                ),
+                "subtitle" => array(
+                    "en" => $subtitle['en'] ?? '',
+                    "ar" => $subtitle['ar'] ?? ''
+                ),
+                "details" => array(
+                    "en" => $details['en'] ?? '',
+                    "ar" => $details['ar'] ?? ''
+                ),
+                "priceSubtitle" => array(
+                    "en" => $priceSubtitle['en'] ?? '',
+                    "ar" => $priceSubtitle['ar'] ?? ''
+                ),
                 "price" => $package['price'],
                 "days" => $package['days']
             ];
