@@ -170,7 +170,7 @@ function checkProductDiscountDefault($id){
 function payment($data){
 	$curl = curl_init();
 	curl_setopt_array($curl, array(
-	  CURLOPT_URL => 'https://createapi.link/api/v2/index.php',
+	  CURLOPT_URL => 'https://createapi.link/api/v3/index.php',
 	  CURLOPT_RETURNTRANSFER => true,
 	  CURLOPT_ENCODING => '',
 	  CURLOPT_MAXREDIRS => 10,
@@ -183,6 +183,9 @@ function payment($data){
 	$response = curl_exec($curl);
 	curl_close($curl);
 	$response = json_decode($response,true);
+	var_dump($data);
+	var_dump($response);
+	die();
 	$array = [
 		"url" => $response["data"]["PaymentURL"],
 		"id" => $response["data"]["InvoiceId"]
@@ -194,7 +197,7 @@ function payment($data){
 function checkPayment($data){
 	$curl = curl_init();
 	curl_setopt_array($curl, array(
-	  CURLOPT_URL => 'https://createapi.link/api/v2/index.php',
+	  CURLOPT_URL => 'https://createapi.link/api/v3/index.php',
 	  CURLOPT_RETURNTRANSFER => true,
 	  CURLOPT_ENCODING => '',
 	  CURLOPT_MAXREDIRS => 10,
@@ -261,7 +264,7 @@ function getInternationalShipping($items,$address){
 	);
 	$curl = curl_init();
 	curl_setopt_array($curl, array(
-	CURLOPT_URL => 'https://createapi.link/api/v2/index.php',
+	CURLOPT_URL => 'https://createapi.link/api/v3/index.php',
 	CURLOPT_RETURNTRANSFER => true,
 	CURLOPT_ENCODING => '',
 	CURLOPT_MAXREDIRS => 10,
