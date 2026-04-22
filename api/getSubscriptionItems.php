@@ -42,7 +42,7 @@ if( $subscriptions = queryDB($sql) ){
         2 => direction("Failed", "فاشلة"),
         3 => direction("Expired", "منتهية")
     ];
-    $statusBgColor = ["default", "success", "danger", "warning"];
+    $statusBgColor = ["primary", "success", "danger", "warning"];
 
     for( $i = 0; $i < sizeof($subscriptions); $i++ ){
         $price = $subscriptions[$i]["price"];
