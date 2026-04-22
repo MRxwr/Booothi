@@ -6,48 +6,40 @@ require("../admin/includes/functions/payment.php");
 // Set header to HTML because this is a callback page
 header("Content-Type: text/html; charset=utf-8");
 
-$paymentId = $_GET['paymentId'] ?? '';
-$orderId = $_GET['Id'] ?? ''; // Some systems use 'Id' or 'orderId' or 'paymentId' interchangeably in callbacks
+// Try different keys from callback URL (matching checkInvoice.php logic)
+$orderId = $_GET['orderId'] ?? $_GET['requested_order_id'] ?? $_GET['Id'] ?? ''; 
+$status = $_GET['status'] ?? '';
 
-if (empty($paymentId)) {
-    // If not in GET, check if returned as 'Id'
-    $paymentId = $_GET['Id'] ?? '';
-}
-
-if (empty($paymentId)) {
-    echo "<h1>Error: Missing payment ID</h1>";
+if (empty($orderId)) {
+    echo "<h1>Error: Missing order ID</h1>";
     exit;
 }
 
-// Prepare data to check status using the provided checkPayment function
-$checkData = [
-    "endpoint" => "GetPaymentStatus",
-    "apikey" => $PaymentAPIKey,
-    "Key" => $paymentId,
-    "KeyType" => "PaymentId"
-];
-
-$paymentStatus = checkPayment($checkData);
-
-// The checkPayment returns an array like ["status" => "Captured"/"Failed", "id" => "paymentId"]
-$status = $paymentStatus['status'];
-$idFromApi = $paymentStatus['id'];
-
-// Check current subscription in database
-$subscription = selectDBNew("subscriptions", [$idFromApi], "`gatewayId` = ?", "");
+// Check current subscription in database by orderId
+$subscription = selectDBNew("subscriptions", [$orderId], "`orderId` = ?", "");
 
 if (!$subscription) {
     echo "<h1>Error: Subscription record not found.</h1>";
     exit;
 }
 
+// SECURITY: Never allow an order with status other than 0 (Pending) to be updated
+if ($subscription[0]['status'] != 0) {
+    echo "<h1>Error: This subscription has already been processed.</h1>";
+    exit;
+}
+
 $subId = $subscription[0]['id'];
 $storeId = $subscription[0]['storeId'];
 $packageId = $subscription[0]['packageId'];
+$gatewayPayload = json_encode($_GET, JSON_UNESCAPED_UNICODE);
 
-if ($status == "Captured" || $status == "Success") {
-    // 1. Update subscription status
-    updateDB("subscriptions", ["status" => 1], "`id` = '{$subId}'");
+if ($status == "Captured" || $status == "Success" || $status == "CAPTURED") {
+    // 1. Update subscription status and store gateway payload
+    updateDB("subscriptions", [
+        "status" => 1,
+        "gatewayPayload" => $gatewayPayload
+    ], "`id` = '{$subId}'");
 
     // 2. Set maintenance mode to OFF (3) for the store
     updateDB("stores", ["maintenanceMode" => 3], "`id` = '{$storeId}'");
@@ -57,8 +49,11 @@ if ($status == "Captured" || $status == "Success") {
     $message = "Your subscription has been activated successfully.";
     $color = "green";
 } else {
-    // Update status to failed
-    updateDB("subscriptions", ["status" => 2], "`id` = '{$subId}'");
+    // Update status to failed and store gateway payload
+    updateDB("subscriptions", [
+        "status" => 2,
+        "gatewayPayload" => $gatewayPayload
+    ], "`id` = '{$subId}'");
     $title = "Payment Failed";
     $message = "Unfortunately, the payment was not completed. Please try again.";
     $color = "red";
