@@ -133,12 +133,17 @@ if( isset($_POST["title"]) ){
                 <input type="text" name="priceSubtitle[ar]" class="form-control">
 			</div>
 
-            <div class="col-md-6">
+            <div class="col-md-4">
+			    <label><?php echo direction("Duration","المدة") ?></label>
+                <input type="number" step="1" name="duration" min="0" class="form-control" required>
+			</div>
+
+            <div class="col-md-4">
 			    <label><?php echo direction("Discount","الخصم") ?></label>
                 <input type="number" step="any" name="discount" min="0" class="form-control" required>
 			</div>
 
-			<div class="col-md-6">
+			<div class="col-md-4">
 			    <label><?php echo direction("Discount Type","نوع الخصم") ?></label>
                 <select name="discountType" class="form-control" required>
 				    <option value="1"><?php echo direction("Percentage","نسبة مئوية") ?></option>
@@ -244,6 +249,7 @@ if( isset($_POST["title"]) ){
                 <label id="arPriceSubtitleVal<?php echo $packages[$i]["id"]?>"><?php echo $priceSubtitle["ar"] ?></label>
                 <label id="discountVal<?php echo $packages[$i]["id"]?>"><?php echo $packages[$i]["discount"] ?></label>
                 <label id="discountTypeVal<?php echo $packages[$i]["id"]?>"><?php echo $packages[$i]["discountType"] ?></label>
+                <label id="duration<?php echo $packages[$i]["id"]?>"><?php echo $packages[$i]["duration"] ?></label>
             </div>
 			
 			</td>
@@ -277,6 +283,7 @@ if( isset($_POST["title"]) ){
         $("input[name='priceSubtitle[en]']").val($("#enPriceSubtitleVal"+id).text());
         $("input[name='priceSubtitle[ar]']").val($("#arPriceSubtitleVal"+id).text());
         $("input[name='discount']").val($("#discountVal"+id).text());
+        $("input[name='duration']").val($("#duration"+id).text());
         $("select[name='discountType']").val($("#discountTypeVal"+id).text());
 
         if (tinymce.get("enDetails")) {
