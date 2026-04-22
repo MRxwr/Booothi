@@ -98,7 +98,12 @@ elseif ($action == "packages") {
                     "ar" => $priceSubtitle['ar'] ?? ''
                 ),
                 "price" => $package['price'],
-                "days" => $package['days']
+                "discount" => $package['discount'],
+                "discountType" => $package['discountType'],
+                "discountedPrice" => ($package['discountType'] == "percent") 
+                    ? round($package['price'] * (1 - $package['discount'] / 100), 2) 
+                    : max(0, round($package['price'] - $package['discount'], 2)),
+                "duration" => $package['duration']
             ];
         }
         echo json_encode(["status" => "success", "data" => $response]);
