@@ -28,9 +28,10 @@ if ($action == "list") {
     $totalPages = ceil($totalEntries / $limit);
 
     // Fetch records
-    $sql = "SELECT s.*, p.title as packageTitle 
+    $sql = "SELECT s.orderId, s.gatewayId, s.price, e.fullName, p.title as packageTitle 
             FROM subscriptions as s 
             LEFT JOIN packages as p ON s.packageId = p.id 
+            LEFT JOIN employees as e ON s.employeeId = e.id
             WHERE s.{$where} 
             ORDER BY s.{$orderBy} {$orderDir} 
             LIMIT {$offset}, {$limit}";
@@ -51,7 +52,7 @@ if ($action == "list") {
             $sub["statusTitleEn"] = $s["en"];
             $sub["statusTitleAr"] = $s["ar"];
             
-            $sub["formattedDate"] = timeZoneConverter($sub["date"]);
+            $sub["date"] = timeZoneConverter($sub["date"]);
             unset($sub["packageTitle"]);
         }
         
