@@ -62,7 +62,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             echo outputError(["msg" => "Phone is required"]);die();  
         }
         if( selectDB("employees", "phone = '{$data["phone"]}' AND `is_deleted` = '0'") ){
-            echo outputError(["msg" => "Phone number already exists, Please login instead"]);die();  
+            echo outputError(["msg" => "Phone number already exists, Please login instead", "isLogin" => true]);die();  
         }else{
             $employeeToken = generateToken();
             $insertData = [
@@ -74,9 +74,9 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             ];
             if( insertDB("employees", $insertData) ){
                 logStoreActivity("Registration", "New employee registered: " . $data["fullName"], 0);
-                echo outputData(["msg" => "Registration successful", "token" => $employeeToken, "isRegister" => false, "isStore" => true, "roles" => []]);die();
+                echo outputData(["msg" => "Registration successful", "token" => $employeeToken, "isLogin" => false]);die();
             }else{
-                echo outputError(["msg" => "Failed to register employee"]);die();  
+                echo outputError(["msg" => "Failed to register employee", "isLogin" => false]);die();  
             }
         }
     }elseif( $action == "createStore" ){
