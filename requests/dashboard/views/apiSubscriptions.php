@@ -166,17 +166,12 @@ if ($action == "list") {
                 "date" => date("Y-m-d H:i:s")
             ];
             insertDB("subscriptions", $insertData);
-
-            echo json_encode([
-                "status" => "success", 
-                "paymentUrl" => $paymentResponse['url'],
-                "orderId" => $orderId
-            ]);
+            echo outputData(["paymentUrl" => $paymentResponse['url'], "orderId" => $orderId]);die();
         } else {
-            echo outputError(["msg" => "Payment gateway error."]);
+            echo outputError(["msg" => "Payment gateway error."]);die();
         }
     } else {
-        echo outputError(["msg" => "Package not found."]);
+        echo outputError(["msg" => "Package not found."]);die();
     }
 }
 ?>
