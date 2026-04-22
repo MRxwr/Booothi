@@ -10,7 +10,7 @@ $orderId = $_GET['orderId'] ?? $_GET['requested_order_id'] ?? $_GET['Id'] ?? '';
 $status = $_GET['status'] ?? $_GET['result'] ?? '';
 
 if (empty($orderId)) {
-    echo "<h1>Error: Missing order ID</h1>";
+    //echo "<h1>Error: Missing order ID</h1>";
     exit;
 }
 
@@ -18,13 +18,13 @@ if (empty($orderId)) {
 $subscription = selectDBNew("subscriptions", [$orderId], "`orderId` = ?", "");
 
 if (!$subscription) {
-    echo "<h1>Error: Subscription record not found.</h1>";
+    //echo "<h1>Error: Subscription record not found.</h1>";
     exit;
 }
 
 // SECURITY: Never allow an order with status other than 0 (Pending) to be updated
 if ($subscription[0]['status'] != 0) {
-    echo "<h1>Error: This subscription has already been processed.</h1>";
+    //echo "<h1>Error: This subscription has already been processed.</h1>";
     exit;
 }
 
@@ -59,6 +59,7 @@ if ($status == "Captured" || $status == "Success" || $status == "CAPTURED") {
 }
 
 // Landing page HTML for the App to capture (No ? parameters as requested)
+/*
 ?>
 <!DOCTYPE html>
 <html>
@@ -81,3 +82,5 @@ if ($status == "Captured" || $status == "Success" || $status == "CAPTURED") {
     </div>
 </body>
 </html>
+*/
+?>
