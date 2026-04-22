@@ -15,7 +15,7 @@ if (empty($orderId)) {
 }
 
 // Check current subscription in database by orderId
-$subscription = selectDBNew("subscriptions", [$orderId], "`orderId` = ?", "");
+$subscription = selectDBNew("subscriptions", [$orderId], "`gatewayId` = ?", "");
 
 if (!$subscription) {
     //echo "<h1>Error: Subscription record not found.</h1>";
