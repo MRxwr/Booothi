@@ -401,4 +401,11 @@ function manifestGenerate(){
     $modifiedJsonContent = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     file_put_contents($jsonAdminFilePath, $modifiedJsonContent);
 }
+
+function getPaymentAPIKey(){
+	if( $settings = selectDB("settings","`id` = '1'") ){
+		return $settings[0]["PaymentAPIKey"];
+	}
+	return "";
+}
 ?>

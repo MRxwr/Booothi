@@ -67,9 +67,7 @@ if ($action == "list") {
     } else {
         echo json_encode(["status" => "success", "data" => [], "msg" => "No subscriptions found"]);
     }
-}
-
-elseif ($action == "packages") {
+}elseif ($action == "packages") {
     // List all available packages for purchase
     if ($packages = selectDBNew("packages", ["0"], "`status` = ?", "`rank` ASC")) {
         $response = [];
@@ -110,13 +108,9 @@ elseif ($action == "packages") {
     } else {
         echo outputError(["msg" => "No packages available."]);
     }
-}
-
-elseif ($action == "purchase") {
-    // Initiate a new subscription purchase
-    $input = json_decode(file_get_contents('php://input'), true);
-    $packageId = $input['packageId'] ?? 0;
-    $employeeId = $input['employeeId'] ?? 0; // Coming from app context
+}elseif ($action == "purchase") {
+    $packageId = $_REQUEST['packageId'] ?? 0;
+    $employeeId = getEmployeeDetails()['id'] ?? 0; // Coming from app context
 
     if (!$packageId) {
         echo outputError(["msg" => "Package ID is required."]);
@@ -125,20 +119,25 @@ elseif ($action == "purchase") {
 
     if ($package = selectDBNew("packages", [$packageId], "`id` = ? AND `status` = '0'", "")) {
         $orderId = "SUB-" . time() . mt_rand(100, 999);
-        $price = $package[0]['price'];
-
+        $price = ( $package[0]['discountType'] == "1" ) 
+            ? round($package[0]['price'] * (1 - $package[0]['discount'] / 100), 2) 
+            : max(0, round($package[0]['price'] - $package[0]['discount'], 2));
+        if(getPaymentAPIKey() == ""){
+            echo outputError(["msg" => "Payment gateway not configured. Please contact support."]);
+            die();
+        }
         // Request payment link
         $paymentData = [
             "endpoint" => "PaymentRequest",
-            "apikey" => $PaymentAPIKey,
-            "PaymentMethodId" => 2,
+            "apikey" => getPaymentAPIKey(),
+            "PaymentMethodId" => 1,
             "CustomerReference" => $orderId,
             "DisplayCurrencyIso" => "KWD",
             "InvoiceValue" => $price,
-            "CallBackUrl" => $protocol . $_SERVER['HTTP_HOST'] . "/api/subCallback.php",
-            "ErrorUrl" => $protocol . $_SERVER['HTTP_HOST'] . "/api/subCallback.php",
-            "CustomerName" => $storeDetails[0]["title"] ?? "Store Subscription",
-            "CustomerEmail" => "subscription@artline.com",
+            "CallBackUrl" => "https://" . $_SERVER['HTTP_HOST'] . "/api/subCallback.php",
+            "ErrorUrl" => "https://" . $_SERVER['HTTP_HOST'] . "/api/subCallback.php",
+            "CustomerName" => $storeDetails["title"] ?? "Store Subscription",
+            "CustomerEmail" => $storeDetails["email"] ?? "noreply@booothi.com",
             "Language" => "en",
             "Items" => [
                 [
@@ -159,6 +158,9 @@ elseif ($action == "purchase") {
                 "orderId" => $orderId,
                 "gatewayId" => $paymentResponse['id'],
                 "price" => $price,
+                "payload" => json_encode($paymentData),
+                "gatewayResponse" => json_encode($paymentResponse),
+                "gatewayURL" => $paymentResponse['url'],
                 "status" => 0,
                 "date" => date("Y-m-d H:i:s")
             ];
