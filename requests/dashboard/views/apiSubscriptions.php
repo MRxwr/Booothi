@@ -100,7 +100,7 @@ elseif ($action == "packages") {
                 "price" => $package['price'],
                 "discount" => $package['discount'],
                 "discountType" => $package['discountType'],
-                "discountedPrice" => ($package['discountType'] == "percent") 
+                "discountedPrice" => ($package['discountType'] == "1") 
                     ? round($package['price'] * (1 - $package['discount'] / 100), 2) 
                     : max(0, round($package['price'] - $package['discount'], 2)),
                 "duration" => $package['duration']
