@@ -138,6 +138,7 @@ if ($action == "list") {
             "ErrorUrl"           => "https://" . $_SERVER['HTTP_HOST'] . "/api/subCallback.php",
             "CustomerName"       => $storeDetails[0]["title"] ?? "Store Subscription",
             "CustomerEmail"      => $storeDetails[0]["email"] ?? "noreply@artline.com",
+            "CustomerMobile"     => $storeDetails[0]["phone"] ?? "97104334",
             "Language"           => "en",
             "invoiceItems"       => [ // Changed from "Items" to "invoiceItems"
                 [
