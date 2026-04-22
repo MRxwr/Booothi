@@ -71,7 +71,7 @@ if ($action == "list") {
 
 elseif ($action == "packages") {
     // List all available packages for purchase
-    if ($packages = selectDBNew("packages", [], "`status` = '0'", "`rank` ASC")) {
+    if ($packages = selectDBNew("packages", ["0"], "`status` = ?", "`rank` ASC")) {
         $response = [];
         foreach ($packages as $package) {
             $title = json_decode($package['title'], true);
