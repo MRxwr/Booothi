@@ -77,6 +77,7 @@ elseif ($action == "packages") {
             $title = json_decode($package['title'], true);
             $subtitle = json_decode($package['subtitle'], true);
             $details = json_decode($package['details'], true);
+            $priceSubtitle = json_decode($package['priceSubtitle'], true);
             
             $response[] = [
                 "id" => $package['id'],
@@ -86,6 +87,8 @@ elseif ($action == "packages") {
                 "subtitleAr" => $subtitle['ar'] ?? '',
                 "detailsEn" => $details['en'] ?? '',
                 "detailsAr" => $details['ar'] ?? '',
+                "priceSubtitleEn" => $priceSubtitle['en'] ?? '',
+                "priceSubtitleAr" => $priceSubtitle['ar'] ?? '',
                 "price" => $package['price'],
                 "days" => $package['days']
             ];
