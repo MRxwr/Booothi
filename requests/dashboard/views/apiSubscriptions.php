@@ -56,7 +56,14 @@ if ($action == "list") {
             unset($sub["packageTitle"]);
             unset($sub["date"]);
         }
-        
+        echo outputData([
+            "subscriptions" => $subscriptions,
+            "pagination" => [
+                "currentPage" => $page,
+                "totalPages" => $totalPages,
+                "totalEntries" => $totalEntries
+            ]
+        ]);die();
         echo json_encode([
             "status" => "success", 
             "data" => $subscriptions,
