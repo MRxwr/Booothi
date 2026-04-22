@@ -18,11 +18,11 @@ if($searchValue != ''){
 }
 
 ## Total number of records without filtering
-$totalRecordsQuery = selectDBNew("subscriptions", [], "`id` != '0'", "");
+$totalRecordsQuery = selectDBNew("subscriptions", [0], "`id` != ?", "");
 $totalRecords = is_array($totalRecordsQuery) ? count($totalRecordsQuery) : 0;
 
 ## Total number of record with filtering
-$totalFilterQuery = selectDBNew("subscriptions", [], "`id` != '0' {$searchQuery}", "");
+$totalFilterQuery = selectDBNew("subscriptions", [0], "`id` != ? {$searchQuery}", "");
 $totalRecordwithFilter = is_array($totalFilterQuery) ? count($totalFilterQuery) : 0;
 
 ## Fetch records
