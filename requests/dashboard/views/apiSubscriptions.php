@@ -128,22 +128,22 @@ if ($action == "list") {
         }
         // Request payment link
         $paymentData = [
-            "endpoint" => "PaymentRequest",
-            "apikey" => getPaymentAPIKey(),
-            "PaymentMethodId" => 1,
-            "CustomerReference" => $orderId,
+            "endpoint"           => "PaymentRequestExcuteNew2024", 
+            "apikey"             => getPaymentAPIKey(),
+            "PaymentMethodId"    => 1,
+            "CustomerReference"  => $orderId,
             "DisplayCurrencyIso" => "KWD",
-            "InvoiceValue" => $price,
-            "CallBackUrl" => "https://" . $_SERVER['HTTP_HOST'] . "/api/subCallback.php",
-            "ErrorUrl" => "https://" . $_SERVER['HTTP_HOST'] . "/api/subCallback.php",
-            "CustomerName" => $storeDetails["title"] ?? "Store Subscription",
-            "CustomerEmail" => $storeDetails["email"] ?? "noreply@booothi.com",
-            "Language" => "en",
-            "Items" => [
+            "invoiceValue"       => (float)$price, // Ensured float type
+            "CallBackUrl"        => "https://" . $_SERVER['HTTP_HOST'] . "/api/subCallback.php",
+            "ErrorUrl"           => "https://" . $_SERVER['HTTP_HOST'] . "/api/subCallback.php",
+            "CustomerName"       => $storeDetails[0]["title"] ?? "Store Subscription",
+            "CustomerEmail"      => $storeDetails[0]["email"] ?? "noreply@artline.com",
+            "Language"           => "en",
+            "invoiceItems"       => [ // Changed from "Items" to "invoiceItems"
                 [
-                    "ItemName" => "Package: " . json_decode($package[0]['title'], true)['en'],
-                    "Quantity" => 1,
-                    "UnitPrice" => $price
+                    "ItemName"  => "Package: " . json_decode($package[0]['title'], true)['en'],
+                    "Quantity"  => 1,
+                    "UnitPrice" => (float)$price
                 ]
             ]
         ];
