@@ -69,7 +69,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             echo outputError(array("msg" => "Shop ID Is Required"));die();  
         }
         // get shop hidden status then reverse it
-        $shop = selectDB("shops", "id = '{$data["shopId"]}' AND storeId = '{$storeId}'");
+        $shop = selectDBNew("shops", [$data["shopId"], $storeId], "id = ? AND storeId = ?", "");
         if( !$shop ){
             echo outputError(array("msg" => "Shop not found"));die();  
         }

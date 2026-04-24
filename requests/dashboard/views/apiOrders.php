@@ -22,7 +22,10 @@ function listOrders($storeId) {
 
     // Base query parts
     $where = "storeId = '{$storeId}'";
-    
+    $orderBy = $dbconnect->real_escape_string($orderBy);
+    $orderDir = $dbconnect->real_escape_string($orderDir);
+    $limit = $dbconnect->real_escape_string($limit);
+    $offset = $dbconnect->real_escape_string($offset);
     // Search logic: Search within JSON 'info' field directly in SQL for better performance
     if (!empty($search)) {
         $searchEscaped = $dbconnect->real_escape_string($search);

@@ -70,7 +70,7 @@ switch ($action) {
        if( !isset($_REQUEST["roleId"]) || empty($_REQUEST["roleId"]) ){
             echo outputError(["msg" => "Role ID Is Required"]);die();  
         }
-        $role = selectDB("roles", "id = '{$_REQUEST["roleId"]}' AND storeId = '{$storeId}'");
+        $role = selectDBNew("roles", [$_REQUEST["roleId"], $storeId], "id = ? AND storeId = ?", "");
         if( !$role ){
             echo outputError(["msg" => "Role not found"]);die();
         }

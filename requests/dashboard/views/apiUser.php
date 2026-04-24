@@ -24,9 +24,9 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         if( !isset($data["code"]) || empty($data["code"]) ){
             echo outputError(["msg" => "OTP code is required"]);die();  
         }
-        if( $otp = selectDB("otp_codes", "`phone` = '{$data["phone"]}' AND `code` = '{$data["code"]}' AND `type` = 'login'") ){
+        if( $otp = selectDBNew("otp_codes", [$data["phone"], $data["code"]], "`phone` = ? AND `code` = ? AND `type` = 'login'", "") ){
             deleteDB("otp_codes", "phone = '{$data["phone"]}'");
-            if( $employee = selectDB("employees", "phone = '{$data["phone"]}' AND `is_deleted` = '0'") ){
+            if( $employee = selectDBNew("employees", [$data["phone"]], "phone = ? AND `is_deleted` = '0'", "") ){
                 if ( $employee[0]["hidden"] == "2" ){
                     updateDB("employees", ["keepMeAlive" => ""], "id = '{$employee[0]["id"]}'");
                     echo outputError(["msg" => "Your account is locked, Please contact support", "isRegister" => false, "isStore" => false, "roles" => []]);die();
@@ -40,7 +40,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
                     echo outputError(["msg" => "No store assigned to this account, Please contact support", "token" => $employeeToken, "isRegister" => false, "isStore" => true, "roles" => []]);die();
                 }
-                $employeeRole = selectDB("roles", "id = '{$employee[0]["empType"]}'");
+                $employeeRole = selectDBNew("roles", [$employee[0]["empType"]], "id = ?", "");
                 $employeeToken = generateToken();
                 updateDB("employees", ["keepMeAlive" => $employeeToken], "id = '{$employee[0]["id"]}'");
                 logStoreActivity("OTP Verified", "OTP verified for phone: " . $data["phone"], $employee[0]["storeId"]);
@@ -61,7 +61,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         if( !isset($data["phone"]) || empty($data["phone"]) ){
             echo outputError(["msg" => "Phone is required"]);die();  
         }
-        if( selectDB("employees", "phone = '{$data["phone"]}' AND `is_deleted` = '0'") ){
+        if( selectDBNew("employees", [$data["phone"]], "phone = ? AND `is_deleted` = '0'", "") ){
             echo outputError(["msg" => "Phone number already exists, Please login instead", "isLogin" => true]);die();  
         }else{
             $employeeToken = generateToken();
@@ -92,7 +92,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         if( !isset($data["email"]) || empty($data["email"]) ){
             echo outputError(["msg" => "Email is required"]);die();  
         }
-        if( selectDB("stores", "storeCode = '{$data["url"]}'") ){
+        if( selectDBNew("stores", [$data["url"]], "storeCode = ?", "") ){
             echo outputError(["msg" => "Store URL already exists, Please choose another one"]);die();
         }else{
             $insertData = [
@@ -103,7 +103,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             ];
             if( insertDB("stores", $insertData) ){
                 //get store id
-                $store = selectDB("stores", "storeCode = '{$data["url"]}'");
+                $store = selectDBNew("stores", [$data["url"]], "storeCode = ?", "");
                 //create shop called Online Store
                 insertDB("shops", [
                     "storeId" => $store[0]["id"],
@@ -117,9 +117,9 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
                     "arTitle" => "مالك المتجر",
                     "hidden"  => "1",
                 ]);
-                $role = selectDB("roles", "storeId = '{$store[0]["id"]}' AND enTitle = 'Store Owner'");
+                $role = selectDBNew("roles", [$store[0]["id"], 'Store Owner'], "storeId = ? AND enTitle = ?", "");
                 $roleId = $role[0]["id"];
-                $shop = selectDB("shops", "storeId = '{$store[0]["id"]}' AND enTitle = 'Online Store'");
+                $shop = selectDBNew("shops", [$store[0]["id"], 'Online Store'], "storeId = ? AND enTitle = ?", "");
                 $shopId = $shop[0]["id"];
                 $token = getToken();
                 updateDB("employees", ["storeId" => $store[0]["id"], "empType" => $roleId, "shopId" => $shopId], "keepMeAlive = '{$token}'");

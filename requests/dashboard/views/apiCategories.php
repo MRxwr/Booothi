@@ -86,7 +86,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         if( !isset($data["categoryId"]) || empty($data["categoryId"]) ){
             echo outputError(["msg" => "Category ID Is Required"]);die();  
         }
-        $category = selectDB("categories", "id = '{$data["categoryId"]}' AND storeId = '{$storeId}'");
+        $category = selectDBNew("categories", [$data["categoryId"], $storeId], "id = ? AND storeId = ?", "");
         if( !$category ){
             echo outputError(["msg" => "Category not found"]);die();
         }

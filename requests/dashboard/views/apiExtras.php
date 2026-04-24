@@ -94,7 +94,7 @@ switch ($action) {
         if( !isset($_REQUEST["extraId"]) || empty($_REQUEST["extraId"]) ){
             echo outputError(["msg" => "Extra ID Is Required"]);die();  
         }
-        $extra = selectDB("extras", "id = '{$_REQUEST["extraId"]}' AND storeId = '{$storeId}'");
+        $extra = selectDBNew("extras", [$_REQUEST["extraId"], $storeId], "id = ? AND storeId = ?", "");
         if( !$extra ){
             echo outputError(["msg" => "Extra not found"]);die();
         }

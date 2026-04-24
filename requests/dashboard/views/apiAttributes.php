@@ -65,7 +65,7 @@ switch ($action) {
         if( !isset($_REQUEST["attributeId"]) || empty($_REQUEST["attributeId"]) ){
             echo outputError(["msg" => "Attribute ID Is Required"]);die();  
         }
-        $attribute = selectDB("attributes", "id = '{$_REQUEST["attributeId"]}' AND storeId = '{$storeId}'");
+        $attribute = selectDBNew("attributes", [$_REQUEST["attributeId"], $storeId], "id = ? AND storeId = ?", "");
         if( !$attribute ){
             echo outputError(["msg" => "Attribute not found"]);die();
         }

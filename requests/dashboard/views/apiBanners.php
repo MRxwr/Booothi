@@ -78,7 +78,7 @@ switch ($action) {
         if( !isset($_REQUEST["bannerId"]) || empty($_REQUEST["bannerId"]) ){
             echo outputError(["msg" => "Banner ID Is Required"]);die();  
         }
-        $banner = selectDB("banner", "id = '{$_REQUEST["bannerId"]}' AND storeId = '{$storeId}'");
+        $banner = selectDBNew("banner", [$_REQUEST["bannerId"], $storeId], "id = ? AND storeId = ?", "");
         if( !$banner ){
             echo outputError(["msg" => "Banner not found"]);die();
         }

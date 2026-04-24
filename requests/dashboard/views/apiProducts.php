@@ -54,23 +54,23 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         if( !isset($data["productId"]) || empty($data["productId"]) ){
             echo outputError(array("msg" => "Product ID Is Required"));die();
         }
-        $product = selectDB("products", "id = '{$data["productId"]}' AND storeId = '{$storeId}'");
+        $product = selectDBNew("products", [$data["productId"], $storeId], "id = ? AND storeId = ?", "");
         if( !$product ){
             echo outputError(array("msg" => "Product not found"));die();
         }
         $product = $product[0];
         
         // Get all images from images table for management/deletion
-        $images = selectDB2("id, imageurl", "images", "productId = '{$product["id"]}' ORDER BY id ASC");
+        $images = selectDB2New("id, imageurl", "images", [$product["id"]], "productId = ? ORDER BY id ASC", "");
         $product["image"] = $images[0]["imageurl"] ?? "";
         $product["gallery"] = $images ?: [];
 
         // Get categories
-        $categories = selectDB("category_products", "productId = '{$product["id"]}'");
+        $categories = selectDBNew("category_products", [$product["id"]], "productId = ?", "");
         $product["selectedCategories"] = array();
         if ($categories) {
             foreach ($categories as $cat) {
-                $categoryInfo = selectDB2("id, enTitle, arTitle", "categories", "id = '{$cat["categoryId"]}'");
+                $categoryInfo = selectDB2New("id, enTitle, arTitle", "categories", [$cat["categoryId"]], "id = ?", "");
                 if ($categoryInfo) {
                     $product["selectedCategories"][] = [
                         "id" => $categoryInfo[0]["id"],
@@ -86,7 +86,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         $product["selectedExtras"] = array();
         if (!empty($extraIds)) {
             foreach ($extraIds as $exId) {
-                $extraInfo = selectDB2("id, enTitle, arTitle", "extras", "id = '{$exId}'");
+                $extraInfo = selectDB2New("id, enTitle, arTitle", "extras", [$exId], "id = ?", "");
                 if ($extraInfo) {
                     $product["selectedExtras"][] = [
                         "id" => $extraInfo[0]["id"],
@@ -99,7 +99,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         }
          // Free memory
         $product["variants"] = [];
-        $variants = selectDB2("id, enTitle, arTitle, price, cost, sku, quantity, hidden", "attributes_products", "productId = '{$product["id"]}' AND  `status` = '0'");
+        $variants = selectDB2New("id, enTitle, arTitle, price, cost, sku, quantity, hidden", "attributes_products", [$product["id"]], "productId = ? AND  `status` = '0'", "");
         $product["variants"] = $variants ?: [];
 
         unset($product["extras"], $product["categoryId"], $product["storeId"], $product["status"], $product["subId"], $product["date"], $product["storeQuantity"], $product["onlineQuantity"], $product["price"], $product["cost"], $product["sku"], $product["quantity"] );
@@ -278,7 +278,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         if( !isset($_REQUEST["productId"]) || empty($_REQUEST["productId"]) ){
             echo outputError(array("msg" => "Product ID Is Required"));die();  
         }
-        $product = selectDB("products", "id = '{$_REQUEST["productId"]}' AND storeId = '{$storeId}'");
+        $product = selectDBNew("products", [$_REQUEST["productId"], $storeId], "id = ? AND storeId = ?", "");
         if( !$product ){
             echo outputError(array("msg" => "Product not found"));die();
         }
@@ -295,7 +295,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             echo outputError(array("msg" => "Product ID and Field (recent/bestSeller) required"));die();
         }
         $field = ($data["field"] == "recent") ? "recent" : "bestSeller";
-        $product = selectDB("products", "id = '{$data["productId"]}' AND storeId = '{$storeId}'");
+        $product = selectDBNew("products", [$data["productId"], $storeId], "id = ? AND storeId = ?", "");
         if($product){
             $newVal = ($product[0][$field] == 1) ? 0 : 1;
             updateDBNew("products", array($field => $newVal), "id = ? AND storeId = ?", [$data["productId"], $storeId]);
@@ -306,10 +306,10 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
             echo outputError(array("msg" => "Image ID Is Required"));die();
         }
         // Verify image owner via product
-        $image = selectDB("images", "id = '{$data["imageId"]}'");
+        $image = selectDBNew("images", [$data["imageId"]], "id = ?", "");
         if( $image ){
             $pId = $image[0]["productId"];
-            $product = selectDB("products", "id = '{$pId}' AND storeId = '{$storeId}'");
+            $product = selectDBNew("products", [$pId, $storeId], "id = ? AND storeId = ?", "");
             if( $product ){
                 if( deleteDB("images", "id = '{$data["imageId"]}'") ){
                     echo outputData(array("msg" => "Image deleted successfully"));die();
@@ -318,7 +318,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         }
         echo outputError(array("msg" => "Failed to delete image or unauthorized"));
     }elseif( $action == "getAttributes" ){
-        $attributes = selectDB2("id, enTitle, arTitle", "attributes", "status = '0'");
+        $attributes = selectDB2New("id, enTitle, arTitle", "attributes", [0], "status = ?", "");
         echo outputData(array("attributes" => $attributes ?: []));die();
 
     }elseif( $action == "buildVariants" ){
@@ -330,7 +330,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
         $titleGroups = [];
         foreach($data["attributes"] as $attr){
             if( !isset($attr["title"]) || !is_array($attr["title"]) || empty($attr["title"]) ) continue;
-            $attrInfo = selectDB2("enTitle, arTitle", "attributes", "id = '{$attr["attributeId"]}' AND status = '0'");
+            $attrInfo = selectDB2New("enTitle, arTitle", "attributes", [$attr["attributeId"]], "id = ? AND status = '0'", "");
             if( !$attrInfo ) continue;
             $titleGroups[] = $attr["title"];
         }

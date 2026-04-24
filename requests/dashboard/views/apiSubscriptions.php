@@ -22,6 +22,11 @@ if ($action == "list") {
     $orderBy = $_REQUEST["orderBy"] ?? "id";
     $orderDir = $_REQUEST["orderDir"] ?? "DESC";
     
+    $orderBy = $dbconnect->real_escape_string($orderBy);
+    $orderDir = $dbconnect->real_escape_string($orderDir);
+    $limit = $dbconnect->real_escape_string($limit);
+    $offset = $dbconnect->real_escape_string($offset);
+
     // Total count for pagination
     $totalCount = queryDB("SELECT COUNT(*) as total FROM subscriptions WHERE {$where}");
     $totalEntries = (int)($totalCount[0]["total"] ?? 0);
