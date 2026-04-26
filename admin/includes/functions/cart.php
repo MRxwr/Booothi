@@ -292,6 +292,7 @@ function loadWhatsappItems($items){
 		if( !empty(direction($attribute[0]["enTitle"],$attribute[0]["arTitle"])) ){
 			$output .= " - " . direction($attribute[0]["enTitle"],$attribute[0]["arTitle"]);
 		}
+		/*
 		$collection = $items[$i]["collections"];
 		if ( is_null($collection) || (is_string($collection) && ($collection == "null" || empty($collection))) ) {
 			$collection = [];
@@ -304,6 +305,7 @@ function loadWhatsappItems($items){
 				$output .= "[ " . direction($productsInfo[0]["enTitle"],$productsInfo[0]["arTitle"]) . " ]";
 			}
 		}
+			*/
 		$extras = $items[$i]["extras"];
 		for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 			if ( !empty($extras["variant"][$y]) ){
