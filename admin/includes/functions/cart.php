@@ -184,7 +184,6 @@ function loadCartItems(){
 					$output .= "[ " . direction($productsInfo[0]["enTitle"],$productsInfo[0]["arTitle"]) . " ]";
 				}
 			}
-			die("die6");
 			$extras = json_decode($cart[$i]["extras"],true);
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 				if ( !empty($extras["variant"][$y]) ){
@@ -196,6 +195,7 @@ function loadCartItems(){
 					$extraPrice[] = $extraInfo[0]['price'];
 				}
 			}
+			die("die7");
 			$items = json_decode($cart[$i]["giftCard"],true);
 			if ( isset($items["body"]) ){
 				$items["to"] = ( $items["to"] == "" ? "" : $items["to"]);
