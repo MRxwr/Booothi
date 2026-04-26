@@ -234,8 +234,12 @@ function loadItems($items){
 		if( !empty(direction($attribute[0]["enTitle"],$attribute[0]["arTitle"])) ){
 			$output .= " - " . direction($attribute[0]["enTitle"],$attribute[0]["arTitle"]);
 		}
-		var_dump($items[$i]["collections"]);
-		$collection = ( $items[$i]["collections"] == 'null' ) ? [] : $items[$i]["collections"];
+		$collection = $items[$i]["collections"];
+		if ( is_null($collection) || (is_string($collection) && ($collection == "null" || empty($collection))) ) {
+			$collection = [];
+		} elseif ( is_string($collection) ) {
+			$collection = json_decode($collection, true) ?: [];
+		}
 		for( $y = 0; $y < sizeof($collection) ; $y++ ){
 			if ( !empty($collection[$y]) ){
 				$productsInfo = selectDBNew('products',[$collection[$y]], "`id` = ?","");
@@ -289,6 +293,11 @@ function loadWhatsappItems($items){
 			$output .= " - " . direction($attribute[0]["enTitle"],$attribute[0]["arTitle"]);
 		}
 		$collection = $items[$i]["collections"];
+		if ( is_null($collection) || (is_string($collection) && ($collection == "null" || empty($collection))) ) {
+			$collection = [];
+		} elseif ( is_string($collection) ) {
+			$collection = json_decode($collection, true) ?: [];
+		}
 		for( $y = 0; $y < sizeof($collection) ; $y++ ){
 			if ( !empty($collection[$y]) ){
 				$productsInfo = selectDBNew('products', [$collection[$y]], "`id` = ?","");
