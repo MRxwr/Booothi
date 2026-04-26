@@ -159,12 +159,11 @@ function loadCartItems(){
 	$output = "";
 	$extraPrice = [0];
 	$getCartId = json_decode($_COOKIE[$cookieSession."activity"],true);
-	
 	if ( $cart = selectDBNew("cart",[$getCartId["cart"]],"`cartId` = ?","") ){
-		die("die2");
 		for ($i =0; $i < sizeof($cart); $i++){
 			$product = selectDBNew("products",[$cart[$i]["productId"]],"`id` = ?","");
 			$attribute = selectDBNew("attributes_products",[$cart[$i]["subId"]],"`id` = ?","");
+			die("die3");
 			$sale = checkProductDiscount($cart[$i]["subId"]);
 			if( $product[0]["discount"] != 0 ){
 				$realPrice = "[<span style='text-decoration: line-through;'>".numTo3Float(priceCurr($attribute[0]["price"]))."KD]</span>";
