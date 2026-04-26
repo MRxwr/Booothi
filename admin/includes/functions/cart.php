@@ -177,6 +177,7 @@ function loadCartItems(){
 			if( !empty(direction($attribute[0]["enTitle"],$attribute[0]["arTitle"])) ){
 				$output .= " - " . direction($attribute[0]["enTitle"],$attribute[0]["arTitle"]);
 			}
+			/*
 			$items = ( $cart[$i]["collections"] == 'null' ) ? [] : json_decode($cart[$i]["collections"],true);
 			for( $y = 0; $y < sizeof($items) ; $y++ ){
 				if ( !empty($items[$y]) ){
@@ -184,6 +185,7 @@ function loadCartItems(){
 					$output .= "[ " . direction($productsInfo[0]["enTitle"],$productsInfo[0]["arTitle"]) . " ]";
 				}
 			}
+			*/
 			$extras = json_decode($cart[$i]["extras"],true);
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 				if ( !empty($extras["variant"][$y]) ){
