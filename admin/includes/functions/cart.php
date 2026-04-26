@@ -292,7 +292,6 @@ function loadWhatsappItems($items){
 		if( !empty(direction($attribute[0]["enTitle"],$attribute[0]["arTitle"])) ){
 			$output .= " - " . direction($attribute[0]["enTitle"],$attribute[0]["arTitle"]);
 		}
-		/*
 		$collection = $items[$i]["collections"];
 		if ( is_null($collection) || (is_string($collection) && ($collection == "null" || empty($collection))) ) {
 			$collection = [];
@@ -305,11 +304,10 @@ function loadWhatsappItems($items){
 				$output .= "[ " . direction($productsInfo[0]["enTitle"],$productsInfo[0]["arTitle"]) . " ]";
 			}
 		}
-			*/
 		$extras = $items[$i]["extras"];
 		for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 			if ( !empty($extras["variant"][$y]) ){
-				$extraInfo = selectDBNew('extras', [$extras["id"][$y]], "`id` = ?'","");
+				$extraInfo = selectDBNew('extras', [$extras["id"][$y]], "`id` = ?","");
 				$extraInfo[0]['price'] = ($extraInfo[0]['priceBy'] == 0 ? $extraInfo[0]['price'] : $extras["variant"][$y]);
 				$extras["variant"][$y] = ($extraInfo[0]['priceBy'] == 0 ? $extras["variant"][$y] : "");
 				$extraPriceView = $extraInfo[0]['price'] == 0 ? "]" : numTo3Float(priceCurr($extraInfo[0]['price'])). selectedCurr()." ]";
