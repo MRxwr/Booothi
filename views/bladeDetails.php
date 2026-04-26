@@ -256,7 +256,7 @@ body{
                         </div>
                     </div>
                     <div class="profile-sec">
-                        <h5 class="page-title"><?php echo $productsText ?></h5>
+                        <h5 class="page-title"><?php echo direction("Products","المنتجات") ?></h5>
 						<div class="checkoutsidebar"> <?php echo loadItems($order[0]["items"]); ?></div>
 						<div class="checkoutsidebar-calculation"></div>
 						<button type="button" onclick="window.print()" class="btn btn-dark"><?php echo $printText ?></button>
