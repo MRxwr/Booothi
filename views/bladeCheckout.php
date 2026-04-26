@@ -15,7 +15,7 @@ if( isset($_GET["error"]) && $_GET["error"] == "3" ){
 				<div class="checkout-page">
 					<div class="sidebar-item">
 						<div class="make-me-sticky check-make-me-sticky">
-							<h3 class="bold text-center mb-4 pb-3"><?php echo $cartText ?></h3>
+							<h3 class="bold text-center mb-4 pb-3"><?php echo direction("CART","سلة التسوق") ?></h3>
 							<div class="checkoutsidebar">
 								<?php
 								if ( getCartItemsTotal() < 1 ){
