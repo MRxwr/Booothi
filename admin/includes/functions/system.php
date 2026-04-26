@@ -74,7 +74,7 @@ function maintenanceMode($storeCode){
 function getCategories(){
 	GLOBAL $showCategoryTitle, $categoryView, $storePrefix, $storeID;
 	$output = "";
-	if($categories = selectDBNew("categories",[0,1,$storeID],"`status` = '0' AND `hidden` = '1' AND `storeId` = ?","`rank` ASC") ){
+	if($categories = selectDBNew("categories",[0,1,$storeID],"`status` = ? AND `hidden` = ? AND `storeId` = ?","`rank` ASC") ){
 	    for ($i =0; $i < sizeof($categories); $i++){
 			$categoryShape = ( $categoryView == 0 ) ? "product-box-img" : "product-box-img-rect" ;
     		$output .= "<div class='col-xl-4 col-lg-4 col-md-4 col-sm-4 col-6' style='text-align: -webkit-center!important'>
