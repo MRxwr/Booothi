@@ -185,6 +185,7 @@ function loadCartItems(){
 				}
 			}
 			$extras = json_decode($cart[$i]["extras"],true);
+			die("die7");
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 				if ( !empty($extras["variant"][$y]) ){
 					$extraInfo = selectDBNew('extras', [$extras["id"][$y]], "`id` = ?'", "");
@@ -195,7 +196,7 @@ function loadCartItems(){
 					$extraPrice[] = $extraInfo[0]['price'];
 				}
 			}
-			die("die7");
+			
 			$items = json_decode($cart[$i]["giftCard"],true);
 			if ( isset($items["body"]) ){
 				$items["to"] = ( $items["to"] == "" ? "" : $items["to"]);
