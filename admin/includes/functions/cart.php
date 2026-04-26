@@ -163,8 +163,8 @@ function loadCartItems(){
 		for ($i =0; $i < sizeof($cart); $i++){
 			$product = selectDBNew("products",[$cart[$i]["productId"]],"`id` = ?","");
 			$attribute = selectDBNew("attributes_products",[$cart[$i]["subId"]],"`id` = ?","");
-			die("die3");
 			$sale = checkProductDiscount($cart[$i]["subId"]);
+			die("die4");
 			if( $product[0]["discount"] != 0 ){
 				$realPrice = "[<span style='text-decoration: line-through;'>".numTo3Float(priceCurr($attribute[0]["price"]))."KD]</span>";
 			}else{
