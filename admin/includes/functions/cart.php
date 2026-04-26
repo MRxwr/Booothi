@@ -234,6 +234,7 @@ function loadItems($items){
 		if( !empty(direction($attribute[0]["enTitle"],$attribute[0]["arTitle"])) ){
 			$output .= " - " . direction($attribute[0]["enTitle"],$attribute[0]["arTitle"]);
 		}
+		var_dump($items[$i]["collections"]);
 		$collection = ( $items[$i]["collections"] == 'null' ) ? [] : $items[$i]["collections"];
 		for( $y = 0; $y < sizeof($collection) ; $y++ ){
 			if ( !empty($collection[$y]) ){
