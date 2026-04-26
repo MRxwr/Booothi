@@ -10,7 +10,7 @@ function getCartPriceDefault(){
 			$sale = checkProductDiscountDefault($cart[$i]["subId"]);
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 				if ( !empty($extras["variant"][$y]) ){
-					$extraInfo = selectDB('extras', "`id` = '{$extras["id"][$y]}'");
+					$extraInfo = selectDBNew('extras', [$extras["id"][$y]], "`id` = ?","");
 					$extraInfo[0]['price'] = ($extraInfo[0]['priceBy'] == 0 ? $extraInfo[0]['price'] : $extras["variant"][$y]);
 					$extraPrice[] = $extraInfo[0]["price"] * $cart[$i]["quantity"];
 				}
@@ -35,7 +35,7 @@ function getExtarsTotalDefault(){
 			$extras = json_decode($cart[$i]["extras"] ,true);
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 				if ( !empty($extras["variant"][$y]) ){
-					$extraInfo = selectDB('extras', "`id` = '{$extras["id"][$y]}'");
+					$extraInfo = selectDBNew('extras', [$extras["id"][$y]], "`id` = ?","");
 					$extraInfo[0]['price'] = ($extraInfo[0]['priceBy'] == 0 ? $extraInfo[0]['price'] : $extras["variant"][$y]);
 					$extraPrice[] = $extraInfo[0]["price"] * $cart[$i]["quantity"];
 				}
@@ -157,7 +157,7 @@ function voucherDoubleDiscountDefault($code){
 
 function checkProductDiscountDefault($id){
 	$attribute = selectDBNew("attributes_products",[$id],"`id` = ?","");
-	$product = selectDB("products","`id` = '{$attribute[0]["productId"]}'");
+	$product = selectDBNew("products",[$attribute[0]["productId"]],"`id` = ?","");
 	if( $product[0]["discountType"] == 0 ){
 		$sale = $attribute[0]["price"] * ( 1 - ($product[0]["discount"] / 100) );
 	}else{
@@ -228,8 +228,8 @@ function checkPayment($data){
 function getItemsForPayment($cartId,$prices){
 	if ( $cart = selectDBNew("cart",[$cartId],"`cartId` = ?","") ){
 		for( $i = 0; $i < sizeof($cart); $i++ ){
-			$item = selectDB("products","`id` = '{$cart[$i]["productId"]}'");
-			$attribute = selectDB("products","`id` = '{$cart[$i]["subId"]}'");
+			$item = selectDBNew("products",[$cart[$i]["productId"]],"`id` = ?","");
+			$attribute = selectDBNew("products",[$cart[$i]["subId"]],"`id` = ?","");
 			$item[0]["enTitle"] = (!empty($attribute[0]["enTitle"]) ? "{$item[0]["enTitle"]} - {$attribute[0]["enTitle"]}" : $item[0]["enTitle"]);
 			$returnData[] = array(
 				"ItemName" 		=> $item[0]["enTitle"],
@@ -308,7 +308,7 @@ function sendOrderToAllowMENA($orderId){
 		);
 		$items = json_decode($order[0]["items"],true);
 		for( $i = 0; $i < sizeof($items); $i++ ){
-			$item = selectDB("attributes_products","`id` = '{$items[$i]["subId"]}'");
+			$item = selectDBNew("attributes_products",[$items[$i]["subId"]],"`id` = ?","");
 			$array["order_items"][] = array(
 				"barcode" =>$item[0]["sku"],
 				"quantity" =>$items[$i]["quantity"]

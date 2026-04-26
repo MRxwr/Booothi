@@ -3,7 +3,7 @@
 function getCartId(){
 	jump:
 	$randomCart = rand("00000000","99999999");
-	if( $cart = selectDB("cart", "`cartId` = '{$randomCart}'") ){
+	if( $cart = selectDBNew("cart",[$randomCart],"`cartId` = ?","") ){
 		goto jump;
 	}else{
 		return $randomCart;
@@ -44,7 +44,7 @@ function getCartPrice(){
 			$sale = checkProductDiscount($cart[$i]["subId"]);
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 				if ( !empty($extras["variant"][$y]) ){
-					$extraInfo = selectDB('extras', "`id` = '{$extras["id"][$y]}'");
+					$extraInfo = selectDBNew('extras',[$extras["id"][$y]], "`id` = ?","");
 					$extraInfo[0]['price'] = ($extraInfo[0]['priceBy'] == 0 ? $extraInfo[0]['price'] : $extras["variant"][$y]);
 					$extraPrice[] = $extraInfo[0]["price"] * $cart[$i]["quantity"];
 				}
@@ -70,7 +70,7 @@ function getCartPriceTotal(){
 			$sale = checkProductDiscount($cart[$i]["subId"]);
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 				if ( !empty($extras["variant"][$y]) ){
-					$extraInfo = selectDB('extras', "`id` = '{$extras["id"][$y]}'");
+					$extraInfo = selectDBNew('extras',[$extras["id"][$y]],"`id` = ?","");
 					$extraInfo[0]['price'] = ($extraInfo[0]['priceBy'] == 0 ? $extraInfo[0]['price'] : $extras["variant"][$y]);
 					$extraPrice[] = $extraInfo[0]["price"] * $cart[$i]["quantity"];
 				}
@@ -93,11 +93,11 @@ function noDiscountCartPrice(){
 	if ( $cart = selectDBNew("cart",[$getCartId["cart"]],"`cartId` = ?","") ){
 		for ($i =0; $i < sizeof($cart); $i++){
 			$extras = json_decode($cart[$i]["extras"] ,true);
-			$price = selectDB("attributes_products","`id` = '{$cart[$i]["subId"]}'");
+			$price = selectDBNew("attributes_products",[$cart[$i]["subId"]],"`id` = ?","");
 			$sale = $price[0]["price"];
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 				if ( !empty($extras["variant"][$y]) ){
-					$extraInfo = selectDB('extras', "`id` = '{$extras["id"][$y]}'");
+					$extraInfo = selectDBNew('extras',[$extras["id"][$y]], "`id` = ?","");
 					$extraInfo[0]['price'] = ($extraInfo[0]['priceBy'] == 0 ? $extraInfo[0]['price'] : $extras["variant"][$y]);
 					$extraPrice[] = $extraInfo[0]["price"] * $cart[$i]["quantity"];
 				}
@@ -118,7 +118,7 @@ function noDiscountItemsPrice(){
 	$getCartId = json_decode($_COOKIE[$cookieSession."activity"],true);
 	if ( $cart = selectDBNew("cart",[$getCartId["cart"]],"`cartId` = ?","") ){
 		for ($i =0; $i < sizeof($cart); $i++){
-			$price = selectDB("attributes_products","`id` = '{$cart[$i]["subId"]}'");
+			$price = selectDBNew("attributes_products",[$cart[$i]["subId"]],"`id` = ?","");
 			$totals[] = ($price[0]["price"] * $cart[$i]["quantity"]);
 		}
 	}
@@ -138,7 +138,7 @@ function getExtarsTotal(){
 			$extras = json_decode($cart[$i]["extras"] ,true);
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 				if ( !empty($extras["variant"][$y]) ){
-					$extraInfo = selectDB('extras', "`id` = '{$extras["id"][$y]}'");
+					$extraInfo = selectDBNew('extras',[$extras["id"][$y]], "`id` = ?","");
 					$extraInfo[0]['price'] = ($extraInfo[0]['priceBy'] == 0 ? $extraInfo[0]['price'] : $extras["variant"][$y]);
 					$extraPrice[] = $extraInfo[0]["price"] * $cart[$i]["quantity"];
 				}
@@ -161,8 +161,8 @@ function loadCartItems(){
 	$getCartId = json_decode($_COOKIE[$cookieSession."activity"],true);
 	if ( $cart = selectDBNew("cart",[$getCartId["cart"]],"`cartId` = ?","") ){
 		for ($i =0; $i < sizeof($cart); $i++){
-			$product = selectDB("products","`id` = '{$cart[$i]["productId"]}'");
-			$attribute = selectDB("attributes_products","`id` = '{$cart[$i]["subId"]}'");
+			$product = selectDBNew("products",[$cart[$i]["productId"]],"`id` = ?","");
+			$attribute = selectDBNew("attributes_products",[$cart[$i]["subId"]],"`id` = ?","");
 			$sale = checkProductDiscount($cart[$i]["subId"]);
 			if( $product[0]["discount"] != 0 ){
 				$realPrice = "[<span style='text-decoration: line-through;'>".numTo3Float(priceCurr($attribute[0]["price"]))."KD]</span>";
@@ -180,14 +180,14 @@ function loadCartItems(){
 			$items = json_decode($cart[$i]["collections"],true);
 			for( $y = 0; $y < sizeof($items) ; $y++ ){
 				if ( !empty($items[$y]) ){
-					$productsInfo = selectDB('products', "`id` = '{$items[$y]}'");
+					$productsInfo = selectDBNew('products',[$items[$y]], "`id` = ?","");
 					$output .= "[ " . direction($productsInfo[0]["enTitle"],$productsInfo[0]["arTitle"]) . " ]";
 				}
 			}
 			$extras = json_decode($cart[$i]["extras"],true);
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 				if ( !empty($extras["variant"][$y]) ){
-					$extraInfo = selectDB('extras', "`id` = '{$extras["id"][$y]}'");
+					$extraInfo = selectDBNew('extras', [$extras["id"][$y]], "`id` = ?'", "");
 					$extraInfo[0]['price'] = ($extraInfo[0]['priceBy'] == 0 ? $extraInfo[0]['price'] : $extras["variant"][$y]);
 					$extras["variant"][$y] = ($extraInfo[0]['priceBy'] == 0 ? $extras["variant"][$y] : "");
 					$extraPriceView = $extraInfo[0]['price'] == 0 ? "]" : numTo3Float(priceCurr($extraInfo[0]['price'])). selectedCurr() ." ]";
@@ -217,8 +217,8 @@ function loadItems($items){
 	$extraPrice = [0];
 	$items = json_decode($items,true);
 	for ($i =0; $i < sizeof($items); $i++){
-		$product = selectDB("products","`id` = '{$items[$i]["productId"]}'");
-		$attribute = selectDB("attributes_products","`id` = '{$items[$i]["subId"]}'");
+		$product = selectDBNew("products",[$items[$i]["productId"]],"`id` = ?","");
+		$attribute = selectDBNew("attributes_products",[$items[$i]["subId"]],"`id` = ?","");
 		if( $items[$i]["priceAfterVoucher"] != 0 ){
 			$sale = $items[$i]["priceAfterVoucher"];
 		}elseif( $items[$i]["discountPrice"] != $items[$i]["price"]){
@@ -237,14 +237,14 @@ function loadItems($items){
 		$collection = $items[$i]["collections"];
 		for( $y = 0; $y < sizeof($collection) ; $y++ ){
 			if ( !empty($collection[$y]) ){
-				$productsInfo = selectDB('products', "`id` = '{$collection[$y]}'");
+				$productsInfo = selectDBNew('products',[$collection[$y]], "`id` = ?","");
 				$output .= "[ " . direction($productsInfo[0]["enTitle"],$productsInfo[0]["arTitle"]) . " ]";
 			}
 		}
 		$extras = $items[$i]["extras"];
 		for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 			if ( !empty($extras["variant"][$y]) ){
-				$extraInfo = selectDB('extras', "`id` = '{$extras["id"][$y]}'");
+				$extraInfo = selectDBNew('extras',[$extras["id"][$y]], "`id` = ?","");
 				$extraInfo[0]['price'] = ($extraInfo[0]['priceBy'] == 0 ? $extraInfo[0]['price'] : $extras["variant"][$y]);
 				$extras["variant"][$y] = ($extraInfo[0]['priceBy'] == 0 ? $extras["variant"][$y] : "");
 				$extraPriceView = $extraInfo[0]['price'] == 0 ? "]" : numTo3Float(priceCurr($extraInfo[0]['price'])). selectedCurr()." ]";
@@ -273,8 +273,8 @@ function loadWhatsappItems($items){
 	$extraPrice = [0];
 	$items = json_decode($items,true);
 	for ($i =0; $i < sizeof($items); $i++){
-		$product = selectDB("products","`id` = '{$items[$i]["productId"]}'");
-		$attribute = selectDB("attributes_products","`id` = '{$items[$i]["subId"]}'");
+		$product = selectDBNew("products",[$items[$i]["productId"]],"`id` = ?","");
+		$attribute = selectDBNew("attributes_products",[$items[$i]["subId"]],"`id` = ?","");
 		if( $items[$i]["priceAfterVoucher"] != 0 ){
 			$sale = $items[$i]["priceAfterVoucher"];
 		}elseif( $items[$i]["discountPrice"] != $items[$i]["price"]){
@@ -290,14 +290,14 @@ function loadWhatsappItems($items){
 		$collection = $items[$i]["collections"];
 		for( $y = 0; $y < sizeof($collection) ; $y++ ){
 			if ( !empty($collection[$y]) ){
-				$productsInfo = selectDB('products', "`id` = '{$collection[$y]}'");
+				$productsInfo = selectDBNew('products', [$collection[$y]], "`id` = ?","");
 				$output .= "[ " . direction($productsInfo[0]["enTitle"],$productsInfo[0]["arTitle"]) . " ]";
 			}
 		}
 		$extras = $items[$i]["extras"];
 		for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 			if ( !empty($extras["variant"][$y]) ){
-				$extraInfo = selectDB('extras', "`id` = '{$extras["id"][$y]}'");
+				$extraInfo = selectDBNew('extras', [$extras["id"][$y]], "`id` = ?'","");
 				$extraInfo[0]['price'] = ($extraInfo[0]['priceBy'] == 0 ? $extraInfo[0]['price'] : $extras["variant"][$y]);
 				$extras["variant"][$y] = ($extraInfo[0]['priceBy'] == 0 ? $extras["variant"][$y] : "");
 				$extraPriceView = $extraInfo[0]['price'] == 0 ? "]" : numTo3Float(priceCurr($extraInfo[0]['price'])). selectedCurr()." ]";

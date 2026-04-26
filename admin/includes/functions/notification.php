@@ -32,7 +32,7 @@ function sendNotification($data){
 
 function emailBody($orderId){
 	GLOBAL $settingsEmail, $settingsTitle, $settingsWebsite, $settingslogo;
-	$order = selectDB("orders2","`id` = '{$orderId}'");
+	$order = selectDBNew("orders2",[$orderId],"`id` = ?","");
 	$info = json_decode($order[0]["info"],true);
 	$address = json_decode($order[0]["address"],true);
 	$giftCard = json_decode($order[0]["giftCard"],true);
@@ -58,7 +58,7 @@ function emailBody($orderId){
 			
 			if( $address["place"] != 3 ){
 				if( $address["country"] == "KW" ){
-					$area = selectDB("areas","`enTitle` = '{$address["area"]}' OR `arTitle` = '{$address["area"]}'");
+					$area = selectDBNew("areas",[$address["area"], $address["area"]],"`enTitle` = ? OR `arTitle` = ?","");
 					$areaTitle = $area[0]["enTitle"];
 				}else{
 					$areaTitle = $address["area"];
@@ -74,7 +74,7 @@ function emailBody($orderId){
 			<td><hr>Price<hr></td>
 			</tr>';
 			for( $i = 0 ; $i < sizeof($items) ; $i++ ){
-				$subProduct = selectDB("attributes_products","`id` = '{$items[$i]["subId"]}'");
+				$subProduct = selectDBNew("attributes_products",[$items[$i]["subId"]],"`id` = ?","");
 				if( $items[$i]["priceAfterVoucher"] != 0 ){
 					$sale = $items[$i]["priceAfterVoucher"];
 				}elseif( $items[$i]["discountPrice"] != $items[$i]["price"]){
@@ -86,11 +86,11 @@ function emailBody($orderId){
 				$output = "";
 				for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 					if ( !empty($extras["variant"][$y]) ){
-						$extraInfo = selectDB('extras', "`id` = '{$extras["id"][$y]}'");
+						$extraInfo = selectDBNew('extras', [$extras["id"][$y]], "`id` = ?","");
 						$output = "[" . direction($extraInfo[0]["enTitle"],$extraInfo[0]["arTitle"]) . ": {$extras["variant"][$y]}]";
 					}
 				}
-				$product = selectDB("products","`id` = '{$subProduct[0]["productId"]}'");
+				$product = selectDBNew("products",[$subProduct[0]["productId"]],"`id` = ?","");
 				$body .= "<tr>
 						<td>{$items[$i]["quantity"]}x {$product[0]["enTitle"]} - {$subProduct[0]["enTitle"]} {$output} {$subProduct[0]["sku"]} {$items[$i]["note"]}</td>
 						<td>{$sale}KD</td>
@@ -205,7 +205,7 @@ function sendMailsAdmin($orderId){
 // whatsapp notification \\
 function whatsappNoti($order){
 	GLOBAL $settingsTitle;
-	if( $whatsappNoti = selectDB("settings","`id` = '1'") ){
+	if( $whatsappNoti = selectDBNew("settings", [1], "`id` = ?","") ){
 		$whatsappNoti1 = json_decode($whatsappNoti[0]["whatsappNoti"],true);
 		if( $whatsappNoti1["status"] != 1 ){
 			$data = array();
@@ -246,7 +246,7 @@ function whatsappNoti($order){
 
 function whatsappUltraMsg($order){
 	GLOBAL $settingsTitle;
-	if( $whatsappNoti = selectDB("settings","`id` = '1'") ){
+	if( $whatsappNoti = selectDBNew("settings", [1], "`id` = ?","") ){
 		$whatsappNoti1 = json_decode($whatsappNoti[0]["whatsappNoti"],true);
 		$token = $whatsappNoti[0]["whatsappToken"];
 		if( $whatsappNoti1["status"] != 1 ){
@@ -284,8 +284,8 @@ function whatsappUltraMsg($order){
 
 function whatsappUltraMsgImage($to,$eventId, $inviteeLink){
 	GLOBAL $_SERVER;
-	if( $whatsappNoti = selectDB("settings","`id` = '1'") ){
-		$event = selectDB("events","`id` = '{$eventId}'");
+	if( $whatsappNoti = selectDBNew("settings", [1], "`id` = ?","") ){
+		$event = selectDBNew("events", [$eventId], "`id` = ?","");
 		$messageDetails = json_decode($whatsappNoti[0]["whatsappNoti"],true);
 		if( $messageDetails["status"] != 1 ){
 			$data = array();
@@ -328,7 +328,7 @@ function whatsappUltraMsgImage($to,$eventId, $inviteeLink){
 }
 
 function whatsappUltraMsgVerify($to, $code){
-	if( $whatsappNoti = selectDB("settings","`id` = '1'") ){
+	if( $whatsappNoti = selectDBNew("settings", [1], "`id` = ?","") ){
 		$messageDetails = json_decode($whatsappNoti[0]["whatsappNoti"],true);
 		if( $messageDetails["status"] != 1 ){
 			$data = array();
@@ -371,7 +371,7 @@ function whatsappUltraMsgVerify($to, $code){
 
 // Send WhatsApp message for password reset (Forget Password)
 function whatsappUltraMsgForgetPassword($to, $code) {
-	if ($whatsappNoti = selectDB("settings", "`id` = '1'") ) {
+	if ($whatsappNoti = selectDBNew("settings", [1], "`id` = ?","") ) {
 		$messageDetails = json_decode($whatsappNoti[0]["whatsappNoti"], true);
 		if ($messageDetails["status"] != 1) {
 			return false;

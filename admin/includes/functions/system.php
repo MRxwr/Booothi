@@ -74,7 +74,7 @@ function maintenanceMode($storeCode){
 function getCategories(){
 	GLOBAL $showCategoryTitle, $categoryView, $storePrefix, $storeID;
 	$output = "";
-	if($categories = selectDB("categories","`status` = '0' AND `hidden` = '1' AND `storeId` = '{$storeID}' ORDER BY `rank` ASC")){
+	if($categories = selectDBNew("categories",[0,1,$storeID],"`status` = '0' AND `hidden` = '1' AND `storeId` = ?","`rank` ASC") ){
 	    for ($i =0; $i < sizeof($categories); $i++){
 			$categoryShape = ( $categoryView == 0 ) ? "product-box-img" : "product-box-img-rect" ;
     		$output .= "<div class='col-xl-4 col-lg-4 col-md-4 col-sm-4 col-6' style='text-align: -webkit-center!important'>
@@ -93,7 +93,7 @@ function getCategories(){
 }
 
 function getStoreNameById($id){
-	if( $store = selectDB("stores","`id` = '{$id}'") ){
+	if( $store = selectDBNew("stores",[$id],"`id` = ?","") ){
 		return $store[0]["title"];
 	}else{
 		return "";
@@ -102,16 +102,19 @@ function getStoreNameById($id){
 
 //items
 function updateItemQuantity($data){
-	GLOBAL $dbconnect;
+	//GLOBAL $dbconnect;
 	$check = [';','"',"'"];
 	$data = str_replace($check,"",$data);
+	/*
 	$sql = "UPDATE `attributes_products`
 			SET 
-			`quantity` = `quantity` - {$data["quantity"]}
+			`quabtity` = `quantity` - {$data["quantity"]}
 			WHERE
 			`id` = '{$data["id"]}'
 			";
-	if($dbconnect->query($sql)){
+	*/
+	$updateData = array("quantity" => "`quantity` - {$data["quantity"]}");
+	if(updateDB("attributes_products",$updateData,"`id` = '{$data["id"]}'")){
 		return 1;
 	}else{
 		$error = array("msg"=>"update quantity error");
