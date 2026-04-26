@@ -185,7 +185,7 @@ function loadCartItems(){
 				}
 			}
 			$extras = json_decode($cart[$i]["extras"],true);
-			
+			print_r($extras);
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 				die("die8");
 				if ( !empty($extras["variant"][$y]) ){
