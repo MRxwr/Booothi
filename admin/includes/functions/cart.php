@@ -159,8 +159,9 @@ function loadCartItems(){
 	$output = "";
 	$extraPrice = [0];
 	$getCartId = json_decode($_COOKIE[$cookieSession."activity"],true);
-	die("die");
+	
 	if ( $cart = selectDBNew("cart",[$getCartId["cart"]],"`cartId` = ?","") ){
+		die("die2");
 		for ($i =0; $i < sizeof($cart); $i++){
 			$product = selectDBNew("products",[$cart[$i]["productId"]],"`id` = ?","");
 			$attribute = selectDBNew("attributes_products",[$cart[$i]["subId"]],"`id` = ?","");
