@@ -187,9 +187,7 @@ function loadCartItems(){
 			$extras = json_decode($cart[$i]["extras"],true);
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
 				if ( !empty($extras["variant"][$y]) ){
-					var_dump($extras["id"][$y]);
-					$extraInfo = selectDBNew('extras', [$extras["id"][$y]], "`id` = ?'", "");
-					die("die10");
+					$extraInfo = selectDBNew('extras', [$extras["id"][$y]], "`id` = ?", "");
 					$extraInfo[0]['price'] = ($extraInfo[0]['priceBy'] == 0 ? $extraInfo[0]['price'] : $extras["variant"][$y]);
 					$extras["variant"][$y] = ($extraInfo[0]['priceBy'] == 0 ? $extras["variant"][$y] : "");
 					$extraPriceView = $extraInfo[0]['price'] == 0 ? "]" : numTo3Float(priceCurr($extraInfo[0]['price'])). selectedCurr() ." ]";
