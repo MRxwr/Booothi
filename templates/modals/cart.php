@@ -46,7 +46,7 @@
 							echo " ";
 							echo direction($attribute[0]["enTitle"],$attribute[0]["arTitle"]);
 							echo " ";
-							$items = ( $cart[$i]["collections"] != 'null' ) ? [] : json_decode($cart[$i]["collections"],true);
+							$items = ( $cart[$i]["collections"] == 'null' ) ? [] : json_decode($cart[$i]["collections"],true);
 							for( $y = 0; $y < sizeof($items) ; $y++ ){
 								if ( !empty($items[$y]) ){
 									$productsInfo = selectDB('products', "`id` = '{$items[$y]}'");
