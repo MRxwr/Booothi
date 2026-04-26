@@ -185,8 +185,9 @@ function loadCartItems(){
 				}
 			}
 			$extras = json_decode($cart[$i]["extras"],true);
-			die("die7");
+			
 			for( $y = 0; $y < sizeof($extras["id"]) ; $y++ ){
+				die("die8");
 				if ( !empty($extras["variant"][$y]) ){
 					$extraInfo = selectDBNew('extras', [$extras["id"][$y]], "`id` = ?'", "");
 					$extraInfo[0]['price'] = ($extraInfo[0]['priceBy'] == 0 ? $extraInfo[0]['price'] : $extras["variant"][$y]);
