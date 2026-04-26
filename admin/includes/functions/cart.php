@@ -164,7 +164,6 @@ function loadCartItems(){
 			$product = selectDBNew("products",[$cart[$i]["productId"]],"`id` = ?","");
 			$attribute = selectDBNew("attributes_products",[$cart[$i]["subId"]],"`id` = ?","");
 			$sale = checkProductDiscount($cart[$i]["subId"]);
-			die("die4");
 			if( $product[0]["discount"] != 0 ){
 				$realPrice = "[<span style='text-decoration: line-through;'>".numTo3Float(priceCurr($attribute[0]["price"]))."KD]</span>";
 			}else{
@@ -178,6 +177,7 @@ function loadCartItems(){
 			if( !empty(direction($attribute[0]["enTitle"],$attribute[0]["arTitle"])) ){
 				$output .= " - " . direction($attribute[0]["enTitle"],$attribute[0]["arTitle"]);
 			}
+			die("die5");
 			$items = ( $cart[$i]["collections"] == 'null' ) ? [] : json_decode($cart[$i]["collections"],true);
 			for( $y = 0; $y < sizeof($items) ; $y++ ){
 				if ( !empty($items[$y]) ){
