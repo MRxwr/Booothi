@@ -5,7 +5,7 @@ if( !isset($_REQUEST["action"]) || empty($_REQUEST["action"]) ){
     $action = $_REQUEST["action"];
     $data = $_POST;
     if( $action == "list" ){
-        $categories = selectDB2("id, enTitle, arTitle, imageurl, header, rank, hidden", "categories", "storeId = '{$storeId}' AND status = '0' ORDER BY rank ASC");
+        $categories = selectDB2New("id, enTitle, arTitle, imageurl, header, rank, hidden", "categories",[0, $storeId], "storeId = ? AND status = ?","rank ASC");
         $response["categories"] = array();
         if( $categories ){
                 $response["categories"] = $categories;

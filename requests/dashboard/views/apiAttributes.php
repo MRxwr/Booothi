@@ -12,7 +12,7 @@ $action = $_REQUEST["action"] ?? "";
 switch ($action) {
     case "list":
         // List all non-deleted attributes for the store
-        $attributes = selectDB2("`id`,`enTitle`,`arTitle`,`hidden`", "attributes", "status = '0' AND storeId = '{$storeId}' ORDER BY id DESC");
+        $attributes = selectDB2New("`id`,`enTitle`,`arTitle`,`hidden`", "attributes",[0, $storeId], "status = ? AND storeId = ?","id DESC");
         if ($attributes) {
             echo outputData($attributes); die();
         } else {
