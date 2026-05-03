@@ -64,8 +64,7 @@ switch ($action) {
         $orderAreas = direction("enTitle", "arTitle");
         $sql = "SELECT a.id, a.enTitle, a.arTitle, 
                        IFNULL(sao.price, a.charges) as currentPrice,
-                       IFNULL(sao.status, a.status) as currentStatus,
-                       CASE WHEN sao.price IS NOT NULL THEN 1 ELSE 0 END as isOverridden
+                       COALESCE(sao.status, a.status) as currentStatus
                 FROM areas a 
                 LEFT JOIN store_area_overrides sao ON a.id = sao.areaId AND sao.storeId = ?
                 WHERE a.status = '0' 
