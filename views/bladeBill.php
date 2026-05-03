@@ -46,7 +46,7 @@ if ( isset($_POST["address"]["place"]) && !empty($_POST["address"]["place"]) && 
 		$areaId = (int)$_POST["address"]["area"];
 		$sql = "SELECT a.*, sao.price as overridePrice 
 				FROM areas a 
-				LEFT JOIN store_area_overrides sao ON a.id = sao.areaId AND sao.storeId = '{$storeId}'
+				LEFT JOIN store_area_overrides sao ON a.id = sao.areaId AND sao.storeId = '{$storeID}'
 				WHERE a.id = ? 
 				LIMIT 1";
 		if ($stmt = $dbconnect->prepare($sql)) {

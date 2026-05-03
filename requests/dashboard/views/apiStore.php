@@ -155,20 +155,18 @@ switch ($action) {
             if ( count($_POST["areaOverrides"]) > 0 ){
                 foreach ($_POST["areaOverrides"] as $override) {
                     $aId = (isset($override["areaId"])) ? (int)$override["areaId"] : 0;
-                    $aPrice = (isset($override["price"]) && $override["price"] !== "") ? (float)$override["price"] : 0;
+                    $aPrice = (isset($override["price"])) ? (float)$override["price"] : 0;
                     $aStatus = (isset($override["status"])) ? (int)$override["status"] : 0;
                     
                     if ( $aId > 0 ){
                         // Upsert logic: Delete existing and insert new
                         deleteDBNew("store_area_overrides", [$storeId, $aId], "storeId = ? AND areaId = ?");
                         
-                        $insertData = [
-                            "storeId" => $storeId,
-                            "areaId" => $aId,
-                            "price" => $aPrice,
-                            "status" => $aStatus
-                        ];
-                        insertDB("store_area_overrides", $insertData);
+                        $sqlInsert = "INSERT INTO `store_area_overrides` (`storeId`, `areaId`, `price`, `status`) VALUES (?, ?, ?, ?)";
+                        $stmtInsert = $dbconnect->prepare($sqlInsert);
+                        $stmtInsert->bind_param("iidi", $storeId, $aId, $aPrice, $aStatus);
+                        $stmtInsert->execute();
+                        $stmtInsert->close();
                     }
                 }
                 echo outputData(["msg" => "Store updated successfully with area overrides."]);die();
