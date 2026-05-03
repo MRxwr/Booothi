@@ -154,23 +154,28 @@ switch ($action) {
 
         // Handle Area Overrides
         if (isset($_POST["areaOverrides"]) && is_array($_POST["areaOverrides"])) {
-            foreach ($_POST["areaOverrides"] as $override) {
-                $aId = (int)$override["areaId"];
-                $aPrice = isset($override["price"]) ? (float)$override["price"] : null;
-                $aStatus = isset($override["status"]) ? (int)$override["status"] : 0;
-                
-                // Upsert logic: Delete existing and insert new
-                deleteDBNew("store_area_overrides", [$storeId, $aId], "storeId = ? AND areaId = ?");
-                
-                // Only insert if price is not default or status is disabled
-                // You can also choose to always insert for clarity
-                $insertData = [
-                    "storeId" => $storeId,
-                    "areaId" => $aId,
-                    "price" => $aPrice,
-                    "status" => $aStatus
-                ];
-                insertDB("store_area_overrides", $insertData);
+            if ( count($_POST["areaOverrides"]) > 0 ){
+                foreach ($_POST["areaOverrides"] as $override) {
+                    $aId = (int)$override["areaId"];
+                    $aPrice = isset($override["price"]) ? (float)$override["price"] : null;
+                    $aStatus = isset($override["status"]) ? (int)$override["status"] : 0;
+                    
+                    // Upsert logic: Delete existing and insert new
+                    deleteDBNew("store_area_overrides", [$storeId, $aId], "storeId = ? AND areaId = ?");
+                    
+                    // Only insert if price is not default or status is disabled
+                    // You can also choose to always insert for clarity
+                    $insertData = [
+                        "storeId" => $storeId,
+                        "areaId" => $aId,
+                        "price" => $aPrice,
+                        "status" => $aStatus
+                    ];
+                    insertDB("store_area_overrides", $insertData);
+                }
+                echo outputData(["msg" => "Store updated successfully with area overrides."]);die();
+            }else{
+                echo outputError(["msg" => "Area overrides array is empty."]);die();
             }
         }
 
