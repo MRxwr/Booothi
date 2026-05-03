@@ -105,8 +105,25 @@ $itemList[] = array(
 // shiiping information \\
 if( $address["country"] == "KW" ){
 	$settingsShippingMethod = 0;
-	$area = selectDBNew("areas",[$address["area"]],"`id` = ?","");
-	$address["area"] = $area[0]["enTitle"];
+	$areaId = (int)$address["area"];
+	$sql = "SELECT a.*, sao.price as overridePrice 
+			FROM areas a 
+			LEFT JOIN store_area_overrides sao ON a.id = sao.areaId AND sao.storeId = '{$storeID}'
+			WHERE a.id = ? 
+			LIMIT 1";
+	if ($stmt = $dbconnect->prepare($sql)) {
+		$stmt->bind_param("i", $areaId);
+		$stmt->execute();
+		$resultArr = $stmt->get_result();
+		if ($row = $resultArr->fetch_assoc()) {
+			$address["shipping"] = (!is_null($row["overridePrice"])) ? $row["overridePrice"] : $row["charges"];
+			$address["area"] = $row["enTitle"];
+		} else {
+			$address["shipping"] = 0;
+			$address["area"] = "Unknown";
+		}
+		$stmt->close();
+	}
 	$totalPrice = numTo3Float((float)$price + (float)$address["shipping"] + (float)substr(getExtarsTotalDefault(),0,6));
 	$itemList[] = array(
 		"ItemName" 		=> "Delivery charges",

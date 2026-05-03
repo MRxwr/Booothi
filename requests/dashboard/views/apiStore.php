@@ -20,7 +20,8 @@ switch ($action) {
              giftCard, emailOpt, enableInvoiceImage, userDiscount, inStore, noAddress, noAddressDelivery,
              whatsappNoti, socialMedia, internationalDelivery, expressDelivery,
              enAbout, arAbout, enPrivacy, arPrivacy, enTerms, arTerms,
-             paymentAPIKey, enDeveliveryTime, arDeveliveryTime, paymentOptions",
+             paymentAPIKey, enDeveliveryTime, arDeveliveryTime, paymentOptions,
+             (SELECT JSON_ARRAYAGG(JSON_OBJECT('areaId', areaId, 'price', price, 'status', status)) FROM store_area_overrides WHERE storeId = stores.id) as areaOverrides",
             "stores",
             [$storeId],
             "id = ?",
@@ -29,6 +30,7 @@ switch ($action) {
 
         if ($store && isset($store[0])) {
             $store = $store[0];
+            $store["areaOverrides"] = (isset($store["areaOverrides"]) && !empty($store["areaOverrides"])) ? json_decode($store["areaOverrides"], true) : [];
             $store["enAbout"]    = isset($store["enAbout"]) ? urldecode($store["enAbout"]) : "";
             $store["arAbout"]    = isset($store["arAbout"]) ? urldecode($store["arAbout"]) : "";
             $store["enPrivacy"]  = isset($store["enPrivacy"]) ? urldecode($store["enPrivacy"]) : "";
@@ -55,6 +57,28 @@ switch ($action) {
             echo outputData(["store" => $store]);die();
         } else {
             echo outputError(["msg" => "Store details not found."]);die();
+        }
+        break;
+
+    case "listAreas":
+        $orderAreas = direction("enTitle", "arTitle");
+        $sql = "SELECT a.id, a.enTitle, a.arTitle, 
+                       IFNULL(sao.price, a.charges) as currentPrice,
+                       IFNULL(sao.status, a.status) as currentStatus,
+                       CASE WHEN sao.price IS NOT NULL THEN 1 ELSE 0 END as isOverridden
+                FROM areas a 
+                LEFT JOIN store_area_overrides sao ON a.id = sao.areaId AND sao.storeId = ?
+                WHERE a.status = '0' 
+                ORDER BY a.{$orderAreas} ASC";
+        
+        if ($stmt = $dbconnect->prepare($sql)) {
+            $stmt->bind_param("i", $storeId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $areas = $result->fetch_all(MYSQLI_ASSOC);
+            echo outputData(["areas" => $areas]);die();
+        } else {
+            echo outputError(["msg" => "Could not fetch areas."]);die();
         }
         break;
 
@@ -126,6 +150,28 @@ switch ($action) {
                 ]
             ];
             $data["paymentOptions"] = is_array($poArray) ? json_encode($poArray) : $poArray;
+        }
+
+        // Handle Area Overrides
+        if (isset($_POST["areaOverrides"]) && is_array($_POST["areaOverrides"])) {
+            foreach ($_POST["areaOverrides"] as $override) {
+                $aId = (int)$override["areaId"];
+                $aPrice = isset($override["price"]) ? (float)$override["price"] : null;
+                $aStatus = isset($override["status"]) ? (int)$override["status"] : 0;
+                
+                // Upsert logic: Delete existing and insert new
+                deleteDBNew("store_area_overrides", [$storeId, $aId], "storeId = ? AND areaId = ?");
+                
+                // Only insert if price is not default or status is disabled
+                // You can also choose to always insert for clarity
+                $insertData = [
+                    "storeId" => $storeId,
+                    "areaId" => $aId,
+                    "price" => $aPrice,
+                    "status" => $aStatus
+                ];
+                insertDB("store_area_overrides", $insertData);
+            }
         }
 
         // Handle file uploads

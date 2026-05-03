@@ -15,24 +15,47 @@ if( isset($_POST["enTitle"]) ){
 	$id = $_POST["update"];
 	unset($_POST["update"]);
 	if ( $id == 0 ){
-		if( insertDB("areas", $_POST) ){
-			header("LOCATION: ?v=Areas");
-		}else{
-		?>
-		<script>
-			alert("Could not process your request, Please try again.");
-		</script>
-		<?php
+		if ( $userType != 0 ) {
+			// If not super admin, we don't allow creating global areas here
+			// Or we handle it as a store-specific override if it's an existing area
+			echo '<script>alert("Only developers can add new global areas.");</script>';
+		} else {
+			if( insertDB("areas", $_POST) ){
+				header("LOCATION: ?v=Areas");
+			}else{
+			?>
+			<script>
+				alert("Could not process your request, Please try again.");
+			</script>
+			<?php
+			}
 		}
 	}else{
-		if( updateDB("areas", $_POST, "`id` = '{$id}'") ){
+		if ( $userType != 0 ) {
+			// Store Manager editing: Update or Insert into store_area_overrides
+			$checkOverride = selectDB("store_area_overrides", "`storeId` = '{$storeId}' AND `areaId` = '{$id}'");
+			$overrideData = array(
+				"storeId" => $storeId,
+				"areaId" => $id,
+				"price" => $_POST["charges"],
+				"status" => '0'
+			);
+			if ( $checkOverride ) {
+				updateDB("store_area_overrides", $overrideData, "`id` = '{$checkOverride[0]["id"]}'");
+			} else {
+				insertDB("store_area_overrides", $overrideData);
+			}
 			header("LOCATION: ?v=Areas");
-		}else{
-		?>
-		<script>
-			alert("Could not process your request, Please try again.");
-		</script>
-		<?php
+		} else {
+			if( updateDB("areas", $_POST, "`id` = '{$id}'") ){
+				header("LOCATION: ?v=Areas");
+			}else{
+			?>
+			<script>
+				alert("Could not process your request, Please try again.");
+			</script>
+			<?php
+			}
 		}
 	}
 }
@@ -130,14 +153,24 @@ if( isset($_POST["enTitle"]) ){
 		<tbody>
 		<?php 
 		$orderBy = direction("enTitle","arTitle");
-		if( $areas = selectDB("areas","`status` = '0' ORDER BY `{$orderBy}` ASC") ){
+		$sql = "SELECT a.*, sao.price as overridePrice, sao.status as overrideStatus 
+				FROM areas a 
+				LEFT JOIN store_area_overrides sao ON a.id = sao.areaId AND sao.storeId = '{$storeId}'
+				WHERE a.status = '0' 
+				ORDER BY a.{$orderBy} ASC";
+		$query = $dbconnect->query($sql);
+		if( $query && $query->num_rows > 0 ){
+			$areas = $query->fetch_all(MYSQLI_ASSOC);
 			for( $i = 0; $i < sizeof($areas); $i++ ){
 				$counter = $i + 1;
+				$currentAreaId = $areas[$i]["id"];
+				$displayCharge = (!is_null($areas[$i]["overridePrice"])) ? $areas[$i]["overridePrice"] : $areas[$i]["charges"];
+				$overrideClass = (!is_null($areas[$i]["overridePrice"])) ? "text-primary font-bold" : "";
 				?>
 				<tr>
 				<td id="enTitle<?php echo $areas[$i]["id"]?>" ><?php echo $areas[$i]["enTitle"] ?></td>
 				<td id="arTitle<?php echo $areas[$i]["id"]?>" ><?php echo $areas[$i]["arTitle"] ?></td>
-				<td id="charges<?php echo $areas[$i]["id"]?>" ><?php echo $areas[$i]["charges"] ?></td>
+				<td id="charges<?php echo $areas[$i]["id"]?>" class="<?php echo $overrideClass ?>"><?php echo $displayCharge ?></td>
 				<td class="text-nowrap">
 					<a id="<?php echo $areas[$i]["id"] ?>" class="mr-25 edit" data-toggle="tooltip" data-original-title="Edit"> <i class="fa fa-pencil text-inverse m-r-10"></i>
 					</a>

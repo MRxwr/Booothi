@@ -42,8 +42,26 @@ if ( $cart = selectDBNew("cart",[$getCartId["cart"]],"`cartId` = ?","") ){
 }
 
 if ( isset($_POST["address"]["place"]) && !empty($_POST["address"]["place"]) && $_POST["address"]["place"] != 3 && $_POST["address"]["place"] != 4 ){
-	if ( $_POST["address"]["country"] == "KW" && $delivery = selectDBNew("areas",[$_POST["address"]["area"]],"`id` = ?","") ){
-		$shoppingCharges = $delivery[0]["charges"];
+	if ( $_POST["address"]["country"] == "KW" ){
+		$areaId = (int)$_POST["address"]["area"];
+		$sql = "SELECT a.*, sao.price as overridePrice 
+				FROM areas a 
+				LEFT JOIN store_area_overrides sao ON a.id = sao.areaId AND sao.storeId = '{$storeId}'
+				WHERE a.id = ? 
+				LIMIT 1";
+		if ($stmt = $dbconnect->prepare($sql)) {
+			$stmt->bind_param("i", $areaId);
+			$stmt->execute();
+			$result = $stmt->get_result();
+			if ($row = $result->fetch_assoc()) {
+				$shoppingCharges = (!is_null($row["overridePrice"])) ? $row["overridePrice"] : $row["charges"];
+			} else {
+				$shoppingCharges = 0;
+			}
+			$stmt->close();
+		} else {
+			$shoppingCharges = 0;
+		}
 	}elseif( $delivery = selectDBNew("stores",[$storeCode],"`storeCode` = ?","") ){
 		if( $delivery[0]["shippingMethod"] != 0 ){
 			$PaymentAPIKey = $delivery[0]["PaymentAPIKey"];

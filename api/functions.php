@@ -9,11 +9,30 @@ require ('../includes/checksouthead.php');
 if ( isset($_POST["getAreasA"]) ){
 	if ( $_POST["getAreasA"] == "KW" ){
 		$orderAreas = direction("enTitle","arTitle");
-		if( $areas = selectDB("areas","`id` != '0' AND `status` = '0' ORDER BY `{$orderAreas}` ASC") ){
-			for( $i =0; $i < sizeof($areas); $i++ ){
-				$title = direction($areas[$i]['enTitle'],$areas[$i]['arTitle']);
-				echo "<option value='{$areas[$i]['id']}'>{$title}</option>";
+		$storeIdFilter = "";
+		// If we are in a store context (which we should be), we should filter by storeId overrides
+		// However, api/functions.php is global. We need to know which store is asking.
+		// For now, let's assume we can get $storeId from the session or a passed parameter.
+		$currentStoreId = (isset($_POST["storeId"])) ? (int)$_POST["storeId"] : 0;
+		
+		$sql = "SELECT a.*, sao.price as overridePrice, sao.status as overrideStatus 
+				FROM areas a 
+				LEFT JOIN store_area_overrides sao ON a.id = sao.areaId AND sao.storeId = ?
+				WHERE a.status = '0' 
+				AND (sao.status = '0' OR sao.status IS NULL)
+				ORDER BY a.{$orderAreas} ASC";
+		
+		if ($stmt = $dbconnect->prepare($sql)) {
+			$stmt->bind_param("i", $currentStoreId);
+			$stmt->execute();
+			$query = $stmt->get_result();
+			if ($query && $query->num_rows > 0) {
+				while ($row = $query->fetch_assoc()) {
+					$title = direction($row['enTitle'], $row['arTitle']);
+					echo "<option value='{$row['id']}'>{$title}</option>";
+				}
 			}
+			$stmt->close();
 		}
 	}else{
 		if( $countries = selectDBNew("cities",[$_POST["getAreasA"]],"`CountryCode` = ?","`CityNames` ASC") ){
