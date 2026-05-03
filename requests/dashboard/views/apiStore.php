@@ -156,10 +156,10 @@ switch ($action) {
             if ( count($_POST["areaOverrides"]) > 0 ){
                 foreach ($_POST["areaOverrides"] as $override) {
                     $aId = (isset($override["areaId"])) ? (int)$override["areaId"] : 0;
-                    $aPrice = (isset($override["price"]) && $override["price"] !== "") ? (float)$override["price"] : 0;
+                    $aPrice = (isset($override["price"]) && $override["price"] !== "") ? (float)$override["price"] : -1;
                     $aStatus = (isset($override["status"])) ? (int)$override["status"] : 0;
                     
-                    if ( $aId > 0 ){
+                    if ( $aId > 0 && $aPrice >= 0 ){
                         // Upsert logic: Delete existing and insert new
                         deleteDBNew("store_area_overrides", [$storeId, $aId], "storeId = ? AND areaId = ?");
                         
